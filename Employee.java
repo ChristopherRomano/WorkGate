@@ -94,7 +94,7 @@ public class Employee extends User {
 	 */
 	public void setPhoneNum(String phoneNum) {
 		// TODO - implement Employee.setPhoneNum
-		throw new UnsupportedOperationException();
+        this.phoneNumber = phoneNum; 
 	}
 
 	/**
