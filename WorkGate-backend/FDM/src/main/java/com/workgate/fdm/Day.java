@@ -1,8 +1,10 @@
-package java.com.workgate.fdm;
+package com.workgate.fdm;
+
+import java.util.List;
 
 public class Day {
 
-	private List<Employees> EmployeesOut;
+	private List<Employee> EmployeesOut;
 	private int Date;
 
 	/**
@@ -29,7 +31,7 @@ public class Day {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<Employees> getEmployees() {
+	public List<Employee> getEmployees() {
 		// TODO - implement Day.getEmployees
 		throw new UnsupportedOperationException();
 	}
@@ -38,7 +40,7 @@ public class Day {
 	 * 
 	 * @param employee
 	 */
-	public bool removeEmployee(Employee employee) {
+	public boolean removeEmployee(Employee employee) {
 		// TODO - implement Day.removeEmployee
 		throw new UnsupportedOperationException();
 	}

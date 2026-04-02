@@ -1,6 +1,7 @@
-package java.com.workgate.fdm;
+package com.workgate.fdm;
 
 
+import java.util.List;
 
 public class HrRep extends Poster {
 
@@ -12,7 +13,9 @@ public class HrRep extends Poster {
 	 * @param password
 	 */
 	public HrRep(String email, String password) {
-		// TODO - implement HrRep.HrRep
+        super(email, password);
+
+        // TODO - implement HrRep.HrRep
 		throw new UnsupportedOperationException();
 	}
 

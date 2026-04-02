@@ -1,4 +1,4 @@
-package java.com.workgate.fdm;
+package com.workgate.fdm;
 
 public class ExpenseRequest extends ManagerRequest {
 

@@ -1,4 +1,4 @@
-package java.com.workgate.fdm;
+package com.workgate.fdm;
 
 import java.util.List;
 
@@ -12,7 +12,8 @@ public class Manager extends Poster {
 	 * @param password
 	 */
 	public Manager(String email, String password) {
-		// TODO - implement Manager.Manager
+        super(email, password);
+        // TODO - implement Manager.Manager
 		throw new UnsupportedOperationException();
 	}
 

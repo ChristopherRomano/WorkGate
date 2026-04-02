@@ -1,8 +1,8 @@
-package java.com.workgate.fdm;
+package com.workgate.fdm;
 
 public abstract class Poster extends Employee {
 
-    public Poster(String name, String email, String password) {
+    public Poster(String email, String password) {
         super(email, password);
     }
 

@@ -1,4 +1,6 @@
-package java.com.workgate.fdm;
+package com.workgate.fdm;
+
+import java.util.List;
 
 public class Consultant extends Employee {
 
@@ -12,7 +14,8 @@ public class Consultant extends Employee {
 	 * @param password
 	 */
 	public Consultant(String email, String password) {
-		// TODO - implement Consultant.Consultant
+        super(email, password);
+        // TODO - implement Consultant.Consultant
 		throw new UnsupportedOperationException();
 	}
 
@@ -20,7 +23,7 @@ public class Consultant extends Employee {
 	 * 
 	 * @param hours
 	 */
-	public bool updateTimeSheet(int hours) {
+	public boolean updateTimeSheet(int hours) {
 		// TODO - implement Consultant.updateTimeSheet
 		throw new UnsupportedOperationException();
 	}
@@ -29,7 +32,7 @@ public class Consultant extends Employee {
 	 * 
 	 * @param skill
 	 */
-	public bool addKeySkill(String skill) {
+	public boolean addKeySkill(String skill) {
 		// TODO - implement Consultant.addKeySkill
 		throw new UnsupportedOperationException();
 	}
@@ -38,12 +41,12 @@ public class Consultant extends Employee {
 	 * 
 	 * @param skill
 	 */
-	public bool removeKeySkill(String skill) {
+	public boolean removeKeySkill(String skill) {
 		// TODO - implement Consultant.removeKeySkill
 		throw new UnsupportedOperationException();
 	}
 
-	public bool printInformation() {
+	public boolean printInformation() {
 		// TODO - implement Consultant.printInformation
 		throw new UnsupportedOperationException();
 	}

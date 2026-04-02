@@ -1,10 +1,10 @@
-package java.com.workgate.fdm;
+package com.workgate.fdm;
 
 public class EmployeeReport extends Request {
 
-	private string content;
-	private string title;
-	private bool anonymous;
+	private String content;
+	private String title;
+	private boolean anonymous;
 
 	/**
 	 * 
@@ -14,20 +14,20 @@ public class EmployeeReport extends Request {
 	 * @param title
 	 * @param privacy
 	 */
-	public EmployeeReport(Employee employee, int creationTime, String content, String title, bool privacy) {
+	public EmployeeReport(Employee employee, int creationTime, String content, String title, boolean privacy) {
 		// TODO - implement EmployeeReport.EmployeeReport
 		throw new UnsupportedOperationException();
 	}
 
-	public string getContent() {
+	public String getContent() {
 		return this.content;
 	}
 
-	public string getTitle() {
+	public String getTitle() {
 		return this.title;
 	}
 
-	public bool getAnonymous() {
+	public boolean getAnonymous() {
 		return this.anonymous;
 	}
 
