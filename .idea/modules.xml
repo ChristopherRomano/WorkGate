@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/WorkGate.iml" filepath="$PROJECT_DIR$/.idea/WorkGate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FDM/FDM.iml" filepath="$PROJECT_DIR$/FDM/FDM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WorkGate.iml" filepath="$PROJECT_DIR$/WorkGate.iml" />
     </modules>
   </component>
 </project>
