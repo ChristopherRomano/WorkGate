@@ -1,10 +1,9 @@
 package com.workgate.fdm;
 
 public enum PRIORITY {
+	LOW,
+	MEDIUM,
+	HIGH
     ;
-
-	private int low;
-	private int medium;
-	private int high;
 
 }

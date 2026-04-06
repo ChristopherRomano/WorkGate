@@ -1,12 +1,10 @@
 package com.workgate.fdm;
 
 public enum STATUS {
+	OPEN,
+	IN_PROGRESS,
+	RESOLVED,
+	REJECTED,
+	ACCEPTED,
 	;
-
-	private int open;
-	private int inProgress;
-	private int resolved;
-	private int rejected;
-	private int accepted;
-
 }
