@@ -7,10 +7,24 @@ export default function Timesheet() {
   const [rows, setRows] = useState(timesheetData.rows.map(r => ({ ...r, hours: [...r.hours] })));
   const [status, setStatus] = useState('draft');
 
+  const roundToQuarter = (val) => Math.round(val * 4) / 4;
+
   const setHour = (rIdx, dIdx, val) => {
+    const parsed = parseFloat(val);
+    if (isNaN(parsed)) {
+      setRows(prev => {
+        const next = prev.map(r => ({ ...r, hours: [...r.hours] }));
+        next[rIdx].hours[dIdx] = 0;
+        return next;
+      });
+      return;
+    }
+    const rounded = roundToQuarter(Math.max(0, parsed));
     setRows(prev => {
       const next = prev.map(r => ({ ...r, hours: [...r.hours] }));
-      next[rIdx].hours[dIdx] = parseFloat(val) || 0;
+      const currentDayTotal = next.reduce((sum, r) => sum + (r.hours[dIdx] || 0), 0);
+      const remaining = 24 - (currentDayTotal - (next[rIdx].hours[dIdx] || 0));
+      next[rIdx].hours[dIdx] = Math.min(rounded, remaining);
       return next;
     });
   };
@@ -54,9 +68,10 @@ export default function Timesheet() {
                     type="number"
                     min="0"
                     max="24"
-                    step="0.5"
+                    step="0.25"
                     value={h}
                     onChange={e => setHour(ri, di, e.target.value)}
+                    onBlur={e => setHour(ri, di, e.target.value)}
                   />
                 </div>
               ))}
