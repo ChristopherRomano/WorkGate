@@ -21,6 +21,9 @@ const NAV = [
     { to: '/app/it',           icon: '🖥', label: 'IT Support' },
     { to: '/app/hr',           icon: '📋', label: 'HR Reports' },
   ]},
+  { section: 'Posting', items: [
+    { to: '/app/posting',      icon: '�', label: 'Create Posting' },
+  ]},
 ];
 
 
