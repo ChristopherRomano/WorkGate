@@ -10,8 +10,9 @@ import Leave       from './pages/Leave';
 import Expenses    from './pages/Expenses';
 import News        from './pages/News';
 import IT          from './pages/IT';
-import HR          from './pages/HR';
-import Posting    from './pages/Posting';
+import HR             from './pages/HR';
+import Posting         from './pages/Posting';
+import LeaveApproval   from './pages/LeaveApproval';
 
 export default function App() {
   return (
@@ -29,8 +30,9 @@ export default function App() {
             <Route path="expenses"    element={<Expenses />} />
             <Route path="news"        element={<News />} />
             <Route path="it"          element={<IT />} />
-            <Route path="hr"          element={<HR />} />
-            <Route path="posting"     element={<Posting />} />
+            <Route path="hr"              element={<HR />} />
+            <Route path="posting"         element={<Posting />} />
+            <Route path="leave-approval"  element={<LeaveApproval />} />
 
           </Route>
           <Route path="*" element={<Navigate to="/login" replace />} />

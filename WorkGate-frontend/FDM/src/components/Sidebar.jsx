@@ -21,6 +21,9 @@ const NAV = [
     { to: '/app/it',           icon: '🖥', label: 'IT Support' },
     { to: '/app/hr',           icon: '📋', label: 'HR Reports' },
   ]},
+  { section: 'Management', items: [
+    { to: '/app/leave-approval', icon: '📋', label: 'Leave Approvals', roles: ['manager', 'admin'] },
+  ]},
   { section: 'Posting', items: [
     { to: '/app/posting',      icon: '�', label: 'Create Posting' },
   ]},
@@ -51,10 +54,13 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className={styles.nav}>
-        {NAV.map(({ section, items }) => (
+        {NAV.map(({ section, items }) => {
+          const visible = items.filter(item => !item.roles || item.roles.includes(currentUser.role));
+          if (visible.length === 0) return null;
+          return (
           <div key={section}>
             <div className={styles.sectionLabel}>{section}</div>
-            {items.map(({ to, icon, label, badge }) => (
+            {visible.map(({ to, icon, label, badge }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -71,7 +77,8 @@ export default function Sidebar() {
               </NavLink>
             ))}
           </div>
-        ))}
+          );
+        })}
       </nav>
 
       {/* Leave balance + Settings */}

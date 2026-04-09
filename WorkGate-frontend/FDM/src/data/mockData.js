@@ -9,6 +9,7 @@ export const currentUser = {
   emergencyPhone: '+44 7700 900456',
   tag: 'Consultant - Deployed',
   tagCode: 'CONSULTANT_DEPLOYED',
+  role: 'manager',
   manager: 'Sarah O\'Brien',
   clientCode: 'CLIENT-003',
   clientName: 'Barclays',
@@ -18,6 +19,14 @@ export const currentUser = {
   skillScore: 12,
   skills: ['Python', 'SQL', 'Excel', 'Java', 'Agile', 'Power BI'],
 };
+
+export const employeeLeaveRequests = [
+  { id: 'el1', employee: 'Marcus Reyes',  initials: 'MR', start: '20 Apr 2026', end: '24 Apr 2026', days: 5, type: 'Annual Leave',    reason: 'Family holiday to Spain.',                             status: 'pending' },
+  { id: 'el2', employee: 'Aisha Patel',   initials: 'AP', start: '28 Apr 2026', end: '28 Apr 2026', days: 1, type: 'Annual Leave',    reason: 'Personal appointment.',                                status: 'pending' },
+  { id: 'el3', employee: 'Lucy Wang',     initials: 'LW', start: '5 May 2026',  end: '9 May 2026',  days: 5, type: 'Annual Leave',    reason: 'Pre-booked holiday.',                                  status: 'pending' },
+  { id: 'el4', employee: 'Sam Kim',       initials: 'SK', start: '1 Apr 2026',  end: '2 Apr 2026',  days: 2, type: 'Sick Leave',      reason: 'Unwell, doctor appointment on 1st.',                   status: 'approved', comment: '' },
+  { id: 'el5', employee: 'Marcus Reyes',  initials: 'MR', start: '10 Mar 2026', end: '10 Mar 2026', days: 1, type: 'Annual Leave',    reason: 'Personal errand.',                                     status: 'rejected', comment: 'Client deliverable due that day — please rebook.' },
+];
 
 export const tasks = [
   { id: 't1', title: 'Complete Security Awareness Training', type: 'Onboarding', priority: 'high', due: '5 Apr 2026', done: false },

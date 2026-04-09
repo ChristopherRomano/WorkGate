@@ -11,7 +11,8 @@ const TITLES = {
   '/app/expenses':     ['Expense Claims', 'Submit and monitor expense claims'],
   '/app/news':         ['News Feed', 'Company announcements and updates'],
   '/app/it':           ['IT Support', 'Raise tickets and browse the knowledge base'],
-  '/app/hr':           ['HR Reports', 'Submit feedback and reports to HR'],
+  '/app/hr':             ['HR Reports', 'Submit feedback and reports to HR'],
+  '/app/leave-approval': ['Leave Approvals', 'Review and action employee leave requests'],
 };
 
 export default function Topbar() {
