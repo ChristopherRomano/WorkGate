@@ -11,6 +11,12 @@ export default function Leave() {
   const usedDays = currentUser.leaveTotal - currentUser.leaveBalance;
   const pct = (usedDays / currentUser.leaveTotal) * 100;
 
+  // Get today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
   const cancel = (id) => setRequests(prev => prev.filter(r => r.id !== id));
 
   const submit = () => {
@@ -93,7 +99,7 @@ export default function Leave() {
           <div className="form-grid form-grid-2">
             <div className="form-group">
               <label>Start Date</label>
-              <input className="field" type="date" value={form.start} onChange={e => setForm(f => ({ ...f, start: e.target.value }))} />
+              <input className="field" type="date" min={getTodayDate()} value={form.start} onChange={e => setForm(f => ({ ...f, start: e.target.value }))} />
             </div>
             <div className="form-group">
               <label>End Date</label>
