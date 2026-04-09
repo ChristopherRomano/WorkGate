@@ -17,12 +17,28 @@ export default function Leave() {
     return today.toISOString().split('T')[0];
   };
 
+  const formatDate = (iso) => {
+    const d = new Date(iso + 'T00:00:00');
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+
+  const calcDays = (start, end) => {
+    const ms = new Date(end + 'T00:00:00') - new Date(start + 'T00:00:00');
+    return Math.max(1, Math.round(ms / 86400000) + 1);
+  };
+
   const cancel = (id) => setRequests(prev => prev.filter(r => r.id !== id));
 
   const submit = () => {
     if (!form.start || !form.end) return;
     setRequests(prev => [
-      { id: `lr${Date.now()}`, start: form.start, end: form.end, days: 1, status: 'pending' },
+      {
+        id: `lr${Date.now()}`,
+        start: formatDate(form.start),
+        end: formatDate(form.end),
+        days: calcDays(form.start, form.end),
+        status: 'pending',
+      },
       ...prev,
     ]);
     setShowModal(false);
