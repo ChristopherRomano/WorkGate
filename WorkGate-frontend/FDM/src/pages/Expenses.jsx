@@ -57,7 +57,7 @@ export default function Expenses() {
         <div className="table-wrap">
           <table>
             <thead>
-              <tr><th></th><th>Description</th><th>Date</th><th>Project</th><th>Amount</th><th>Status</th></tr>
+              <tr><th></th><th>Description</th><th>Date</th><th>Project</th><th>Amount</th><th>Status</th><th>Action</th></tr>
             </thead>
             <tbody>
               {items.map(e => (
@@ -68,6 +68,12 @@ export default function Expenses() {
                   <td style={{ fontFamily: 'var(--mono)', fontSize: 11 }}>{e.project}</td>
                   <td><strong style={{ color: 'var(--lime)', fontFamily: 'var(--mono)' }}>{e.amount}</strong></td>
                   <td><span className={`badge badge-${e.status}`}>{e.status.toUpperCase()}</span></td>
+                  <td>
+                    {e.status === 'pending'
+                      ? <button className="btn btn-danger" onClick={() => setItems(prev => prev.filter(i => i.id !== e.id))}>Cancel</button>
+                      : <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>—</span>
+                    }
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -84,7 +90,7 @@ export default function Expenses() {
           <div className="form-grid form-grid-2">
             <div className="form-group">
               <label>Amount</label>
-              <input className="field" type="number" placeholder="0.00" step="0.01" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+              <input className="field" type="number" placeholder="0.00" step="0.01" min="0.01" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
             </div>
             <div className="form-group">
               <label>Currency</label>
@@ -115,7 +121,6 @@ export default function Expenses() {
           </div>
           <div className="modal-actions">
             <button className="btn btn-primary" onClick={submit}>Submit Claim</button>
-            <button className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
           </div>
         </div>
       </Modal>
