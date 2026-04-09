@@ -1,21 +1,14 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { tasks, leaveRequests, expenses, newsPosts } from '../data/mockData';
 import '../styles/components.css';
 import styles from './Dashboard.module.css';
 
 function TaskRow({ task }) {
-  const [done, setDone] = useState(task.done);
   return (
     <div className={styles.taskRow}>
-      <div
-        className={`${styles.check} ${done ? styles.checkDone : ''}`}
-        onClick={() => setDone(d => !d)}
-        role="checkbox"
-        aria-checked={done}
-      />
+      <div className={`${styles.check} ${task.done ? styles.checkDone : ''}`} />
       <div className={styles.taskInfo}>
-        <div className={`${styles.taskTitle} ${done ? styles.taskDone : ''}`}>{task.title}</div>
+        <div className={`${styles.taskTitle} ${task.done ? styles.taskDone : ''}`}>{task.title}</div>
         <div className={styles.taskMeta}>{task.type} · {task.due}</div>
       </div>
       <span className={`pill pill-${task.priority}`}>{task.priority.toUpperCase()}</span>

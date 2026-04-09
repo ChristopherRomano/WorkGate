@@ -20,6 +20,15 @@ export const currentUser = {
   skills: ['Python', 'SQL', 'Excel', 'Java', 'Agile', 'Power BI'],
 };
 
+export const employees = [
+  { id: 'e001', name: 'Marcus Reyes',  initials: 'MR', role: 'Consultant', client: 'HSBC',     email: 'm.reyes@fdmgroup.com' },
+  { id: 'e002', name: 'Aisha Patel',   initials: 'AP', role: 'Consultant', client: 'Barclays', email: 'a.patel@fdmgroup.com' },
+  { id: 'e003', name: 'Lucy Wang',     initials: 'LW', role: 'Consultant', client: 'Deloitte', email: 'l.wang@fdmgroup.com' },
+  { id: 'e004', name: 'Sam Kim',       initials: 'SK', role: 'Consultant', client: 'KPMG',     email: 's.kim@fdmgroup.com' },
+  { id: 'e005', name: 'Tom O\'Brien',  initials: 'TO', role: 'Consultant', client: 'NatWest',  email: 't.obrien@fdmgroup.com' },
+  { id: 'e006', name: 'Priya Sharma',  initials: 'PS', role: 'Consultant', client: 'Barclays', email: 'p.sharma@fdmgroup.com' },
+];
+
 export const employeeLeaveRequests = [
   { id: 'el1', employee: 'Marcus Reyes',  initials: 'MR', start: '20 Apr 2026', end: '24 Apr 2026', days: 5, type: 'Annual Leave',    reason: 'Family holiday to Spain.',                             status: 'pending' },
   { id: 'el2', employee: 'Aisha Patel',   initials: 'AP', start: '28 Apr 2026', end: '28 Apr 2026', days: 1, type: 'Annual Leave',    reason: 'Personal appointment.',                                status: 'pending' },

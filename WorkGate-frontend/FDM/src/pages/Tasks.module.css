@@ -1,0 +1,52 @@
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.taskCard { margin-bottom: 14px; }
+
+.taskBody { padding: 6px 20px; }
+
+.taskRow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.taskRow:last-child { border-bottom: none; }
+
+.taskInfo { flex: 1; min-width: 0; }
+
+.taskTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.taskTitle.done {
+  text-decoration: line-through;
+  color: var(--text-dim);
+}
+
+.taskMeta {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.completedBadge {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--lime);
+  background: var(--lime-dim);
+  border: 1px solid var(--lime-border);
+  padding: 3px 10px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.completeBtn { flex-shrink: 0; }

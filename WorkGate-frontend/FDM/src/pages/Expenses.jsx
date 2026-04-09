@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { expenses as initial } from '../data/mockData';
 import Modal from '../components/Modal';
 import '../styles/components.css';
+import styles from './Expenses.module.css';
 
 const ICONS = { Train: '🚂', Hotel: '🏨', Lunch: '🍽', Taxi: '🚕', Flight: '✈️', Other: '📎' };
 const getIcon = (desc) => {
@@ -30,21 +31,16 @@ export default function Expenses() {
 
   return (
     <div className="animate-fade">
-      {/* Summary */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 20 }}>
+      <div className={styles.statsGrid}>
         {[
           { icon: '⏳', val: pending.length, label: 'Pending claims' },
           { icon: '💰', val: `£${pendingTotal.toFixed(2)}`, label: 'Pending total', highlight: true },
           { icon: '✅', val: items.filter(e => e.status === 'approved').length, label: 'Paid claims' },
         ].map(({ icon, val, label, highlight }) => (
-          <div key={label} style={{
-            background: 'var(--surface)', border: `1px solid ${highlight ? 'var(--border-bright)' : 'var(--border)'}`,
-            borderRadius: 'var(--radius)', padding: '18px 20px',
-            boxShadow: highlight ? '0 0 22px var(--lime-glow)' : 'none',
-          }}>
-            <div style={{ fontSize: 20, marginBottom: 8 }}>{icon}</div>
-            <div style={{ fontFamily: 'var(--mono)', fontSize: 26, fontWeight: 700, color: 'var(--lime)', lineHeight: 1 }}>{val}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>{label}</div>
+          <div key={label} className={`${styles.statCard} ${highlight ? styles.highlight : ''}`}>
+            <div className={styles.statIcon}>{icon}</div>
+            <div className={styles.statVal}>{val}</div>
+            <div className={styles.statLabel}>{label}</div>
           </div>
         ))}
       </div>
@@ -62,11 +58,11 @@ export default function Expenses() {
             <tbody>
               {items.map(e => (
                 <tr key={e.id}>
-                  <td style={{ fontSize: 20, width: 40 }}>{getIcon(e.description)}</td>
+                  <td className={styles.iconCell}>{getIcon(e.description)}</td>
                   <td><strong>{e.description}</strong></td>
                   <td>{e.date}</td>
-                  <td style={{ fontFamily: 'var(--mono)', fontSize: 11 }}>{e.project}</td>
-                  <td><strong style={{ color: 'var(--lime)', fontFamily: 'var(--mono)' }}>{e.amount}</strong></td>
+                  <td className={styles.projectCell}>{e.project}</td>
+                  <td><strong className={styles.amountCell}>{e.amount}</strong></td>
                   <td><span className={`badge badge-${e.status}`}>{e.status.toUpperCase()}</span></td>
                   <td>
                     {e.status === 'pending'
