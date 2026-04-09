@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { employeeLeaveRequests } from '../data/mockData';
 import Modal from '../components/Modal';
 import '../styles/components.css';
+import styles from './LeaveApproval.module.css';
 
 export default function LeaveApproval() {
   const [requests, setRequests] = useState(employeeLeaveRequests);
@@ -9,14 +10,10 @@ export default function LeaveApproval() {
   const [rejectTarget, setRejectTarget] = useState(null);
   const [rejectComment, setRejectComment] = useState('');
 
-  const approve = (id) => {
+  const approve = (id) =>
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved', comment: '' } : r));
-  };
 
-  const openReject = (request) => {
-    setRejectTarget(request);
-    setRejectComment('');
-  };
+  const openReject = (request) => { setRejectTarget(request); setRejectComment(''); };
 
   const confirmReject = () => {
     if (!rejectComment.trim()) return;
@@ -30,8 +27,7 @@ export default function LeaveApproval() {
 
   return (
     <div className="animate-fade">
-      {/* Filter tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+      <div className={styles.filters}>
         {[['pending', `Pending${pendingCount ? ` (${pendingCount})` : ''}`], ['approved', 'Approved'], ['rejected', 'Rejected'], ['all', 'All']].map(([val, label]) => (
           <button key={val} className={`btn ${filter === val ? 'btn-primary' : 'btn-ghost'} btn-sm`} onClick={() => setFilter(val)}>{label}</button>
         ))}
@@ -41,36 +37,25 @@ export default function LeaveApproval() {
         <div className="card-header">
           <span className="card-title">Employee Leave Requests</span>
         </div>
-        <div style={{ padding: '8px 20px' }}>
-          {filtered.length === 0 && (
-            <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text-dim)', fontSize: 13 }}>No requests found.</div>
-          )}
+        <div className={styles.listBody}>
+          {filtered.length === 0 && <div className={styles.empty}>No requests found.</div>}
           {filtered.map(req => (
-            <div key={req.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 0', borderBottom: '1px solid var(--border)' }}>
-              {/* Avatar */}
-              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--surface-3)', border: '1px solid var(--border-bright)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, fontFamily: 'var(--mono)', color: 'var(--lime)', flexShrink: 0 }}>
-                {req.initials}
-              </div>
-
-              {/* Info */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{req.employee}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>
-                  {req.type} · {req.start}{req.start !== req.end ? ` – ${req.end}` : ''} · <strong style={{ color: 'var(--text)' }}>{req.days} day{req.days !== 1 ? 's' : ''}</strong>
+            <div key={req.id} className={styles.requestRow}>
+              <div className={styles.avatar}>{req.initials}</div>
+              <div className={styles.info}>
+                <div className={styles.employeeName}>{req.employee}</div>
+                <div className={styles.meta}>
+                  {req.type} · {req.start}{req.start !== req.end ? ` – ${req.end}` : ''} · <strong className={styles.metaStrong}>{req.days} day{req.days !== 1 ? 's' : ''}</strong>
                 </div>
-                {req.reason && (
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3, fontStyle: 'italic' }}>"{req.reason}"</div>
-                )}
+                {req.reason && <div className={styles.reason}>"{req.reason}"</div>}
                 {req.status === 'rejected' && req.comment && (
-                  <div style={{ fontSize: 11, color: 'var(--amber, #f59e0b)', marginTop: 4, fontFamily: 'var(--mono)' }}>Reason: {req.comment}</div>
+                  <div className={styles.rejectReason}>Reason: {req.comment}</div>
                 )}
               </div>
-
-              {/* Status / Actions */}
               {req.status === 'pending' ? (
-                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                <div className={styles.actions}>
                   <button className="btn btn-primary btn-sm" onClick={() => approve(req.id)}>Approve</button>
-                  <button className="btn btn-ghost btn-sm" style={{ color: 'var(--red, #f87171)' }} onClick={() => openReject(req)}>Reject</button>
+                  <button className={`btn btn-ghost btn-sm ${styles.rejectBtn}`} onClick={() => openReject(req)}>Reject</button>
                 </div>
               ) : (
                 <span className={`badge badge-${req.status === 'approved' ? 'approved' : 'rejected'}`}>
@@ -82,17 +67,18 @@ export default function LeaveApproval() {
         </div>
       </div>
 
-      {/* Reject Modal */}
       <Modal isOpen={!!rejectTarget} onClose={() => setRejectTarget(null)} title="Reject Leave Request">
         <div className="form-grid">
           {rejectTarget && (
-            <div style={{ background: 'var(--surface-3)', border: '1px solid var(--border)', borderRadius: 8, padding: '12px 16px', fontSize: 13 }}>
+            <div className={styles.rejectSummary}>
               <strong>{rejectTarget.employee}</strong> — {rejectTarget.type}<br />
-              <span style={{ color: 'var(--text-dim)' }}>{rejectTarget.start}{rejectTarget.start !== rejectTarget.end ? ` – ${rejectTarget.end}` : ''} · {rejectTarget.days} day{rejectTarget.days !== 1 ? 's' : ''}</span>
+              <span className={styles.rejectSummaryMeta}>
+                {rejectTarget.start}{rejectTarget.start !== rejectTarget.end ? ` – ${rejectTarget.end}` : ''} · {rejectTarget.days} day{rejectTarget.days !== 1 ? 's' : ''}
+              </span>
             </div>
           )}
           <div className="form-group">
-            <label>Reason for Rejection <span style={{ color: 'var(--red, #f87171)' }}>*</span></label>
+            <label>Reason for Rejection <span className={styles.requiredStar}>*</span></label>
             <textarea
               className="field"
               style={{ minHeight: 90 }}
@@ -102,7 +88,7 @@ export default function LeaveApproval() {
             />
           </div>
           <div className="modal-actions">
-            <button className="btn btn-primary" onClick={confirmReject} disabled={!rejectComment.trim()} style={{ background: 'var(--red, #f87171)', borderColor: 'var(--red, #f87171)' }}>Confirm Rejection</button>
+            <button className={`btn btn-primary ${styles.confirmRejectBtn}`} onClick={confirmReject} disabled={!rejectComment.trim()}>Confirm Rejection</button>
             <button className="btn btn-ghost" onClick={() => setRejectTarget(null)}>Cancel</button>
           </div>
         </div>

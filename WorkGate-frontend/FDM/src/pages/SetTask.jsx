@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { employees } from '../data/mockData';
 import '../styles/components.css';
+import styles from './SetTask.module.css';
 
 const EMPTY_FORM = { title: '', priority: 'medium', type: 'Operational', due: '', description: '' };
 
@@ -15,10 +16,7 @@ export default function SetTask() {
     ? employees.filter(e => e.name.toLowerCase().includes(search.toLowerCase()))
     : [];
 
-  const selectEmployee = (emp) => {
-    setSelected(emp);
-    setSearch('');
-  };
+  const selectEmployee = (emp) => { setSelected(emp); setSearch(''); };
 
   const field = (key) => ({
     value: form[key],
@@ -29,7 +27,7 @@ export default function SetTask() {
 
   const submit = () => {
     if (!canSubmit) return;
-    const newTask = {
+    setAssigned(prev => [{
       id: `t-mgr-${Date.now()}`,
       employee: selected,
       title: form.title.trim(),
@@ -37,9 +35,7 @@ export default function SetTask() {
       priority: form.priority,
       type: form.type,
       due: form.due,
-      assignedAt: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
-    };
-    setAssigned(prev => [newTask, ...prev]);
+    }, ...prev]);
     setForm(EMPTY_FORM);
     setSelected(null);
     setShowSuccess(true);
@@ -48,73 +44,53 @@ export default function SetTask() {
 
   return (
     <div className="animate-fade">
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+      <div className={styles.layout}>
 
         {/* Left — assign form */}
         <div className="card">
           <div className="card-header"><span className="card-title">Assign Task</span></div>
-          <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '24px' }}>
+          <div className={styles.formBody}>
 
-            {/* Employee search */}
-            <div className="form-group" style={{ position: 'relative' }}>
+            <div className={`form-group ${styles.employeeSearch}`}>
               <label>Employee</label>
               {selected ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--surface-3)', border: '1px solid var(--lime-border)', borderRadius: 8 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--lime-dim)', border: '1px solid var(--lime-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, fontFamily: 'var(--mono)', color: 'var(--lime)', flexShrink: 0 }}>
-                    {selected.initials}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{selected.name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>{selected.role} · {selected.client}</div>
+                <div className={styles.selectedEmployee}>
+                  <div className={styles.selectedAvatar}>{selected.initials}</div>
+                  <div className={styles.selectedInfo}>
+                    <div className={styles.selectedName}>{selected.name}</div>
+                    <div className={styles.selectedMeta}>{selected.role} · {selected.client}</div>
                   </div>
                   <button className="btn btn-ghost btn-sm" onClick={() => setSelected(null)}>Change</button>
                 </div>
               ) : (
                 <>
-                  <input
-                    className="field"
-                    placeholder="Search by name..."
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    autoComplete="off"
-                  />
+                  <input className="field" placeholder="Search by name..." value={search} onChange={e => setSearch(e.target.value)} autoComplete="off" />
                   {filtered.length > 0 && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--surface-2)', border: '1px solid var(--border-bright)', borderRadius: 8, zIndex: 10, overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.3)', marginTop: 4 }}>
+                    <div className={styles.dropdown}>
                       {filtered.map(emp => (
-                        <div
-                          key={emp.id}
-                          onClick={() => selectEmployee(emp)}
-                          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid var(--border)', transition: 'background 0.1s' }}
-                          onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-3)'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                        >
-                          <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'var(--surface-3)', border: '1px solid var(--border-bright)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, fontFamily: 'var(--mono)', color: 'var(--lime)', flexShrink: 0 }}>
-                            {emp.initials}
-                          </div>
+                        <div key={emp.id} className={styles.dropdownItem} onClick={() => selectEmployee(emp)}>
+                          <div className={styles.dropdownAvatar}>{emp.initials}</div>
                           <div>
-                            <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>{emp.name}</div>
-                            <div style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>{emp.role} · {emp.client}</div>
+                            <div className={styles.dropdownName}>{emp.name}</div>
+                            <div className={styles.dropdownMeta}>{emp.role} · {emp.client}</div>
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
                   {search.trim() && filtered.length === 0 && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--surface-2)', border: '1px solid var(--border-bright)', borderRadius: 8, zIndex: 10, padding: '12px 16px', marginTop: 4, fontSize: 13, color: 'var(--text-dim)' }}>
-                      No employees found.
-                    </div>
+                    <div className={styles.noResults}>No employees found.</div>
                   )}
                 </>
               )}
             </div>
 
-            {/* Task fields */}
             <div className="form-group">
               <label>Task Title</label>
               <input className="field" placeholder="e.g. Complete onboarding checklist" {...field('title')} />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className={styles.twoCol}>
               <div className="form-group">
                 <label>Priority</label>
                 <select className="field" {...field('priority')}>
@@ -143,13 +119,9 @@ export default function SetTask() {
               <textarea className="field" style={{ minHeight: 130 }} placeholder="Describe the task in detail..." {...field('description')} />
             </div>
 
-            {showSuccess && (
-              <div style={{ fontSize: 13, color: 'var(--lime)', background: 'var(--lime-dim)', border: '1px solid var(--lime-border)', borderRadius: 8, padding: '10px 14px', marginBottom: 4 }}>
-                Task assigned successfully.
-              </div>
-            )}
+            {showSuccess && <div className={styles.successBanner}>Task assigned successfully.</div>}
 
-            <button className="btn btn-primary" style={{ width: '100%' }} onClick={submit} disabled={!canSubmit}>
+            <button className={`btn btn-primary ${styles.assignBtn}`} onClick={submit} disabled={!canSubmit}>
               Assign Task
             </button>
           </div>
@@ -158,20 +130,16 @@ export default function SetTask() {
         {/* Right — recently assigned */}
         <div className="card" style={{ alignSelf: 'start' }}>
           <div className="card-header"><span className="card-title">Recently Assigned</span></div>
-          <div style={{ padding: '8px 24px' }}>
-            {assigned.length === 0 && (
-              <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text-dim)', fontSize: 13 }}>No tasks assigned yet this session.</div>
-            )}
+          <div className={styles.recentBody}>
+            {assigned.length === 0 && <div className={styles.recentEmpty}>No tasks assigned yet this session.</div>}
             {assigned.map(t => (
-              <div key={t.id} style={{ padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', flex: 1 }}>{t.title}</span>
+              <div key={t.id} className={styles.recentItem}>
+                <div className={styles.recentHeader}>
+                  <span className={styles.recentTitle}>{t.title}</span>
                   <span className={`pill pill-${t.priority}`}>{t.priority.toUpperCase()}</span>
                 </div>
-                <div style={{ fontSize: 12, color: 'var(--text-dim)', fontFamily: 'var(--mono)', marginBottom: 4 }}>
-                  → {t.employee.name} · {t.type} · Due {t.due}
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t.description}</div>
+                <div className={styles.recentMeta}>→ {t.employee.name} · {t.type} · Due {t.due}</div>
+                <div className={styles.recentDesc}>{t.description}</div>
               </div>
             ))}
           </div>

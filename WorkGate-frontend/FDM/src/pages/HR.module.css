@@ -1,0 +1,104 @@
+.reportBody { padding: 4px 20px; }
+
+.reportItem {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.reportItem:last-child { border-bottom: none; }
+
+.reportTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.reportExcerpt {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.reportFooter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+
+.anonBadge {
+  padding: 1px 7px;
+  border-radius: 3px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  font-size: 9px;
+}
+
+.empty {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.confidentialCard {
+  margin-top: 16px;
+  padding: 18px 20px;
+}
+
+.confidentialInner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.confidentialIcon { font-size: 28px; }
+
+.confidentialTitle {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+
+.confidentialBody {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.anonCheckRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.anonCheckbox {
+  width: auto;
+  margin-top: 2px;
+  accent-color: var(--lime);
+}
+
+.anonLabel {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.anonLabelTitle {
+  color: var(--text);
+  display: block;
+  font-weight: 600;
+  margin-bottom: 2px;
+}

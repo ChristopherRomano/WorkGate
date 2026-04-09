@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { leaveRequests as initial, currentUser } from '../data/mockData';
 import Modal from '../components/Modal';
 import '../styles/components.css';
+import styles from './Leave.module.css';
 
 export default function Leave() {
   const [requests, setRequests] = useState(initial);
@@ -11,16 +12,10 @@ export default function Leave() {
   const usedDays = currentUser.leaveTotal - currentUser.leaveBalance;
   const pct = (usedDays / currentUser.leaveTotal) * 100;
 
-  // Get today's date in YYYY-MM-DD format
-  const getTodayDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  };
+  const getTodayDate = () => new Date().toISOString().split('T')[0];
 
-  const formatDate = (iso) => {
-    const d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  };
+  const formatDate = (iso) =>
+    new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
   const calcDays = (start, end) => {
     const ms = new Date(end + 'T00:00:00') - new Date(start + 'T00:00:00');
@@ -47,39 +42,32 @@ export default function Leave() {
 
   return (
     <div className="animate-fade">
-      {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 20 }}>
+      <div className={styles.statsGrid}>
         {[
           { icon: '✅', val: usedDays, label: 'Days used' },
           { icon: '📅', val: currentUser.leaveBalance, label: 'Days remaining', highlight: true },
           { icon: '⏳', val: requests.filter(r => r.status === 'pending').length, label: 'Pending requests' },
         ].map(({ icon, val, label, highlight }) => (
-          <div key={label} style={{
-            background: 'var(--surface)', border: `1px solid ${highlight ? 'var(--border-bright)' : 'var(--border)'}`,
-            borderRadius: 'var(--radius)', padding: '18px 20px',
-            boxShadow: highlight ? '0 0 22px var(--lime-glow)' : 'none',
-          }}>
-            <div style={{ fontSize: 20, marginBottom: 8 }}>{icon}</div>
-            <div style={{ fontFamily: 'var(--mono)', fontSize: 28, fontWeight: 700, color: 'var(--lime)', lineHeight: 1 }}>{val}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>{label}</div>
+          <div key={label} className={`${styles.statCard} ${highlight ? styles.highlight : ''}`}>
+            <div className={styles.statIcon}>{icon}</div>
+            <div className={styles.statVal}>{val}</div>
+            <div className={styles.statLabel}>{label}</div>
           </div>
         ))}
       </div>
 
-      {/* Balance bar */}
-      <div className="card" style={{ marginBottom: 18 }}>
+      <div className={`card ${styles.balanceCard}`}>
         <div className="card-body">
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 12, color: 'var(--text-muted)' }}>
+          <div className={styles.balanceRow}>
             <span>Leave used this year</span>
-            <span style={{ fontFamily: 'var(--mono)', color: 'var(--lime)' }}>{usedDays} / {currentUser.leaveTotal} days</span>
+            <span className={styles.balanceCount}>{usedDays} / {currentUser.leaveTotal} days</span>
           </div>
-          <div style={{ height: 6, background: 'var(--surface-3)', borderRadius: 3, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${pct}%`, background: 'var(--lime)', borderRadius: 3, transition: 'width 1s ease' }} />
+          <div className={styles.barTrack}>
+            <div className={styles.barFill} style={{ width: `${pct}%` }} />
           </div>
         </div>
       </div>
 
-      {/* History table */}
       <div className="card">
         <div className="card-header">
           <span className="card-title">Leave History</span>
@@ -100,7 +88,7 @@ export default function Leave() {
                   <td>
                     {r.status === 'pending'
                       ? <button className="btn btn-danger" onClick={() => cancel(r.id)}>Cancel</button>
-                      : <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>—</span>
+                      : <span className={styles.emptyCell}>—</span>
                     }
                   </td>
                 </tr>
@@ -123,8 +111,8 @@ export default function Leave() {
             </div>
           </div>
           {form.start && form.end && (
-            <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: 'var(--text-muted)' }}>
-              📅 <strong style={{ color: 'var(--lime)' }}>{currentUser.leaveBalance} days</strong> remaining after approval
+            <div className={styles.dateHint}>
+              📅 <strong className={styles.dateHintVal}>{currentUser.leaveBalance} days</strong> remaining after approval
             </div>
           )}
           <div className="form-group">
