@@ -23,6 +23,7 @@ const NAV = [
   ]},
   { section: 'Management', items: [
     { to: '/app/leave-approval', icon: '📋', label: 'Leave Approvals', roles: ['manager', 'admin'] },
+    { to: '/app/set-task',       icon: '✎',  label: 'Set Task',        roles: ['manager', 'admin'] },
   ]},
   { section: 'Posting', items: [
     { to: '/app/posting',      icon: '�', label: 'Create Posting' },

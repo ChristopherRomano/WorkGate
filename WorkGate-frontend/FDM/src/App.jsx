@@ -13,6 +13,7 @@ import IT          from './pages/IT';
 import HR             from './pages/HR';
 import Posting         from './pages/Posting';
 import LeaveApproval   from './pages/LeaveApproval';
+import SetTask         from './pages/SetTask';
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="hr"              element={<HR />} />
             <Route path="posting"         element={<Posting />} />
             <Route path="leave-approval"  element={<LeaveApproval />} />
+            <Route path="set-task"        element={<SetTask />} />
 
           </Route>
           <Route path="*" element={<Navigate to="/login" replace />} />

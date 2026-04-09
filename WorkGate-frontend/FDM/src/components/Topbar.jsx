@@ -13,6 +13,7 @@ const TITLES = {
   '/app/it':           ['IT Support', 'Raise tickets and browse the knowledge base'],
   '/app/hr':             ['HR Reports', 'Submit feedback and reports to HR'],
   '/app/leave-approval': ['Leave Approvals', 'Review and action employee leave requests'],
+  '/app/set-task':       ['Set Task', 'Assign tasks to employees on your team'],
 };
 
 export default function Topbar() {
