@@ -34,7 +34,7 @@ export default function Dashboard() {
         <div className="card">
           <div className="card-header">
             <span className="card-title">My Tasks</span>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/tasks')}>View all</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/app/tasks')}>View all</button>
           </div>
           <div className="card-body" style={{ padding: '8px 20px' }}>
             {tasks.slice(0, 4).map(t => <TaskRow key={t.id} task={t} />)}
@@ -45,7 +45,7 @@ export default function Dashboard() {
         <div className="card">
           <div className="card-header">
             <span className="card-title">News Feed</span>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/news')}>View all</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/app/news')}>View all</button>
           </div>
           <div className="card-body" style={{ padding: '4px 20px' }}>
             {newsPosts.slice(0, 2).map(p => (
@@ -89,7 +89,7 @@ export default function Dashboard() {
         <div className="card">
           <div className="card-header">
             <span className="card-title">Leave Requests</span>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/leave')}>View all</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/app/leave')}>View all</button>
           </div>
           <div className="card-body">
             <div className="table-wrap">

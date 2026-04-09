@@ -5,21 +5,21 @@ import styles from './Sidebar.module.css';
 
 const NAV = [
   { section: 'Overview', items: [
-    { to: '/',            icon: '◈', label: 'Dashboard' },
-    { to: '/profile',     icon: '◉', label: 'My Profile' },
+    { to: '/app',              icon: '◈', label: 'Dashboard' },
+    { to: '/app/profile',      icon: '◉', label: 'My Profile' },
   ]},
   { section: 'Work', items: [
-    { to: '/timesheet',   icon: '⏱', label: 'Timesheet' },
-    { to: '/tasks',       icon: '✓', label: 'Tasks',      badge: 3 },
-    { to: '/leave',       icon: '📅', label: 'Leave' },
-    { to: '/expenses',    icon: '£', label: 'Expenses' },
+    { to: '/app/timesheet',    icon: '⏱', label: 'Timesheet' },
+    { to: '/app/tasks',        icon: '✓', label: 'Tasks',      badge: 3 },
+    { to: '/app/leave',        icon: '📅', label: 'Leave' },
+    { to: '/app/expenses',     icon: '£', label: 'Expenses' },
   ]},
   { section: 'Company', items: [
-    { to: '/news',        icon: '📢', label: 'News Feed',  badge: 2 },
+    { to: '/app/news',         icon: '📢', label: 'News Feed',  badge: 2 },
   ]},
   { section: 'Support', items: [
-    { to: '/it',          icon: '🖥', label: 'IT Support' },
-    { to: '/hr',          icon: '📋', label: 'HR Reports' },
+    { to: '/app/it',           icon: '🖥', label: 'IT Support' },
+    { to: '/app/hr',           icon: '📋', label: 'HR Reports' },
   ]},
 ];
 
@@ -57,7 +57,7 @@ export default function Sidebar() {
               <NavLink
                 key={to}
                 to={to}
-                end={to === '/'}
+                end={to === '/app'}
                 className={({ isActive }) =>
                   `${styles.navItem} ${isActive ? styles.active : ''}`
                 }
