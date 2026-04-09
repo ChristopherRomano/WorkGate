@@ -28,7 +28,6 @@ export default function Profile() {
           </div>
         </div>
         <div className={styles.profileActions}>
-          <button className="btn btn-ghost" onClick={() => setShowEdit(true)}>✏ Edit Profile</button>
           <button className="btn btn-primary">↓ Download FDM Profile</button>
         </div>
       </div>

@@ -8,7 +8,6 @@ import Tasks       from './pages/Tasks';
 import Leave       from './pages/Leave';
 import Expenses    from './pages/Expenses';
 import News        from './pages/News';
-import Leaderboard from './pages/Leaderboard';
 import IT          from './pages/IT';
 import HR          from './pages/HR';
 
@@ -25,7 +24,6 @@ export default function App() {
           <Route path="leave"       element={<Leave />} />
           <Route path="expenses"    element={<Expenses />} />
           <Route path="news"        element={<News />} />
-          <Route path="leaderboard" element={<Leaderboard />} />
           <Route path="it"          element={<IT />} />
           <Route path="hr"          element={<HR />} />
         </Route>

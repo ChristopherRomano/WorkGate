@@ -16,7 +16,6 @@ const NAV = [
   ]},
   { section: 'Company', items: [
     { to: '/news',        icon: '📢', label: 'News Feed',  badge: 2 },
-    { to: '/leaderboard', icon: '🏆', label: 'Leaderboard' },
   ]},
   { section: 'Support', items: [
     { to: '/it',          icon: '🖥', label: 'IT Support' },

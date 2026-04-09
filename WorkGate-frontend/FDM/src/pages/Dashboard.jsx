@@ -1,19 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { currentUser, tasks, leaveRequests, expenses, newsPosts } from '../data/mockData';
+import { tasks, leaveRequests, expenses, newsPosts } from '../data/mockData';
 import '../styles/components.css';
 import styles from './Dashboard.module.css';
-
-function StatCard({ icon, value, label, delta, deltaType, highlight }) {
-  return (
-    <div className={`${styles.statCard} ${highlight ? styles.highlight : ''}`}>
-      <div className={styles.statIcon}>{icon}</div>
-      <div className={styles.statNum}>{value}</div>
-      <div className={styles.statLabel}>{label}</div>
-      {delta && <div className={`${styles.statDelta} ${styles[deltaType]}`}>{delta}</div>}
-    </div>
-  );
-}
 
 function TaskRow({ task }) {
   const [done, setDone] = useState(task.done);
@@ -40,14 +29,6 @@ export default function Dashboard() {
 
   return (
     <div className="animate-fade">
-      {/* Stats */}
-      <div className={styles.statsGrid}>
-        <StatCard icon="⏱" value="38.5" label="Hours this week" delta="↑ 2.5h vs last week" deltaType="up" highlight />
-        <StatCard icon="✓" value={pendingTasks} label="Tasks pending" delta="3 due this week" deltaType="warn" />
-        <StatCard icon="📅" value={currentUser.leaveBalance} label="Leave days remaining" delta={`of ${currentUser.leaveTotal} total`} />
-        <StatCard icon="🎯" value={currentUser.skillScore} label="Skill score" delta="↑ 3 this month" deltaType="up" />
-      </div>
-
       <div className={styles.twoCol}>
         {/* Tasks */}
         <div className="card">
