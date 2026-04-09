@@ -13,6 +13,35 @@ export default function Leave() {
 
   const cancel = (id) => setRequests(prev => prev.filter(r => r.id !== id));
 
+  const createTicket = async (start,end,notes) => {
+
+        const ticket = {
+          username: "john",
+          creationTime: (new Date()).getTime(),
+          startOfLeave:  new Date(start).getTime(),
+          endOfLeave : new Date(end).getTime(),
+          reason : notes,
+        };
+
+        try {
+          const response = await fetch("http://localhost:8080/api/createAnnualLeave", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(ticket)
+          });
+          console.log(JSON.stringify(ticket))
+          if (!response.ok) {
+            throw new Error("Failed to create ticket");
+          }
+
+          console.log("Ticket created!");
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
   const submit = () => {
     if (!form.start || !form.end) return;
     setRequests(prev => [
@@ -20,6 +49,9 @@ export default function Leave() {
       ...prev,
     ]);
     setShowModal(false);
+
+    createTicket(form.start,form.end,form.notes);
+
     setForm({ start: '', end: '', notes: '' });
   };
 

@@ -11,27 +11,13 @@ public class PostRequest {
 	private Poster author;
 	private int timePosted;
 
-    public String getTitle() {
-        return title;
-    }
+    public PostRequest(){}
 
-    public String getContent() {
-        return content;
-    }
+    public String getTitle() { return title; }
+    public String getContent() { return content; }
+    public Poster getAuthor() { return author; }
 
-    public Poster getAuthor() {
-        return author;
-    }
-
-    public int getTimePosted() {
-        return timePosted;
-    }
-
-    public VISIBILITY getVisibility() {
-        return visibility;
-    }
-    
-    public boolean getPinned(){
-        return pinned;
-    }
+    public int getTimePosted() { return timePosted; }
+    public VISIBILITY getVisibility() { return visibility; }
+    public boolean getPinned(){ return pinned; }
 }

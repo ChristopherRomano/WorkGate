@@ -17,7 +17,8 @@ public class ExpenseRequestController {
         return List.of();
     }
     @PostMapping("/createExpense")
-    public void createExpenseRequest(@RequestParam ExpenseRequestRequest request){
+    public void createExpenseRequest(@RequestBody ExpenseRequestRequest request){
+        System.out.println(request);
     }
     
 }

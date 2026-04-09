@@ -16,7 +16,8 @@ public class PostController {
     }
 
     @PostMapping("/createPost")
-    public void createPost(@RequestParam PostRequest request){
+    public void createPost(@RequestBody PostRequest request){
+        System.out.println(request);
     }
 
 }

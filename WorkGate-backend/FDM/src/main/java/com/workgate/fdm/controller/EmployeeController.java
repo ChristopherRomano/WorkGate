@@ -19,12 +19,14 @@ public class EmployeeController{
     }
 
     @PostMapping("/employeeUpdate")
-    public void updateEmployeeInfo(@RequestParam UpdateInfoRequest info){
+    public void updateEmployeeInfo(@RequestBody UpdateInfoRequest info){
+        System.out.println(info);
 
     }
 
     @PostMapping("/create")
-    public void updateCreate(@RequestParam LoginRequest info){
-        
+    public void createEmployee(@RequestBody LoginRequest info){
+        System.out.println(info);
     }
+
 }

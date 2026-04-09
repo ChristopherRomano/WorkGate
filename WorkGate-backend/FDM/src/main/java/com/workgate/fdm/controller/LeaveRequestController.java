@@ -18,7 +18,7 @@ public class LeaveRequestController {
     }
 
     @PostMapping("/createAnnualLeave")
-    public void createExpenseRequest(@RequestParam ExpenseRequestRequest request){
-        
+    public void createExpenseRequest(@RequestBody ExpenseRequestRequest request){
+        System.out.println(request);
     }
 }

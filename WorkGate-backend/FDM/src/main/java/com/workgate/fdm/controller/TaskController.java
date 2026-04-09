@@ -7,7 +7,7 @@ import com.workgate.fdm.model.PRIORITY;
 import com.workgate.fdm.model.Task;
 
 import java.util.List;
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api")
 public class TaskController {
@@ -17,6 +17,7 @@ public class TaskController {
     }
     @PostMapping("/newTask")
     public boolean newTask (@RequestBody TaskRequest taskRequest){
+        System.out.println(taskRequest);
         return true;
     }
 }
