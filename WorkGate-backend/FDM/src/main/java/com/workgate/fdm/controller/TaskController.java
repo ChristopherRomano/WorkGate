@@ -12,10 +12,10 @@ import java.util.List;
 @RequestMapping("/api")
 public class TaskController {
     @GetMapping("/tasks")
-    public List<Task> getTasks (){
+    public List<Task> getTasks (@RequestParam String username){
         return List.of(new Task(0, false, "", "", PRIORITY.LOW));
     }
-    @GetMapping("/newTask")
+    @PostMapping("/newTask")
     public boolean newTask (@RequestBody TaskRequest taskRequest){
         return true;
     }

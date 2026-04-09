@@ -5,11 +5,15 @@ E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\controller\Leave
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\controller\PostController.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\controller\TaskController.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\EmployeeReportRequest.java
+E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\EmployeeRequest.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\ExpenseRequestRequest.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\ItTicketRequest.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\LeaveRequestRequest.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\LoginRequest.java
+E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\ManagerRequest.java
+E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\PostRequest.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\TaskRequest.java
+E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\UpdateInfoRequest.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\Administrator.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\AnnualLeaveFactory.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\AnnualLeaveRequest.java

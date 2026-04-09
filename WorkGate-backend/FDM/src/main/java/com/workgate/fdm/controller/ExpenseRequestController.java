@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
+import com.workgate.fdm.DTO.ExpenseRequestRequest;
 import com.workgate.fdm.model.ExpenseRequest;
 
 @RestController
@@ -15,6 +16,8 @@ public class ExpenseRequestController {
     public List<ExpenseRequest> getExpenseRequests(@RequestParam String Username){
         return List.of();
     }
-
+    @PostMapping("/createExpense")
+    public void createExpenseRequest(@RequestParam ExpenseRequestRequest request){
+    }
     
 }
