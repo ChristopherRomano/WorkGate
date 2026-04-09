@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout';
+import Login       from './pages/Login';
 import Dashboard   from './pages/Dashboard';
 import Profile     from './pages/Profile';
 import Timesheet   from './pages/Timesheet';
@@ -14,21 +15,24 @@ import HR          from './pages/HR';
 export default function App() {
   return (
     <ThemeProvider>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index        element={<Dashboard />} />
-          <Route path="profile"     element={<Profile />} />
-          <Route path="timesheet"   element={<Timesheet />} />
-          <Route path="tasks"       element={<Tasks />} />
-          <Route path="leave"       element={<Leave />} />
-          <Route path="expenses"    element={<Expenses />} />
-          <Route path="news"        element={<News />} />
-          <Route path="it"          element={<IT />} />
-          <Route path="hr"          element={<HR />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/app" element={<Layout />}>
+            <Route index        element={<Dashboard />} />
+            <Route path="profile"     element={<Profile />} />
+            <Route path="timesheet"   element={<Timesheet />} />
+            <Route path="tasks"       element={<Tasks />} />
+            <Route path="leave"       element={<Leave />} />
+            <Route path="expenses"    element={<Expenses />} />
+            <Route path="news"        element={<News />} />
+            <Route path="it"          element={<IT />} />
+            <Route path="hr"          element={<HR />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }
