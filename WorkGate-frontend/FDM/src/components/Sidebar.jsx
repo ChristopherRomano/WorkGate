@@ -23,8 +23,6 @@ const NAV = [
   ]},
 ];
 
-const usedDays = currentUser.leaveTotal - currentUser.leaveBalance;
-const pct = (usedDays / currentUser.leaveTotal) * 100;
 
 export default function Sidebar() {
   const { theme, setTheme } = useTheme();
@@ -75,18 +73,7 @@ export default function Sidebar() {
 
       {/* Leave balance + Settings */}
       <div className={styles.bottom}>
-        <div className={styles.leaveWidget}>
-          <div className={styles.leaveLabel}>Annual Leave</div>
-          <div className={styles.leaveTrack}>
-            <div className={styles.leaveFill} style={{ width: `${pct}%` }} />
-          </div>
-          <div className={styles.leaveNums}>
-            <span>{currentUser.leaveBalance} remaining</span>
-            <span>{usedDays} used</span>
-          </div>
-        </div>
-
-        <div className={styles.settingsWidget}>
+<div className={styles.settingsWidget}>
           <div className={styles.settingsLabel}>Appearance</div>
           <div className={styles.themeButtons}>
             <button
