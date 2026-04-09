@@ -29,24 +29,16 @@ export default function Tasks() {
           <div className="card-header"><span className="card-title">{type} Tasks</span></div>
           <div className="card-body" style={{ padding: '6px 20px' }}>
             {group.map(task => (
-              <div key={task.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 11, padding: '11px 0', borderBottom: '1px solid var(--border)' }}>
-                <div
-                  onClick={() => toggle(task.id)}
-                  style={{
-                    width: 17, height: 17, borderRadius: 4, flexShrink: 0, marginTop: 2, cursor: 'pointer',
-                    border: task.done ? 'none' : '2px solid var(--border-bright)',
-                    background: task.done ? 'var(--lime)' : 'transparent',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {task.done && <span style={{ color: 'var(--black)', fontSize: 10, fontWeight: 700 }}>✓</span>}
-                </div>
+              <div key={task.id} style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '11px 0', borderBottom: '1px solid var(--border)' }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 500, color: task.done ? 'var(--text-dim)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none' }}>{task.title}</div>
                   <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2 }}>{task.type} · {task.due}</div>
                 </div>
                 <span className={`pill pill-${task.priority}`}>{task.priority.toUpperCase()}</span>
+                {task.done
+                  ? <span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--lime)', background: 'var(--lime-dim)', border: '1px solid var(--lime-border)', padding: '3px 10px', borderRadius: 6, flexShrink: 0 }}>✓ Completed</span>
+                  : <button className="btn btn-ghost btn-sm" style={{ flexShrink: 0 }} onClick={() => toggle(task.id)}>Mark as Complete</button>
+                }
               </div>
             ))}
           </div>
