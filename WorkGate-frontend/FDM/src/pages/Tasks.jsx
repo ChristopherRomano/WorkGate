@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { tasks as initialTasks } from '../data/mockData';
 import '../styles/components.css';
+import styles from './Tasks.module.css';
 
 export default function Tasks() {
   const [items, setItems] = useState(initialTasks);
@@ -18,35 +19,27 @@ export default function Tasks() {
 
   return (
     <div className="animate-fade">
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+      <div className={styles.filters}>
         {types.map(t => (
           <button key={t} className={`btn ${filter === t ? 'btn-primary' : 'btn-ghost'} btn-sm`} onClick={() => setFilter(t)}>{t}</button>
         ))}
       </div>
 
       {Object.entries(grouped).map(([type, group]) => (
-        <div key={type} className="card" style={{ marginBottom: 14 }}>
+        <div key={type} className={`card ${styles.taskCard}`}>
           <div className="card-header"><span className="card-title">{type} Tasks</span></div>
-          <div className="card-body" style={{ padding: '6px 20px' }}>
+          <div className={`card-body ${styles.taskBody}`}>
             {group.map(task => (
-              <div key={task.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 11, padding: '11px 0', borderBottom: '1px solid var(--border)' }}>
-                <div
-                  onClick={() => toggle(task.id)}
-                  style={{
-                    width: 17, height: 17, borderRadius: 4, flexShrink: 0, marginTop: 2, cursor: 'pointer',
-                    border: task.done ? 'none' : '2px solid var(--border-bright)',
-                    background: task.done ? 'var(--lime)' : 'transparent',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {task.done && <span style={{ color: 'var(--black)', fontSize: 10, fontWeight: 700 }}>✓</span>}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 500, color: task.done ? 'var(--text-dim)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none' }}>{task.title}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2 }}>{task.type} · {task.due}</div>
+              <div key={task.id} className={styles.taskRow}>
+                <div className={styles.taskInfo}>
+                  <div className={`${styles.taskTitle} ${task.done ? styles.done : ''}`}>{task.title}</div>
+                  <div className={styles.taskMeta}>{task.type} · {task.due}</div>
                 </div>
                 <span className={`pill pill-${task.priority}`}>{task.priority.toUpperCase()}</span>
+                {task.done
+                  ? <span className={styles.completedBadge}>✓ Completed</span>
+                  : <button className={`btn btn-ghost btn-sm ${styles.completeBtn}`} onClick={() => toggle(task.id)}>Mark as Complete</button>
+                }
               </div>
             ))}
           </div>

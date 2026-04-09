@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { expenses as initial } from '../data/mockData';
 import Modal from '../components/Modal';
 import '../styles/components.css';
+import styles from './Expenses.module.css';
 
 const ICONS = { Train: '🚂', Hotel: '🏨', Lunch: '🍽', Taxi: '🚕', Flight: '✈️', Other: '📎' };
 const getIcon = (desc) => {
@@ -30,21 +31,16 @@ export default function Expenses() {
 
   return (
     <div className="animate-fade">
-      {/* Summary */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 20 }}>
+      <div className={styles.statsGrid}>
         {[
           { icon: '⏳', val: pending.length, label: 'Pending claims' },
           { icon: '💰', val: `£${pendingTotal.toFixed(2)}`, label: 'Pending total', highlight: true },
           { icon: '✅', val: items.filter(e => e.status === 'approved').length, label: 'Paid claims' },
         ].map(({ icon, val, label, highlight }) => (
-          <div key={label} style={{
-            background: 'var(--surface)', border: `1px solid ${highlight ? 'var(--border-bright)' : 'var(--border)'}`,
-            borderRadius: 'var(--radius)', padding: '18px 20px',
-            boxShadow: highlight ? '0 0 22px var(--lime-glow)' : 'none',
-          }}>
-            <div style={{ fontSize: 20, marginBottom: 8 }}>{icon}</div>
-            <div style={{ fontFamily: 'var(--mono)', fontSize: 26, fontWeight: 700, color: 'var(--lime)', lineHeight: 1 }}>{val}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>{label}</div>
+          <div key={label} className={`${styles.statCard} ${highlight ? styles.highlight : ''}`}>
+            <div className={styles.statIcon}>{icon}</div>
+            <div className={styles.statVal}>{val}</div>
+            <div className={styles.statLabel}>{label}</div>
           </div>
         ))}
       </div>
@@ -57,17 +53,23 @@ export default function Expenses() {
         <div className="table-wrap">
           <table>
             <thead>
-              <tr><th></th><th>Description</th><th>Date</th><th>Project</th><th>Amount</th><th>Status</th></tr>
+              <tr><th></th><th>Description</th><th>Date</th><th>Project</th><th>Amount</th><th>Status</th><th>Action</th></tr>
             </thead>
             <tbody>
               {items.map(e => (
                 <tr key={e.id}>
-                  <td style={{ fontSize: 20, width: 40 }}>{getIcon(e.description)}</td>
+                  <td className={styles.iconCell}>{getIcon(e.description)}</td>
                   <td><strong>{e.description}</strong></td>
                   <td>{e.date}</td>
-                  <td style={{ fontFamily: 'var(--mono)', fontSize: 11 }}>{e.project}</td>
-                  <td><strong style={{ color: 'var(--lime)', fontFamily: 'var(--mono)' }}>{e.amount}</strong></td>
+                  <td className={styles.projectCell}>{e.project}</td>
+                  <td><strong className={styles.amountCell}>{e.amount}</strong></td>
                   <td><span className={`badge badge-${e.status}`}>{e.status.toUpperCase()}</span></td>
+                  <td>
+                    {e.status === 'pending'
+                      ? <button className="btn btn-danger" onClick={() => setItems(prev => prev.filter(i => i.id !== e.id))}>Cancel</button>
+                      : <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>—</span>
+                    }
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -84,7 +86,7 @@ export default function Expenses() {
           <div className="form-grid form-grid-2">
             <div className="form-group">
               <label>Amount</label>
-              <input className="field" type="number" placeholder="0.00" step="0.01" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+              <input className="field" type="number" placeholder="0.00" step="0.01" min="0.01" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
             </div>
             <div className="form-group">
               <label>Currency</label>
@@ -115,7 +117,6 @@ export default function Expenses() {
           </div>
           <div className="modal-actions">
             <button className="btn btn-primary" onClick={submit}>Submit Claim</button>
-            <button className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
           </div>
         </div>
       </Modal>

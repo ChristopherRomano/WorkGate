@@ -1,49 +1,12 @@
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 20px;
-}
-.statCard {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  position: relative;
-  overflow: hidden;
-  transition: border-color var(--transition);
-}
-.statCard::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--lime);
-  opacity: 0.2;
-}
-.highlight {
-  border-color: var(--lime-border);
-  box-shadow: 0 0 22px var(--lime-glow);
-}
-.highlight::after { opacity: 1; }
-.statIcon { font-size: 20px; margin-bottom: 10px; }
-.statNum {
-  font-family: var(--mono);
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--lime);
-  line-height: 1;
-}
-.statLabel { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-.statDelta { font-size: 11px; font-family: var(--mono); margin-top: 8px; color: var(--text-dim); }
-.up   { color: var(--lime) !important; }
-.warn { color: var(--amber) !important; }
-
 .twoCol {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 16px;
+}
+.twoCol > .card,
+.twoCol > div {
+  min-height: 320px;
 }
 
 /* Tasks */

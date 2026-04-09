@@ -8,10 +8,28 @@ export default function Profile() {
   const [skills, setSkills] = useState(currentUser.skills);
   const [showEdit, setShowEdit] = useState(false);
   const [showSkill, setShowSkill] = useState(false);
-  const [newSkill, setNewSkill] = useState('');
+  const [selectedSkill, setSelectedSkill] = useState('');
+  const [customSkill, setCustomSkill] = useState('');
+
+  const SKILL_OPTIONS = [
+    'Python', 'Java', 'JavaScript', 'TypeScript', 'C#', 'C++', 'R',
+    'SQL', 'NoSQL', 'MongoDB', 'PostgreSQL',
+    'React', 'Angular', 'Vue.js', 'Node.js', 'Spring Boot', '.NET',
+    'Azure', 'AWS', 'GCP', 'Docker', 'Kubernetes', 'CI/CD',
+    'Machine Learning', 'Data Analysis', 'Power BI', 'Tableau', 'Excel',
+    'Agile', 'Scrum', 'JIRA', 'Project Management',
+    'Linux', 'Networking', 'Cybersecurity',
+    'Other',
+  ];
 
   const addSkill = () => {
-    if (newSkill.trim()) { setSkills(s => [...s, newSkill.trim()]); setNewSkill(''); setShowSkill(false); }
+    const skill = selectedSkill === 'Other' ? customSkill.trim() : selectedSkill;
+    if (skill) {
+      setSkills(s => [...s, skill]);
+      setSelectedSkill('');
+      setCustomSkill('');
+      setShowSkill(false);
+    }
   };
 
   return (
@@ -28,7 +46,6 @@ export default function Profile() {
           </div>
         </div>
         <div className={styles.profileActions}>
-          <button className="btn btn-ghost" onClick={() => setShowEdit(true)}>✏ Edit Profile</button>
           <button className="btn btn-primary">↓ Download FDM Profile</button>
         </div>
       </div>
@@ -107,15 +124,24 @@ export default function Profile() {
       </Modal>
 
       {/* Add Skill Modal */}
-      <Modal isOpen={showSkill} onClose={() => setShowSkill(false)} title="Add Key Skill">
+      <Modal isOpen={showSkill} onClose={() => { setShowSkill(false); setSelectedSkill(''); setCustomSkill(''); }} title="Add Key Skill">
         <div className="form-grid">
           <div className="form-group">
-            <label>Skill Name</label>
-            <input className="field" placeholder="e.g. Python, Azure, Tableau..." value={newSkill} onChange={e => setNewSkill(e.target.value)} onKeyDown={e => e.key === 'Enter' && addSkill()} />
+            <label>Skill</label>
+            <select className="field" value={selectedSkill} onChange={e => { setSelectedSkill(e.target.value); setCustomSkill(''); }}>
+              <option value="">Select a skill...</option>
+              {SKILL_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
           </div>
+          {selectedSkill === 'Other' && (
+            <div className="form-group">
+              <label>Custom Skill</label>
+              <input className="field" placeholder="Enter skill name..." value={customSkill} onChange={e => setCustomSkill(e.target.value)} onKeyDown={e => e.key === 'Enter' && addSkill()} autoFocus />
+            </div>
+          )}
           <div className="modal-actions">
-            <button className="btn btn-primary" onClick={addSkill}>Add Skill</button>
-            <button className="btn btn-ghost" onClick={() => setShowSkill(false)}>Cancel</button>
+            <button className="btn btn-primary" onClick={addSkill} disabled={!selectedSkill || (selectedSkill === 'Other' && !customSkill.trim())}>Add Skill</button>
+            <button className="btn btn-ghost" onClick={() => { setShowSkill(false); setSelectedSkill(''); setCustomSkill(''); }}>Cancel</button>
           </div>
         </div>
       </Modal>

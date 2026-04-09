@@ -5,27 +5,31 @@ import styles from './Sidebar.module.css';
 
 const NAV = [
   { section: 'Overview', items: [
-    { to: '/',            icon: '◈', label: 'Dashboard' },
-    { to: '/profile',     icon: '◉', label: 'My Profile' },
+    { to: '/app',              icon: '◈', label: 'Dashboard' },
+    { to: '/app/profile',      icon: '◉', label: 'My Profile' },
   ]},
   { section: 'Work', items: [
-    { to: '/timesheet',   icon: '⏱', label: 'Timesheet' },
-    { to: '/tasks',       icon: '✓', label: 'Tasks',      badge: 3 },
-    { to: '/leave',       icon: '📅', label: 'Leave' },
-    { to: '/expenses',    icon: '£', label: 'Expenses' },
+    { to: '/app/timesheet',    icon: '⏱', label: 'Timesheet' },
+    { to: '/app/tasks',        icon: '✓', label: 'Tasks',      badge: 3 },
+    { to: '/app/leave',        icon: '📅', label: 'Leave' },
+    { to: '/app/expenses',     icon: '£', label: 'Expenses' },
   ]},
   { section: 'Company', items: [
-    { to: '/news',        icon: '📢', label: 'News Feed',  badge: 2 },
-    { to: '/leaderboard', icon: '🏆', label: 'Leaderboard' },
+    { to: '/app/news',         icon: '📢', label: 'News Feed',  badge: 2 },
   ]},
   { section: 'Support', items: [
-    { to: '/it',          icon: '🖥', label: 'IT Support' },
-    { to: '/hr',          icon: '📋', label: 'HR Reports' },
+    { to: '/app/it',           icon: '🖥', label: 'IT Support' },
+    { to: '/app/hr',           icon: '📋', label: 'HR Reports' },
+  ]},
+  { section: 'Management', items: [
+    { to: '/app/leave-approval', icon: '📋', label: 'Leave Approvals', roles: ['manager', 'admin'] },
+    { to: '/app/set-task',       icon: '✎',  label: 'Set Task',        roles: ['manager', 'admin'] },
+  ]},
+  { section: 'Posting', items: [
+    { to: '/app/posting',      icon: '�', label: 'Create Posting' },
   ]},
 ];
 
-const usedDays = currentUser.leaveTotal - currentUser.leaveBalance;
-const pct = (usedDays / currentUser.leaveTotal) * 100;
 
 export default function Sidebar() {
   const { theme, setTheme } = useTheme();
@@ -51,14 +55,17 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className={styles.nav}>
-        {NAV.map(({ section, items }) => (
+        {NAV.map(({ section, items }) => {
+          const visible = items.filter(item => !item.roles || item.roles.includes(currentUser.role));
+          if (visible.length === 0) return null;
+          return (
           <div key={section}>
             <div className={styles.sectionLabel}>{section}</div>
-            {items.map(({ to, icon, label, badge }) => (
+            {visible.map(({ to, icon, label, badge }) => (
               <NavLink
                 key={to}
                 to={to}
-                end={to === '/'}
+                end={to === '/app'}
                 className={({ isActive }) =>
                   `${styles.navItem} ${isActive ? styles.active : ''}`
                 }
@@ -71,23 +78,13 @@ export default function Sidebar() {
               </NavLink>
             ))}
           </div>
-        ))}
+          );
+        })}
       </nav>
 
       {/* Leave balance + Settings */}
       <div className={styles.bottom}>
-        <div className={styles.leaveWidget}>
-          <div className={styles.leaveLabel}>Annual Leave</div>
-          <div className={styles.leaveTrack}>
-            <div className={styles.leaveFill} style={{ width: `${pct}%` }} />
-          </div>
-          <div className={styles.leaveNums}>
-            <span>{currentUser.leaveBalance} remaining</span>
-            <span>{usedDays} used</span>
-          </div>
-        </div>
-
-        <div className={styles.settingsWidget}>
+<div className={styles.settingsWidget}>
           <div className={styles.settingsLabel}>Appearance</div>
           <div className={styles.themeButtons}>
             <button

@@ -5,16 +5,37 @@ import '../styles/components.css';
 import styles from './IT.module.css';
 
 const KB = [
-  { q: 'How do I reset my password?', tag: 'Access', time: '2 min read' },
-  { q: 'VPN setup guide for remote working', tag: 'Network', time: '5 min read' },
-  { q: 'How to install required software on your laptop', tag: 'Software', time: '3 min read' },
-  { q: 'Setting up multi-factor authentication (MFA)', tag: 'Access', time: '4 min read' },
-  { q: 'Requesting a new hardware device', tag: 'Hardware', time: '2 min read' },
+  {
+    q: 'How do I reset my password?',
+    tag: 'Access', time: '2 min read',
+    a: 'To reset your password, go to the WorkGate login page and click "Forgot password?". Enter your company email address and you will receive a reset link within 5 minutes. If you do not receive it, check your spam folder or contact IT support. Passwords must be at least 12 characters and include uppercase, lowercase, a number, and a special character.',
+  },
+  {
+    q: 'VPN setup guide for remote working',
+    tag: 'Network', time: '5 min read',
+    a: 'Download the approved VPN client (GlobalProtect) from the FDM software portal. Install and launch the application, then enter the server address: vpn.fdmgroup.com. Sign in with your company credentials and complete the MFA prompt. Once connected, you will have full access to internal systems. If you experience connection issues, ensure your internet connection is stable and that your firewall is not blocking the VPN.',
+  },
+  {
+    q: 'How to install required software on your laptop',
+    tag: 'Software', time: '3 min read',
+    a: 'All approved software is available through the FDM Software Centre on your laptop. Open the Software Centre from your taskbar, browse or search for the application you need, and click Install. Installation typically takes 5–15 minutes. If the software you need is not listed, raise an IT ticket and the team will review your request. Do not install unapproved software from the internet.',
+  },
+  {
+    q: 'Setting up multi-factor authentication (MFA)',
+    tag: 'Access', time: '4 min read',
+    a: 'MFA is mandatory for all FDM accounts. To set it up, download the Microsoft Authenticator app on your mobile device. Go to aka.ms/mfasetup and sign in with your company account. Follow the on-screen instructions to scan the QR code with the Authenticator app. Once registered, you will be prompted for MFA approval each time you sign in from a new device or location.',
+  },
+  {
+    q: 'Requesting a new hardware device',
+    tag: 'Hardware', time: '2 min read',
+    a: 'Hardware requests must be approved by your line manager before being submitted to IT. Raise an IT ticket with the category set to "Hardware", include the device type you need and the business justification. Standard lead time for hardware delivery is 5–7 working days. Urgent requests can be escalated through your manager to the IT team directly.',
+  },
 ];
 
 export default function IT() {
   const [tickets, setTickets] = useState(initial);
   const [showModal, setShowModal] = useState(false);
+  const [faqItem, setFaqItem] = useState(null);
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({ title: '', category: 'Software', priority: 'Medium', desc: '' });
 
@@ -64,7 +85,7 @@ export default function IT() {
             <input className="field" style={{ paddingLeft: 38 }} placeholder="Search common solutions..." value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           {filteredKB.map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: '1px solid var(--border)', cursor: 'pointer' }}>
+            <div key={i} onClick={() => setFaqItem(item)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: '1px solid var(--border)', cursor: 'pointer' }}>
               <span style={{ color: 'var(--lime)', fontSize: 16, flexShrink: 0 }}>?</span>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>{item.q}</div>
@@ -78,6 +99,19 @@ export default function IT() {
           )}
         </div>
       </div>
+
+      <Modal isOpen={!!faqItem} onClose={() => setFaqItem(null)} title={faqItem?.q ?? ''}>
+        <div style={{ padding: '4px 0 8px' }}>
+          <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+            <span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--lime)', background: 'var(--lime-dim)', border: '1px solid var(--lime-border)', padding: '2px 8px', borderRadius: 4 }}>{faqItem?.tag}</span>
+            <span style={{ fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-dim)' }}>{faqItem?.time}</span>
+          </div>
+          <p style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.7, margin: 0 }}>{faqItem?.a}</p>
+          <div className="modal-actions" style={{ marginTop: 20 }}>
+            <button className="btn btn-ghost" onClick={() => setFaqItem(null)}>Close</button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Raise IT Ticket">
         <div className="form-grid">
