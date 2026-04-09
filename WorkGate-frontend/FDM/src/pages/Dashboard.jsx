@@ -42,10 +42,7 @@ export default function Dashboard() {
     <div className="animate-fade">
       {/* Stats */}
       <div className={styles.statsGrid}>
-        <StatCard icon="⏱" value="38.5" label="Hours this week" delta="↑ 2.5h vs last week" deltaType="up" highlight />
-        <StatCard icon="✓" value={pendingTasks} label="Tasks pending" delta="3 due this week" deltaType="warn" />
         <StatCard icon="📅" value={currentUser.leaveBalance} label="Leave days remaining" delta={`of ${currentUser.leaveTotal} total`} />
-        <StatCard icon="🎯" value={currentUser.skillScore} label="Skill score" delta="↑ 3 this month" deltaType="up" />
       </div>
 
       <div className={styles.twoCol}>
