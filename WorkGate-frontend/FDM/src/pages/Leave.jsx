@@ -31,12 +31,10 @@ export default function Leave() {
             },
             body: JSON.stringify(ticket)
           });
-          console.log(JSON.stringify(ticket))
           if (!response.ok) {
             throw new Error("Failed to create ticket");
           }
 
-          console.log("Ticket created!");
         } catch (error) {
           console.error(error);
         }
