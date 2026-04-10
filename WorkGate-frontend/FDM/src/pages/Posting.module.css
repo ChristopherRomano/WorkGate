@@ -32,6 +32,19 @@
   text-align: center;
 }
 
+.successMessage {
+  background: var(--lime-dim);
+  border: 1px solid var(--lime-border);
+  color: var(--lime);
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 18px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  animation: slideDown 0.3s ease;
+}
+
 .formGroup {
   display: flex;
   flex-direction: column;
@@ -49,7 +62,8 @@
 }
 
 .formGroup input[type="text"],
-.formGroup textarea {
+.formGroup textarea,
+.formGroup select {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -62,7 +76,8 @@
 }
 
 .formGroup input[type="text"]:focus,
-.formGroup textarea:focus {
+.formGroup textarea:focus,
+.formGroup select:focus {
   outline: none;
   border-color: var(--lime);
   background: var(--surface);
@@ -78,6 +93,15 @@
   resize: vertical;
   min-height: 100px;
   line-height: 1.5;
+}
+
+.formGroup select {
+  cursor: pointer;
+}
+
+.formGroup select option {
+  background: var(--surface-2);
+  color: var(--text);
 }
 
 .formGroup input[type="checkbox"] {
@@ -167,5 +191,16 @@
   .formGroup textarea {
     padding: 9px 11px;
     font-size: 12px;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
