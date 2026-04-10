@@ -107,7 +107,7 @@ export default function Leave() {
             </div>
             <div className="form-group">
               <label>End Date</label>
-              <input className="field" type="date" value={form.end} onChange={e => setForm(f => ({ ...f, end: e.target.value }))} />
+              <input className="field" type="date" min={form.start || getTodayDate()} value={form.end} onChange={e => setForm(f => ({ ...f, end: e.target.value }))} />
             </div>
           </div>
           {form.start && form.end && (

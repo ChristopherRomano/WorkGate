@@ -38,6 +38,7 @@ const NAV = [
     { to: '/app/admin/employees',      icon: '👥', label: 'Manage Employees', roles: ['admin'] },
     { to: '/app/admin/add-employee',   icon: '➕', label: 'Add Employee',     roles: ['admin'] },
     { to: '/app/admin/client-codes',   icon: '🏢', label: 'Client Codes',     roles: ['admin'] },
+
   ]},
 ];
 
