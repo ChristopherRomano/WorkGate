@@ -6,8 +6,11 @@ export default function Posting() {
         title: '',
         description: '',
         pinned: false,
+        visibility: 'Global',
         timePosted: new Date().toISOString(),
     });
+
+    const [successMessage, setSuccessMessage] = useState(false);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -20,12 +23,29 @@ export default function Posting() {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Form submitted:', formData);
-        // Add API call or form submission logic here
+        // Show success message
+        setSuccessMessage(true);
+        // Reset form
+        setFormData({
+            title: '',
+            description: '',
+            pinned: false,
+            visibility: 'Global',
+            timePosted: new Date().toISOString(),
+        });
+        // Hide message after 3 seconds
+        setTimeout(() => setSuccessMessage(false), 3000);
     };
 
     return (
         <div className={styles.postingFormContainer}>
             <h2>Create New Post</h2>
+            {/* Only show this div if success message is true */}
+            {successMessage && (
+                <div className={styles.successMessage}>
+                    Successfully posted
+                </div>
+            )}
             <form onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>
                     <label htmlFor="title">Title *</label>
@@ -49,6 +69,21 @@ export default function Posting() {
                         rows="5"
                         required
                     />
+                </div>
+
+                <div className={styles.formGroup}>
+                    <label htmlFor="visibility">Visibility *</label>
+                    <select
+                        id="visibility"
+                        name="visibility"
+                        value={formData.visibility}
+                        onChange={handleChange}
+                        required
+                    >
+                        <option value="Global">Global</option>
+                        <option value="Regional">Regional</option>
+                        <option value="Social">Social</option>
+                    </select>
                 </div>
 
                 <div className={styles.formGroup}>

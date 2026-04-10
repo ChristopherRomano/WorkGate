@@ -26,7 +26,7 @@ const NAV = [
     { to: '/app/set-task',       icon: '✎',  label: 'Set Task',        roles: ['manager', 'admin'] },
   ]},
   { section: 'Posting', items: [
-    { to: '/app/posting',      icon: '�', label: 'Create Posting' },
+    { to: '/app/posting',      icon: '�', label: 'Create a Post' },
   ]},
 ];
 
