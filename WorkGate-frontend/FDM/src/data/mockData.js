@@ -1,3 +1,51 @@
+// ── ACCOUNTS (for login) ─────────────────────────────────────────────────────
+export const users = [
+  {
+    id: 'u001', username: 'employee', password: 'pass',
+    name: 'Alex Turner', initials: 'AT', email: 'a.turner@fdmgroup.com',
+    role: 'employee', tag: 'BENCH',
+    phone: '+44 7700 900111', address: '22 Baker Street, London, W1U',
+    emergencyContact: 'Sam Turner', emergencyPhone: '+44 7700 900222',
+    manager: 'Sarah O\'Brien', leaveBalance: 20, leaveTotal: 25,
+    skills: [],
+  },
+  {
+    id: 'u002', username: 'consultant', password: 'pass',
+    name: 'Jamie Chen', initials: 'JC', email: 'j.chen@fdmgroup.com',
+    role: 'consultant', tag: 'CONSULTANT_DEPLOYED',
+    phone: '+44 7700 900123', address: '14 Canary Wharf, London, E14',
+    emergencyContact: 'Lin Chen', emergencyPhone: '+44 7700 900456',
+    manager: 'Sarah O\'Brien', leaveBalance: 15, leaveTotal: 25,
+    clientCode: 'CLIENT-003', clientName: 'Barclays', projectEndDate: '2026-06-30',
+    skills: ['Python', 'SQL', 'Excel', 'Java', 'Agile', 'Power BI'],
+  },
+  {
+    id: 'u003', username: 'manager', password: 'pass',
+    name: 'Sarah O\'Brien', initials: 'SO', email: 's.obrien@fdmgroup.com',
+    role: 'manager', tag: 'MANAGER',
+    phone: '+44 7700 900789', address: '5 Liverpool Street, London, EC2M',
+    emergencyContact: 'Tom O\'Brien', emergencyPhone: '+44 7700 900321',
+    manager: 'Diana Frost', leaveBalance: 18, leaveTotal: 25,
+    teamCode: 'TEAM-A', skills: [],
+  },
+  {
+    id: 'u004', username: 'ittech', password: 'pass',
+    name: 'Dev Patel', initials: 'DP', email: 'd.patel@fdmgroup.com',
+    role: 'ittech', tag: 'IT',
+  },
+  {
+    id: 'u005', username: 'hr', password: 'pass',
+    name: 'Maya Singh', initials: 'MS', email: 'm.singh@fdmgroup.com',
+    role: 'hr', tag: 'HR',
+  },
+  {
+    id: 'u006', username: 'admin', password: 'pass',
+    name: 'Chris Morgan', initials: 'CM', email: 'c.morgan@fdmgroup.com',
+    role: 'admin', tag: 'ADMIN',
+  },
+];
+
+// Legacy — kept for any pages that haven't migrated to useAuth() yet
 export const currentUser = {
   id: 'u001',
   name: 'Jamie Chen',
@@ -7,9 +55,9 @@ export const currentUser = {
   address: '14 Canary Wharf, London, E14',
   emergencyContact: 'Lin Chen',
   emergencyPhone: '+44 7700 900456',
-  tag: 'Consultant - Deployed',
-  tagCode: 'CONSULTANT_DEPLOYED',
-  role: 'manager',
+  tag: 'Administrator',
+  tagCode: 'ADMIN',
+  role: 'admin',
   manager: 'Sarah O\'Brien',
   clientCode: 'CLIENT-003',
   clientName: 'Barclays',
@@ -21,12 +69,28 @@ export const currentUser = {
 };
 
 export const employees = [
-  { id: 'e001', name: 'Marcus Reyes',  initials: 'MR', role: 'Consultant', client: 'HSBC',     email: 'm.reyes@fdmgroup.com' },
-  { id: 'e002', name: 'Aisha Patel',   initials: 'AP', role: 'Consultant', client: 'Barclays', email: 'a.patel@fdmgroup.com' },
-  { id: 'e003', name: 'Lucy Wang',     initials: 'LW', role: 'Consultant', client: 'Deloitte', email: 'l.wang@fdmgroup.com' },
-  { id: 'e004', name: 'Sam Kim',       initials: 'SK', role: 'Consultant', client: 'KPMG',     email: 's.kim@fdmgroup.com' },
-  { id: 'e005', name: 'Tom O\'Brien',  initials: 'TO', role: 'Consultant', client: 'NatWest',  email: 't.obrien@fdmgroup.com' },
-  { id: 'e006', name: 'Priya Sharma',  initials: 'PS', role: 'Consultant', client: 'Barclays', email: 'p.sharma@fdmgroup.com' },
+  { id: 'e001', name: 'Marcus Reyes',  initials: 'MR', role: 'Consultant', client: 'HSBC',     clientCode: 'CLIENT-001', email: 'm.reyes@fdmgroup.com',   manager: 'Sarah O\'Brien', tag: 'CONSULTANT_DEPLOYED', active: true },
+  { id: 'e002', name: 'Aisha Patel',   initials: 'AP', role: 'Consultant', client: 'Barclays', clientCode: 'CLIENT-003', email: 'a.patel@fdmgroup.com',   manager: 'Sarah O\'Brien', tag: 'CONSULTANT_DEPLOYED', active: true },
+  { id: 'e003', name: 'Lucy Wang',     initials: 'LW', role: 'Consultant', client: 'Deloitte', clientCode: 'CLIENT-004', email: 'l.wang@fdmgroup.com',    manager: 'James Park',     tag: 'CONSULTANT_DEPLOYED', active: true },
+  { id: 'e004', name: 'Sam Kim',       initials: 'SK', role: 'Consultant', client: 'KPMG',     clientCode: 'CLIENT-005', email: 's.kim@fdmgroup.com',     manager: 'James Park',     tag: 'CONSULTANT_BENCH',    active: true },
+  { id: 'e005', name: 'Tom O\'Brien',  initials: 'TO', role: 'Consultant', client: 'NatWest',  clientCode: 'CLIENT-002', email: 't.obrien@fdmgroup.com',  manager: 'Sarah O\'Brien', tag: 'CONSULTANT_DEPLOYED', active: false },
+  { id: 'e006', name: 'Priya Sharma',  initials: 'PS', role: 'Consultant', client: 'Barclays', clientCode: 'CLIENT-003', email: 'p.sharma@fdmgroup.com',  manager: 'James Park',     tag: 'CONSULTANT_DEPLOYED', active: true },
+];
+
+export const managers = [
+  'Sarah O\'Brien',
+  'James Park',
+  'Diana Frost',
+  'Alex Morgan',
+];
+
+export const clientCodes = [
+  { id: 'cc1', code: 'CLIENT-001', client: 'HSBC',          sector: 'Banking' },
+  { id: 'cc2', code: 'CLIENT-002', client: 'NatWest',       sector: 'Banking' },
+  { id: 'cc3', code: 'CLIENT-003', client: 'Barclays',      sector: 'Banking' },
+  { id: 'cc4', code: 'CLIENT-004', client: 'Deloitte',      sector: 'Consulting' },
+  { id: 'cc5', code: 'CLIENT-005', client: 'KPMG',          sector: 'Consulting' },
+  { id: 'cc6', code: 'INTERNAL',   client: 'FDM Internal',  sector: 'Internal' },
 ];
 
 export const employeeLeaveRequests = [
@@ -90,3 +154,10 @@ export const timesheetData = {
   ],
   status: 'draft',
 };
+
+export const hrReports = [
+  { id: 'hr1', employee: 'Alex Turner',  initials: 'AT', title: 'Workplace Feedback – Team Communication', content: 'General feedback about team communication processes on client site.', date: '20 Mar 2026', status: 'resolved', anon: true,  claimedBy: 'Maya Singh' },
+  { id: 'hr2', employee: 'Aisha Patel',  initials: 'AP', title: 'Overtime Concern', content: 'Repeated requests to work beyond contracted hours without appropriate compensation or advance notice.', date: '2 Apr 2026', status: 'pending', anon: false, claimedBy: null },
+  { id: 'hr3', employee: 'Anonymous',    initials: '?',  title: 'Manager Conduct', content: 'Concerns regarding unprofessional communication from line manager during team meetings.', date: '5 Apr 2026', status: 'pending', anon: true,  claimedBy: null },
+  { id: 'hr4', employee: 'Marcus Reyes', initials: 'MR', title: 'Client Site Safety', content: 'Safety concern raised regarding inadequate fire safety procedures at client premises.', date: '7 Apr 2026', status: 'pending', anon: false, claimedBy: null },
+];

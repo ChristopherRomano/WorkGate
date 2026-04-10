@@ -212,3 +212,24 @@
   color: var(--black);
   border-color: var(--green);
 }
+
+.logoutBtn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 0;
+  font-size: 12px;
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.logoutBtn:hover {
+  background: rgba(248,113,113,0.08);
+  color: var(--red, #f87171);
+  border-color: rgba(248,113,113,0.3);
+}
