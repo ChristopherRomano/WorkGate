@@ -24,7 +24,7 @@ export default function Posting() {
         const request = {
             author: "john",
             timePosted:  (new Date()).getTime(),
-            visibility : "GLOBAL",
+            visibility : visibility.toUpperCase(),
             pinned: pinned,
             content : content,
             title: title,
@@ -50,7 +50,7 @@ export default function Posting() {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Form submitted:', formData);
-        createRequest("GLOBAL",formData.description,formData.pinned,formData.title);
+        createRequest(formData.visibility,formData.description,formData.pinned,formData.title);
         // Show success message
         setSuccessMessage(true);
         // Reset form
