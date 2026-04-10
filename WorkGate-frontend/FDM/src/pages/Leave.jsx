@@ -24,32 +24,32 @@ export default function Leave() {
 
   const cancel = (id) => setRequests(prev => prev.filter(r => r.id !== id));
 
-  const createTicket = async (start,end,notes) => {
+  const createRequest = async (start,end,notes) => {
 
-        const ticket = {
-          username: "john",
-          creationTime: (new Date()).getTime(),
-          startOfLeave:  new Date(start).getTime(),
-          endOfLeave : new Date(end).getTime(),
-          reason : notes,
-        };
+    const request = {
+      username: "john",
+      creationTime: (new Date()).getTime(),
+      startOfLeave:  new Date(start).getTime(),
+      endOfLeave : new Date(end).getTime(),
+      reason : notes,
+    };
 
-        try {
-          const response = await fetch("http://localhost:8080/api/createAnnualLeave", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(ticket)
-          });
-          if (!response.ok) {
-            throw new Error("Failed to create ticket");
-          }
-
-        } catch (error) {
-          console.error(error);
-        }
-      };
+    try {
+      const response = await fetch("http://localhost:8080/api/createAnnualLeave", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create ticket");
+      }
+    } 
+    catch (error) {
+      console.error(error);
+    }
+  };
 
   const submit = () => {
     if (!form.start || !form.end) return;
@@ -65,7 +65,7 @@ export default function Leave() {
     ]);
     setShowModal(false);
 
-    createTicket(form.start,form.end,form.notes);
+    createRequest(form.start,form.end,form.notes);
 
     setForm({ start: '', end: '', notes: '' });
   };

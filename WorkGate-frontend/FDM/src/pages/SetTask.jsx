@@ -25,6 +25,32 @@ export default function SetTask() {
 
   const canSubmit = selected && form.title.trim() && form.description.trim() && form.due;
 
+  const createRequest = async (title,priority,content,category) => {
+  
+      const request = {
+          employeeName: "john",
+          description : content,
+          title: title,
+          priority: priority.toUpperCase(),
+          category: category.toUpperCase(),
+      };
+      try {
+          const response = await fetch("http://localhost:8080/api/newTask", {
+              method: "POST",
+              headers: {
+              "Content-Type": "application/json"
+              },
+              body: JSON.stringify(request)
+          });
+          if (!response.ok) {
+              throw new Error("Failed to create ticket");
+          }
+          } 
+      catch (error) {
+          console.error(error);
+      }
+    };
+
   const submit = () => {
     if (!canSubmit) return;
     setAssigned(prev => [{
@@ -36,6 +62,7 @@ export default function SetTask() {
       type: form.type,
       due: form.due,
     }, ...prev]);
+    createRequest(form.title,form.priority,form.description,form.type);
     setForm(EMPTY_FORM);
     setSelected(null);
     setShowSuccess(true);

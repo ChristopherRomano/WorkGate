@@ -12,6 +12,32 @@ export default function HR() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ title: '', content: '', anon: false });
 
+  const createRequest = async (content,title,anonymous) => {
+
+    const request = {
+      username: "john",
+      content: content,
+      title: title,
+      anonymous: anonymous,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/createEmployeeReport", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create ticket");
+      }
+    } 
+    catch (error) {
+        console.error(error);
+    }
+  };
+
   const submit = () => {
     if (!form.title) return;
     setReports(prev => [
@@ -19,6 +45,7 @@ export default function HR() {
       ...prev,
     ]);
     setShowModal(false);
+    createRequest(form.content,form.title,form.anon)
     setForm({ title: '', content: '', anon: false });
   };
 

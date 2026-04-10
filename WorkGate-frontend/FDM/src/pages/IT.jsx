@@ -39,6 +39,35 @@ export default function IT() {
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({ title: '', category: 'Software', priority: 'Medium', desc: '' });
 
+
+  const createRequest = async (enteredTitle,info,category,evidence) => {
+
+    const request = {
+      username: "john",
+      creationTime: (new Date()).getTime(),
+      title : enteredTitle,
+      description: info,
+      category: category,
+      evidence: ["Image","Image"],
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/createItTicket", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create ticket");
+      }
+    } 
+    catch (error) {
+        console.error(error);
+    }
+  };
+
   const submit = () => {
     if (!form.title) return;
     setTickets(prev => [
@@ -46,6 +75,7 @@ export default function IT() {
       ...prev,
     ]);
     setShowModal(false);
+    createRequest(form.title,form.desc,form.category)
     setForm({ title: '', category: 'Software', priority: 'Medium', desc: '' });
   };
 

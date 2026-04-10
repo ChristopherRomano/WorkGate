@@ -19,6 +19,6 @@ public class ItTicketController {
 
     @PostMapping("/createItTicket")
     public void createItTicket (@RequestBody ItTicketRequest request) {
-        System.out.println(request);
+        System.out.println("Created IT ticket");
     }
 }

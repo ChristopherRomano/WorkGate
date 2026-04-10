@@ -15,6 +15,48 @@ export default function Expenses() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ description: '', amount: '', currency: 'GBP (£)', date: '', project: 'CLIENT-003' });
 
+  const createRequest = async (amount,currency,date,description,evidence) => {
+    let passedCurrency = "";
+    switch (currency){
+      
+      case "GBP (£)":
+        passedCurrency = "GBP"
+        break;
+      case "EUR (€)":
+        passedCurrency = "EUR"
+        break;
+      case "USD ($)":
+        passedCurrency = "USD"
+        break;
+
+    }
+
+    const request = {
+      username: "john",
+      creationTime: (new Date()).getTime(),
+      reason: description,
+      amount : parseFloat(amount),
+      purchaseDate : (new Date(date)).getTime(),
+      currency: passedCurrency,
+      evidence: "image",
+    };
+    try {
+      const response = await fetch("http://localhost:8080/api/createExpense", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create ticket");
+      }
+    } 
+    catch (error) {
+      console.error(error);
+    }
+  };
+
   const submit = () => {
     if (!form.description || !form.amount) return;
     const sym = form.currency.match(/[£$€]/)?.[0] || '£';
@@ -23,6 +65,7 @@ export default function Expenses() {
       ...prev,
     ]);
     setShowModal(false);
+    createRequest(form.amount,form.currency,form.date || new Date().getTime(),form.description,);
     setForm({ description: '', amount: '', currency: 'GBP (£)', date: '', project: 'CLIENT-003' });
   };
 

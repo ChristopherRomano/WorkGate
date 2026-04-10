@@ -19,6 +19,6 @@ public class LeaveRequestController {
 
     @PostMapping("/createAnnualLeave")
     public void createExpenseRequest(@RequestBody ExpenseRequestRequest request){
-        System.out.println(request);
+        System.out.println("Created Annual leave ticket");
     }
 }

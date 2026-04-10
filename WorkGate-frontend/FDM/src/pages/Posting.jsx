@@ -17,10 +17,37 @@ export default function Posting() {
         }));
     };
 
+    const createRequest = async (visibility,content,pinned,title,timePosted) => {
+        const request = {
+            author: "john",
+            timePosted:  (new Date()).getTime(),
+            visibility : "GLOBAL",
+            pinned: pinned,
+            content : content,
+            title: title,
+        };
+        console.log(request)
+        try {
+            const response = await fetch("http://localhost:8080/api/createPost", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json"
+                },
+                body: JSON.stringify(request)
+            });
+            if (!response.ok) {
+                throw new Error("Failed to create ticket");
+            }
+            } 
+        catch (error) {
+            console.error(error);
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Form submitted:', formData);
-        // Add API call or form submission logic here
+        createRequest("GLOBAL",formData.description,formData.pinned,formData.title);
     };
 
     return (

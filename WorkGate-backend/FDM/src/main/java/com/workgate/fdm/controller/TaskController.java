@@ -17,7 +17,7 @@ public class TaskController {
     }
     @PostMapping("/newTask")
     public boolean newTask (@RequestBody TaskRequest taskRequest){
-        System.out.println(taskRequest);
+        System.out.println("Task Created");
         return true;
     }
 }

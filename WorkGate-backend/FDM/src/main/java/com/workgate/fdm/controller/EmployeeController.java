@@ -1,7 +1,6 @@
 package com.workgate.fdm.controller;
 
 import org.springframework.web.bind.annotation.*;
-import com.workgate.fdm.DTO.LoginRequest;
 import com.workgate.fdm.DTO.UpdateInfoRequest;
 import com.workgate.fdm.model.Employee;
 
@@ -20,13 +19,11 @@ public class EmployeeController{
 
     @PostMapping("/employeeUpdate")
     public void updateEmployeeInfo(@RequestBody UpdateInfoRequest info){
-        System.out.println(info);
-
+        System.out.println("Info updated");
     }
 
-    @PostMapping("/create")
-    public void createEmployee(@RequestBody LoginRequest info){
-        System.out.println(info);
+    @PostMapping("/createEmployee")
+    public void createEmployee(@RequestParam String username){
     }
 
 }

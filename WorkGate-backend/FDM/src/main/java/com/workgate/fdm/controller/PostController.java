@@ -17,7 +17,7 @@ public class PostController {
 
     @PostMapping("/createPost")
     public void createPost(@RequestBody PostRequest request){
-        System.out.println(request);
+        System.out.println("Post created");
     }
 
 }
