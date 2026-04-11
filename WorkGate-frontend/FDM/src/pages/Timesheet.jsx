@@ -29,6 +29,33 @@ export default function Timesheet() {
     });
   };
 
+  const createRequest = async () => {
+  
+      const request = {
+          employeeName: "john",
+          dateOfSubmission: new Date().getTime(),
+          interalHours: [],
+          clientHours: [],
+
+      };
+
+      try {
+          const response = await fetch("http://localhost:8080/api/createTimesheet", {
+              method: "POST",
+              headers: {
+              "Content-Type": "application/json"
+              },
+              body: JSON.stringify(request)
+          });
+          if (!response.ok) {
+              throw new Error("Failed to create ticket");
+          }
+          } 
+      catch (error) {
+          console.error(error);
+      }
+    };
+
   const dailyTotals = timesheetData.days.map((_, di) =>
     rows.reduce((sum, r) => sum + (r.hours[di] || 0), 0)
   );

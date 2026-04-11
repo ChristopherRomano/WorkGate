@@ -10,6 +10,15 @@ export default function Profile() {
   const [showSkill, setShowSkill] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState('');
   const [customSkill, setCustomSkill] = useState('');
+  const [formData, setFormData] = useState({
+    name: currentUser.name,
+    surname: currentUser.surname,
+    phoneNumber: currentUser.phone,
+    address: currentUser.address,
+    emergencyContactName: currentUser.emergencyContact,
+    emergencyContactNumber: currentUser.emergencyPhone,
+    profilePicture: null
+  });
 
   const SKILL_OPTIONS = [
     'Python', 'Java', 'JavaScript', 'TypeScript', 'C#', 'C++', 'R',
@@ -21,6 +30,49 @@ export default function Profile() {
     'Linux', 'Networking', 'Cybersecurity',
     'Other',
   ];
+
+  const createRequest = async (address,phoneNumber,emergencyContactNumber,emergencyContactName,surname,name, profilePicture) => {
+  
+      const request = {
+          employeeName: "john",
+          address: address,
+          phoneNumber: phoneNumber,
+          emergencyContactNumber: emergencyContactNumber,
+          emergencyContactName : emergencyContactName,
+          profilePicture : profilePicture,
+          surname: surname,
+          name: name,
+
+      };
+
+      try {
+          const response = await fetch("http://localhost:8080/api/employeeUpdate", {
+              method: "POST",
+              headers: {
+              "Content-Type": "application/json"
+              },
+              body: JSON.stringify(request)
+          });
+          if (!response.ok) {
+              throw new Error("Failed to create ticket");
+          }
+          } 
+      catch (error) {
+          console.error(error);
+      }
+    };
+
+  const onSubmit = (e) =>{
+    setShowEdit(false)
+    createRequest(
+      formData.address,
+      formData.phoneNumber,
+      formData.emergencyContactNumber,
+      formData.emergencyContactName,
+      formData.surname,
+      formData.name,
+  );
+  }
 
   const addSkill = () => {
     const skill = selectedSkill === 'Other' ? customSkill.trim() : selectedSkill;
@@ -102,13 +154,13 @@ export default function Profile() {
       <Modal isOpen={showEdit} onClose={() => setShowEdit(false)} title="Edit Personal Details">
         <div className="form-grid">
           <div className="form-grid form-grid-2">
-            <div className="form-group"><label>First Name</label><input className="field" defaultValue="Jamie" /></div>
-            <div className="form-group"><label>Last Name</label><input className="field" defaultValue="Chen" /></div>
+            <div className="form-group"><label>First Name</label><input className="field" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}/></div>
+            <div className="form-group"><label>Last Name</label><input className="field" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}/></div>
           </div>
-          <div className="form-group"><label>Phone Number</label><input className="field" defaultValue={currentUser.phone} /></div>
-          <div className="form-group"><label>Home Address</label><input className="field" defaultValue={currentUser.address} /></div>
-          <div className="form-group"><label>Emergency Contact Name</label><input className="field" defaultValue={currentUser.emergencyContact} /></div>
-          <div className="form-group"><label>Emergency Contact Phone</label><input className="field" defaultValue={currentUser.emergencyPhone} /></div>
+          <div className="form-group"><label>Phone Number</label><input className="field" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}/></div>
+          <div className="form-group"><label>Home Address</label><input className="field" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}/></div>
+          <div className="form-group"><label>Emergency Contact Name</label><input className="field" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}/></div>
+          <div className="form-group"><label>Emergency Contact Phone</label><input className="field" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}/></div>
           <div className="form-group">
             <label>Profile Photo</label>
             <div className="upload-zone">
@@ -117,7 +169,7 @@ export default function Profile() {
             </div>
           </div>
           <div className="modal-actions">
-            <button className="btn btn-primary" onClick={() => setShowEdit(false)}>Save Changes</button>
+            <button className="btn btn-primary" onClick={onSubmit}>Save Changes</button>
             <button className="btn btn-ghost" onClick={() => setShowEdit(false)}>Cancel</button>
           </div>
         </div>

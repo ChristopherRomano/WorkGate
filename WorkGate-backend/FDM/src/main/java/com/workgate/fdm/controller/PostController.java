@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:5173")
 public class PostController {
-    @RequestMapping("/post")
+    @RequestMapping("/posts")
     public List<Post> getPosts(){
         return List.of();
     }
