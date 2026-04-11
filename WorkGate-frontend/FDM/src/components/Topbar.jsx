@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import styles from './Topbar.module.css';
+import fdmLogo from '../assets/fdm-logo.png';
 import '../styles/components.css';
 
 const PAGE_META = {
@@ -35,6 +36,9 @@ export default function Topbar() {
       <div>
         <div className={styles.title}>{meta.title}</div>
         <div className={styles.subtitle}>{meta.sub(firstName)}</div>
+      </div>
+      <div className={styles.actions}>
+        <img className={styles.logo} src={fdmLogo} alt="FDM logo" />
       </div>
     </header>
   );
