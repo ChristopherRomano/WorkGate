@@ -1,0 +1,86 @@
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.count {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+
+.inactiveRow { opacity: 0.55; }
+
+.empCell  { display: flex; align-items: center; gap: 10px; }
+.empAvatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--surface-3); border: 1px solid var(--border-bright);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; font-family: var(--mono);
+  color: var(--lime); flex-shrink: 0;
+}
+.empName  { font-size: 13px; font-weight: 600; color: var(--text); }
+.empEmail { font-size: 11px; color: var(--text-dim); }
+.empRole  { font-size: 12px; font-weight: 600; color: var(--text); }
+.empTag   { font-size: 10px; color: var(--text-dim); font-family: var(--mono); margin-top: 2px; }
+
+.mono { font-family: var(--mono); font-size: 12px; }
+
+.actions { display: flex; gap: 6px; }
+
+.deactivateBtn {
+  color: var(--red, #f87171);
+  border: 1px solid rgba(248,113,113,0.3);
+  background: transparent;
+  font-size: 12px;
+  padding: 5px 11px;
+}
+.deactivateBtn:hover { background: rgba(248,113,113,0.1); }
+
+.reactivateBtn {
+  color: var(--green);
+  border: 1px solid rgba(134,239,172,0.3);
+  background: transparent;
+  font-size: 12px;
+  padding: 5px 11px;
+}
+.reactivateBtn:hover { background: rgba(134,239,172,0.1); }
+
+.empty {
+  padding: 32px 0;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.editSummary {
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.editEmail { font-size: 11px; color: var(--text-dim); }
+
+.warnBox {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.25);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text);
+}
+.warnIcon { font-size: 20px; flex-shrink: 0; }
+
+.confirmDeactivateBtn {
+  background: var(--red, #f87171) !important;
+  border-color: var(--red, #f87171) !important;
+}
