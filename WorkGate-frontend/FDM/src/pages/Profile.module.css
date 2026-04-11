@@ -69,3 +69,74 @@
   .twoCol { grid-template-columns: 1fr; }
   .skillsGrid { grid-template-columns: repeat(2, 1fr); }
 }
+
+.mobileSignOut {
+  display: none;
+}
+
+.prefCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.prefTitle {
+  font-size: 9px;
+  font-family: var(--mono);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+.prefRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.prefLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+.themeButtons {
+  display: flex;
+  gap: 6px;
+}
+.themeBtn {
+  padding: 6px 14px;
+  font-size: 11px;
+  font-family: var(--mono);
+  font-weight: 700;
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 0.3px;
+}
+.themeBtn:hover {
+  background: var(--surface-3);
+  color: var(--text);
+}
+.themeBtnActive {
+  background: var(--green);
+  color: var(--black);
+  border-color: var(--green);
+}
+
+@media (max-width: 768px) {
+  .profileHeader { padding: 18px 16px; gap: 14px; }
+  .bigAvatar { width: 54px; height: 54px; font-size: 18px; }
+  .profileName { font-size: 17px; }
+  .profileActions { flex-direction: row; flex-wrap: wrap; width: 100%; }
+  .skillsGrid { grid-template-columns: repeat(2, 1fr); }
+
+  .mobileSignOut {
+    display: block;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+}

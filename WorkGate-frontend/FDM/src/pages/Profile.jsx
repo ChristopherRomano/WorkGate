@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './Profile.module.css';
@@ -16,7 +18,9 @@ const SKILL_OPTIONS = [
 ];
 
 export default function Profile() {
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
   const [skills, setSkills] = useState(currentUser?.skills ?? []);
   const [showEdit, setShowEdit] = useState(false);
   const [showSkill, setShowSkill] = useState(false);
@@ -125,6 +129,37 @@ export default function Profile() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Preferences — mobile only */}
+      <div className={styles.mobileSignOut}>
+        <div className={styles.prefCard}>
+          <div className={styles.prefTitle}>Preferences</div>
+          <div className={styles.prefRow}>
+            <span className={styles.prefLabel}>Appearance</span>
+            <div className={styles.themeButtons}>
+              <button
+                className={`${styles.themeBtn} ${theme === 'light' ? styles.themeBtnActive : ''}`}
+                onClick={() => setTheme('light')}
+              >
+                ◑ Light
+              </button>
+              <button
+                className={`${styles.themeBtn} ${theme === 'dark' ? styles.themeBtnActive : ''}`}
+                onClick={() => setTheme('dark')}
+              >
+                ● Dark
+              </button>
+            </div>
+          </div>
+        </div>
+        <button
+          className="btn btn-danger"
+          style={{ width: '100%', justifyContent: 'center', marginTop: 12 }}
+          onClick={() => { logout(); navigate('/login'); }}
+        >
+          Sign Out
+        </button>
       </div>
 
       {/* Edit Profile Modal */}

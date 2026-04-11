@@ -81,3 +81,9 @@
   .statsGrid { grid-template-columns: repeat(2, 1fr); }
   .twoCol { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 768px) {
+  .twoCol > .card,
+  .twoCol > div { min-height: unset; }
+  .expenseAmount { font-size: 13px; }
+}
