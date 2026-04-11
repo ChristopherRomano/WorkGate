@@ -10,12 +10,16 @@ export function AuthProvider({ children }) {
     const user = users.find(u => u.username === username && u.password === password);
     if (user) {
       setCurrentUser(user);
+      localStorage.setItem('role', user.role);
       return user;
     }
     return null;
   };
 
-  const logout = () => setCurrentUser(null);
+  const logout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('role');
+  };
 
   return (
     <AuthContext.Provider value={{ currentUser, login, logout }}>
