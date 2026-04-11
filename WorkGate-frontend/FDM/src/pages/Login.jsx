@@ -14,9 +14,6 @@ const ACCOUNTS = [
   { username: 'employee',   role: 'Employee' },
   { username: 'consultant', role: 'Consultant' },
   { username: 'manager',    role: 'Manager' },
-  { username: 'ittech',     role: 'IT Technician' },
-  { username: 'hr',         role: 'HR Rep' },
-  { username: 'admin',      role: 'Administrator' },
 ];
 
 const ROLE_HOME = {

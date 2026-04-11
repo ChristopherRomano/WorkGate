@@ -4,14 +4,15 @@ import { useTheme } from '../context/ThemeContext';
 import styles from './Sidebar.module.css';
 
 // roles: which roles can see this item. Omit = visible to all authenticated users.
+// mobile: true = show in mobile bottom nav
 const NAV = [
   { section: 'Overview', items: [
-    { to: '/app',         icon: '◈', label: 'Dashboard',  roles: ['employee', 'consultant', 'manager'] },
-    { to: '/app/profile', icon: '◉', label: 'My Profile', roles: ['employee', 'consultant', 'manager'] },
+    { to: '/app',         icon: '◈', label: 'Dashboard',  roles: ['employee', 'consultant', 'manager'], mobile: true },
+    { to: '/app/profile', icon: '◉', label: 'My Profile', roles: ['employee', 'consultant', 'manager'], mobile: true },
   ]},
   { section: 'Work', items: [
     { to: '/app/timesheet', icon: '⏱', label: 'Timesheet', roles: ['consultant', 'manager'] },
-    { to: '/app/tasks',     icon: '✓', label: 'Tasks',     roles: ['employee', 'consultant', 'manager'], badge: 3 },
+    { to: '/app/tasks',     icon: '✓', label: 'Tasks',     roles: ['employee', 'consultant', 'manager'], badge: 3, mobile: true },
     { to: '/app/leave',     icon: '📅', label: 'Leave',    roles: ['employee', 'consultant', 'manager'] },
     { to: '/app/expenses',  icon: '£', label: 'Expenses',  roles: ['employee', 'consultant', 'manager'] },
   ]},
@@ -63,7 +64,12 @@ export default function Sidebar() {
 
   if (!currentUser) return null;
 
+  const mobileItems = NAV
+    .flatMap(s => s.items)
+    .filter(item => item.mobile && (!item.roles || item.roles.includes(currentUser.role)));
+
   return (
+    <>
     <aside className={styles.sidebar}>
       {/* Logo */}
       <div className={styles.logo}>
@@ -131,5 +137,23 @@ export default function Sidebar() {
         <button className={styles.logoutBtn} onClick={handleLogout}>Sign Out</button>
       </div>
     </aside>
+
+    {/* Mobile Bottom Nav — employee / consultant / manager only */}
+    {mobileItems.length > 0 && <nav className={styles.mobileNav}>
+      {mobileItems.map(({ to, icon, label }) => (
+        <NavLink
+          key={to}
+          to={to}
+          end={to === '/app'}
+          className={({ isActive }) =>
+            `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`
+          }
+        >
+          <span className={styles.mobileNavIcon}>{icon}</span>
+          <span className={styles.mobileNavLabel}>{label === 'My Profile' ? 'Profile' : label}</span>
+        </NavLink>
+      ))}
+    </nav>}
+    </>
   );
 }
