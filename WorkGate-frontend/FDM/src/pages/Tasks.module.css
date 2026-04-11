@@ -15,7 +15,11 @@
   gap: 11px;
   padding: 11px 0;
   border-bottom: 1px solid var(--border);
+  border-radius: 6px;
+  transition: background 0.1s;
 }
+
+.taskRow:hover { background: rgba(255,255,255,.03); padding-left: 6px; padding-right: 6px; }
 
 .taskRow:last-child { border-bottom: none; }
 
@@ -50,3 +54,22 @@
 }
 
 .completeBtn { flex-shrink: 0; }
+
+.deleteBtn { color: var(--red) !important; }
+
+.detailView { display: flex; flex-direction: column; gap: 14px; }
+
+.detailRow { display: flex; flex-direction: column; gap: 4px; }
+
+.detailLabel {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detailValue {
+  font-size: 13px;
+  color: var(--text);
+}
