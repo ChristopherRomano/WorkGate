@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { tasks as initialTasks } from '../data/mockData';
-import { useAuth } from '../context/AuthContext';
 import '../styles/components.css';
 import styles from './Tasks.module.css';
 
@@ -8,14 +7,27 @@ const PRIORITIES = ['high', 'medium', 'low'];
 const TYPES = ['Onboarding', 'Operational', 'Upskilling'];
 
 export default function Tasks() {
-  const { currentUser } = useAuth();
-  const isManager = currentUser?.role === 'Manager';
-
+  const isManager = localStorage.getItem('role') === 'manager';
   const [items, setItems] = useState(initialTasks);
   const [filter, setFilter] = useState('All');
   const [draft, setDraft] = useState(null);
+  const [adding, setAdding] = useState(false);
+  const [newTask, setNewTask] = useState({ title: '', description: '', dueDate: '', priority: 'medium', type: 'Onboarding' });
+  const [addErrors, setAddErrors] = useState([]);
 
-  const openTask = (task) => setDraft({ ...task });
+  const addTask = () => {
+    const errors = [];
+    if (newTask.title.trim().length < 3) errors.push('Title must be at least 3 characters.');
+    if (newTask.description.trim().length < 10) errors.push('Description must be at least 10 characters.');
+    if (!newTask.dueDate) errors.push('Due date is required.');
+    else if (new Date(newTask.dueDate) < new Date(new Date().toDateString())) errors.push('Due date cannot be in the past.');
+    if (errors.length) { setAddErrors(errors); return; }
+    setItems(prev => [...prev, { ...newTask, id: `t${Date.now()}`, due: newTask.dueDate, done: false }]);
+    setNewTask({ title: '', description: '', dueDate: '', priority: 'medium', type: 'Onboarding' });
+    setAddErrors([]);
+    setAdding(false);
+  };
+
   const closeOverlay = () => setDraft(null);
 
   const saveChanges = () => {
@@ -43,10 +55,15 @@ export default function Tasks() {
 
   return (
     <div className="animate-fade">
-      <div className={styles.filters}>
-        {types.map(t => (
-          <button key={t} className={`btn ${filter === t ? 'btn-primary' : 'btn-ghost'} btn-sm`} onClick={() => setFilter(t)}>{t}</button>
-        ))}
+      <div className={styles.topBar}>
+        <div className={styles.filters}>
+          {types.map(t => (
+            <button key={t} className={`btn ${filter === t ? 'btn-primary' : 'btn-ghost'} btn-sm`} onClick={() => setFilter(t)}>{t}</button>
+          ))}
+        </div>
+        {isManager && (
+          <button className="btn btn-primary btn-sm" onClick={() => setAdding(true)}>+ Add Task</button>
+        )}
       </div>
 
       {Object.entries(grouped).map(([type, group]) => (
@@ -54,18 +71,85 @@ export default function Tasks() {
           <div className="card-header"><span className="card-title">{type} Tasks</span></div>
           <div className={`card-body ${styles.taskBody}`}>
             {group.map(task => (
-              <div key={task.id} className={styles.taskRow} onClick={() => openTask(task)}>
+              <div
+                key={task.id}
+                className={styles.taskRow}
+                onClick={!isManager ? () => setDraft({ ...task }) : undefined}
+                style={!isManager ? { cursor: 'pointer' } : undefined}
+              >
                 <div className={styles.taskInfo}>
                   <div className={`${styles.taskTitle} ${task.done ? styles.done : ''}`}>{task.title}</div>
                   <div className={styles.taskMeta}>{task.type} · {task.due}</div>
                 </div>
-                <span className={`pill pill-${task.priority}`}>{task.priority.toUpperCase()}</span>
+
+                {!isManager && <span className={`pill pill-${task.priority}`}>{task.priority.toUpperCase()}</span>}
+
                 {task.done && <span className={styles.completedBadge}>✓ Completed</span>}
+
+                {isManager && (
+                  <button
+                    className={styles.editIconBtn}
+                    onClick={() => setDraft({ ...task })}
+                    title="Edit task"
+                  >
+                    ✏️
+                  </button>
+                )}
               </div>
             ))}
           </div>
         </div>
       ))}
+
+      {adding && (
+        <div className="modal-overlay" onClick={() => { setAdding(false); setAddErrors([]); }}>
+          <div className="modal" style={{ width: 520 }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <span className="modal-title">ADD TASK</span>
+              <button className="modal-close" onClick={() => { setAdding(false); setAddErrors([]); }}>×</button>
+            </div>
+            {addErrors.length > 0 && (
+              <div className={styles.errorBar}>
+                {addErrors.map((e, i) => <div key={i}>{e}</div>)}
+              </div>
+            )}
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Title</label>
+                  <input className="field" value={newTask.title} onChange={e => setNewTask(n => ({ ...n, title: e.target.value }))} placeholder="Task title" />
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea className="field" style={{ minHeight: 80 }} value={newTask.description} onChange={e => setNewTask(n => ({ ...n, description: e.target.value }))} placeholder="Optional description" />
+                </div>
+                <div className="form-grid form-grid-2">
+                  <div className="form-group">
+                    <label>Due Date</label>
+                    <input className="field" type="date" value={newTask.dueDate} onChange={e => setNewTask(n => ({ ...n, dueDate: e.target.value }))} />
+                  </div>
+                  <div className="form-group">
+                    <label>Priority</label>
+                    <select className="field" value={newTask.priority} onChange={e => setNewTask(n => ({ ...n, priority: e.target.value }))}>
+                      {PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Category</label>
+                  <select className="field" value={newTask.type} onChange={e => setNewTask(n => ({ ...n, type: e.target.value }))}>
+                    {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div className="modal-actions">
+                  <button className="btn btn-primary" onClick={addTask}>Add Task</button>
+                  <button className="btn btn-ghost" onClick={() => { setAdding(false); setAddErrors([]); }}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {draft && (
         <div className="modal-overlay" onClick={closeOverlay}>
