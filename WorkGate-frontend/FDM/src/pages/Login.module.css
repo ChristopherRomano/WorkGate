@@ -307,6 +307,40 @@
   color: var(--red, #f87171);
 }
 
+/* ── Light mode overrides ── */
+:global([data-theme="light"]) .page {
+  background:
+    radial-gradient(circle at top left, rgba(111, 160, 0, 0.12), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(0, 166, 81, 0.1), transparent 28%),
+    linear-gradient(135deg, #e8e8e8 0%, #efefef 52%, #e4e4e4 100%);
+}
+
+:global([data-theme="light"]) .heroInner {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.6), transparent 28%),
+    linear-gradient(145deg, rgba(235,235,235,0.98), rgba(220,220,220,0.96));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+:global([data-theme="light"]) .panel {
+  background:
+    linear-gradient(180deg, rgba(111,160,0,0.06), transparent 18%),
+    rgba(245,245,245,0.98);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.1);
+}
+
+:global([data-theme="light"]) .metricCard {
+  background: rgba(0,0,0,0.03);
+}
+
+:global([data-theme="light"]) .demoBtn {
+  background: rgba(0,0,0,0.03);
+}
+
+:global([data-theme="light"]) .demoBtn:hover {
+  background: var(--lime-dim);
+}
+
 @media (max-width: 1100px) {
   .shell {
     grid-template-columns: 1fr;
