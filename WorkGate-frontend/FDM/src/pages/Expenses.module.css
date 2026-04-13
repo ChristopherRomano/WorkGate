@@ -1,3 +1,4 @@
+/* ── Stats ── */
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -29,6 +30,7 @@
 
 .statLabel { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
+/* ── Table cells ── */
 .iconCell { font-size: 20px; width: 40px; }
 
 .amountCell {
@@ -40,4 +42,266 @@
 .projectCell {
   font-family: var(--mono);
   font-size: 11px;
+}
+
+/* ── Tab bar ── */
+.tabBar {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.tabBtn {
+  padding: 7px 22px;
+  border-radius: calc(var(--radius) - 3px);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--sans);
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all var(--transition);
+}
+
+.tabBtn:hover { color: var(--text); }
+
+.tabBtnActive {
+  background: var(--green);
+  color: var(--black);
+  box-shadow: 0 2px 8px var(--green-glow);
+}
+
+/* ── Calendar ── */
+.calHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.calTitle {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  flex: 1;
+  text-align: center;
+}
+
+.calClearBtn { margin-left: auto; }
+
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  padding: 12px;
+}
+
+.calDayName {
+  text-align: center;
+  font-size: 9px;
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  padding: 4px 0 8px;
+}
+
+.calDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 4px;
+  border-radius: 6px;
+  min-height: 44px;
+  transition: background var(--transition);
+}
+
+.calDayHasItems {
+  cursor: pointer;
+}
+
+.calDayHasItems:hover { background: var(--surface-2); }
+
+.calDaySelected {
+  background: var(--lime-dim) !important;
+  border: 1px solid var(--lime-border);
+}
+
+.calDayNum {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.calDayHasItems .calDayNum { color: var(--text); font-weight: 600; }
+.calDaySelected .calDayNum { color: var(--lime); }
+
+.calDots {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dotPending,
+.dotApproved,
+.dotRejected {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.dotPending  { background: var(--amber); }
+.dotApproved { background: var(--lime); }
+.dotRejected { background: var(--red); }
+
+/* ── Team filter bar ── */
+.teamFilters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.dayFilterBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--lime-dim);
+  border: 1px solid var(--lime-border);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--lime);
+}
+
+.dayFilterClear {
+  background: none;
+  border: none;
+  color: var(--lime);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+}
+.dayFilterClear:hover { opacity: 1; }
+
+/* ── Clickable table row ── */
+.clickableRow { cursor: pointer; }
+
+.statusCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reviewHint {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.clickableRow:hover .reviewHint { opacity: 1; }
+
+/* ── Employee cell ── */
+.employeeCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--lime-dim);
+  border: 1px solid var(--lime-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--mono);
+  color: var(--lime);
+  flex-shrink: 0;
+}
+
+/* ── Review overlay card ── */
+.reviewCard {
+  background: var(--black-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reviewCardTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reviewInfo { flex: 1; }
+
+.reviewEmployee {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.reviewMeta {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.reviewAmount {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--lime);
+}
+
+.reviewDetail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.reviewIcon { font-size: 18px; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .statsGrid { grid-template-columns: 1fr; }
+  .tabBar { width: 100%; }
+  .tabBtn { flex: 1; text-align: center; }
+  .calGrid { gap: 2px; padding: 8px; }
+  .calDay { padding: 4px 2px; min-height: 36px; }
+  .calDayNum { font-size: 11px; }
 }
