@@ -1,5 +1,6 @@
 package com.workgate.fdm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Employee extends User {
@@ -13,17 +14,11 @@ public class Employee extends User {
 	private List<Request> requestList;
 	private TaskList taskList;
 	private int annualLeaveBalance;
-	private String name;
 
-	/**
-	 * 
-	 * @param email
-	 * @param password
-	 */
 	public Employee(String email, String password) {
-        super(email, password);
-		// TODO - implement Employee.Employee
-		throw new UnsupportedOperationException();
+		super(email, password);
+		this.taskList = new TaskList();
+		this.requestList = new ArrayList<>();
 	}
 
 	public boolean submitHrReport() {
@@ -47,105 +42,35 @@ public class Employee extends User {
 	}
 
 	public List<Request> viewRequests() {
-		// TODO - implement Employee.viewRequests
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * 
-	 * @param request
-	 */
-	public boolean cancelRequest(Request request) {
-		// TODO - implement Employee.cancelRequest
-		throw new UnsupportedOperationException();
-	}
-
-	public List<Task> viewTasks() {
-		// TODO - implement Employee.viewTasks
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * 
-	 * @param task
-	 */
-	public void completeTask(Task task) {
-		// TODO - implement Employee.completeTask
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * 
-	 * @param tag
-	 */
-	public void setTag(TAG tag) {
-		this.tag = tag;
-	}
-
-	/**
-	 * 
-	 * @param address
-	 */
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	/**
-	 * 
-	 * @param phoneNum
-	 */
-	public void setPhoneNum(String phoneNum) {
-		// TODO - implement Employee.setPhoneNum
-        this.phoneNumber = phoneNum; 
-	}
-
-	/**
-	 * 
-	 * @param phoneNum
-	 */
-	public void setEmergencyContact(String phoneNum) {
-		this.emergencyContact = phoneNum;
-	}
-
-	/**
-	 * 
-	 * @param image
-	 */
-	public void setProfilePic(String image) {
-		// TODO - implement Employee.setProfilePic
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * 
-	 * @param manager
-	 */
-	public void setManager(Manager manager) {
-		this.manager = manager;
-	}
-
-	/**
-	 * 
-	 * @param annualLeaveBalance
-	 */
-	public void setAnnualLeaveBalance(int annualLeaveBalance) {
-		this.annualLeaveBalance = annualLeaveBalance;
-	}
-
-	public TAG getTag() {
-		return this.tag;
-	}
-
-	public int getAnnualLeaveBalance() {
-		return this.annualLeaveBalance;
-	}
-
-	public List<Request> getRequestList() {
 		return this.requestList;
 	}
 
-	public TaskList getTaskList() {
-		return this.taskList;
+	public boolean cancelRequest(Request request) {
+		return this.requestList.remove(request);
 	}
+
+	public List<Task> viewTasks() {
+		return this.taskList.getTasks();
+	}
+
+	public void completeTask(Task task) {
+		task.setCompletion(true);
+	}
+
+	public void setTag(TAG tag)                             { this.tag = tag; }
+	public void setAddress(String address)                  { this.address = address; }
+	public void setPhoneNum(String phoneNum)                { this.phoneNumber = phoneNum; }
+	public void setEmergencyContact(String contact)         { this.emergencyContact = contact; }
+	public void setProfilePic(String image)                 { this.profilePicture = image; }
+	public void setManager(Manager manager)                 { this.manager = manager; }
+	public void setAnnualLeaveBalance(int balance)          { this.annualLeaveBalance = balance; }
+
+	public TAG getTag()                     { return this.tag; }
+	public int getAnnualLeaveBalance()      { return this.annualLeaveBalance; }
+	public List<Request> getRequestList()   { return this.requestList; }
+	public TaskList getTaskList()           { return this.taskList; }
+	public Manager getManager()             { return this.manager; }
+	public String getAddress()              { return this.address; }
+	public String getPhoneNumber()          { return this.phoneNumber; }
 
 }

@@ -1,19 +1,27 @@
-import { useState } from 'react';
-import { employees } from '../data/mockData';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { fetchEmployees, assignTask } from '../api/api';
 import '../styles/components.css';
 import styles from './SetTask.module.css';
 
 const EMPTY_FORM = { title: '', priority: 'medium', type: 'Operational', due: '', description: '' };
 
 export default function SetTask() {
+  const { currentUser } = useAuth();
+  const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [assigned, setAssigned] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+
+  useEffect(() => {
+    fetchEmployees().then(setEmployees).catch(() => {});
+  }, []);
 
   const filtered = search.trim()
-    ? employees.filter(e => e.name.toLowerCase().includes(search.toLowerCase()))
+    ? employees.filter(e => e.name?.toLowerCase().includes(search.toLowerCase()))
     : [];
 
   const selectEmployee = (emp) => { setSelected(emp); setSearch(''); };
@@ -25,21 +33,35 @@ export default function SetTask() {
 
   const canSubmit = selected && form.title.trim() && form.description.trim() && form.due;
 
-  const submit = () => {
+  const submit = async () => {
     if (!canSubmit) return;
-    setAssigned(prev => [{
-      id: `t-mgr-${Date.now()}`,
-      employee: selected,
-      title: form.title.trim(),
-      description: form.description.trim(),
-      priority: form.priority,
-      type: form.type,
-      due: form.due,
-    }, ...prev]);
-    setForm(EMPTY_FORM);
-    setSelected(null);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+    setSubmitError(null);
+    try {
+      const res = await assignTask({
+        managerEmail: currentUser.email,
+        employeeEmail: selected.email,
+        title: form.title.trim(),
+        description: form.description.trim(),
+        priority: form.priority.toUpperCase(),
+        dueDate: form.due,
+        category: form.type,
+      });
+      setAssigned(prev => [{
+        id: res.taskId,
+        employee: selected,
+        title: form.title.trim(),
+        description: form.description.trim(),
+        priority: form.priority,
+        type: form.type,
+        due: form.due,
+      }, ...prev]);
+      setForm(EMPTY_FORM);
+      setSelected(null);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (e) {
+      setSubmitError(e.message);
+    }
   };
 
   return (
@@ -58,13 +80,13 @@ export default function SetTask() {
                   <div className={styles.selectedAvatar}>{selected.initials}</div>
                   <div className={styles.selectedInfo}>
                     <div className={styles.selectedName}>{selected.name}</div>
-                    <div className={styles.selectedMeta}>{selected.role} · {selected.client}</div>
+                    <div className={styles.selectedMeta}>{selected.role}</div>
                   </div>
                   <button className="btn btn-ghost btn-sm" onClick={() => setSelected(null)}>Change</button>
                 </div>
               ) : (
                 <>
-                  <input className="field" placeholder="Search by name..." value={search} onChange={e => setSearch(e.target.value)} autoComplete="off" />
+                  <input className="field" placeholder="Search by name…" value={search} onChange={e => setSearch(e.target.value)} autoComplete="off" />
                   {filtered.length > 0 && (
                     <div className={styles.dropdown}>
                       {filtered.map(emp => (
@@ -72,7 +94,7 @@ export default function SetTask() {
                           <div className={styles.dropdownAvatar}>{emp.initials}</div>
                           <div>
                             <div className={styles.dropdownName}>{emp.name}</div>
-                            <div className={styles.dropdownMeta}>{emp.role} · {emp.client}</div>
+                            <div className={styles.dropdownMeta}>{emp.role}</div>
                           </div>
                         </div>
                       ))}
@@ -116,10 +138,11 @@ export default function SetTask() {
 
             <div className="form-group">
               <label>Description</label>
-              <textarea className="field" style={{ minHeight: 130 }} placeholder="Describe the task in detail..." {...field('description')} />
+              <textarea className="field" style={{ minHeight: 130 }} placeholder="Describe the task in detail…" {...field('description')} />
             </div>
 
             {showSuccess && <div className={styles.successBanner}>Task assigned successfully.</div>}
+            {submitError && <div className={styles.errorBanner}>{submitError}</div>}
 
             <button className={`btn btn-primary ${styles.assignBtn}`} onClick={submit} disabled={!canSubmit}>
               Assign Task
@@ -144,6 +167,7 @@ export default function SetTask() {
             ))}
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 package com.workgate.fdm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Consultant extends Employee {
@@ -8,42 +9,22 @@ public class Consultant extends Employee {
 	private List<String> keySkills;
 	private int endDate;
 
-	/**
-	 * 
-	 * @param email
-	 * @param password
-	 */
 	public Consultant(String email, String password) {
-        super(email, password);
-        // TODO - implement Consultant.Consultant
-		throw new UnsupportedOperationException();
+		super(email, password);
+		this.keySkills = new ArrayList<>();
 	}
 
-	/**
-	 * 
-	 * @param hours
-	 */
 	public boolean updateTimeSheet(int hours) {
 		// TODO - implement Consultant.updateTimeSheet
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * 
-	 * @param skill
-	 */
 	public boolean addKeySkill(String skill) {
-		// TODO - implement Consultant.addKeySkill
-		throw new UnsupportedOperationException();
+		return keySkills.add(skill);
 	}
 
-	/**
-	 * 
-	 * @param skill
-	 */
 	public boolean removeKeySkill(String skill) {
-		// TODO - implement Consultant.removeKeySkill
-		throw new UnsupportedOperationException();
+		return keySkills.remove(skill);
 	}
 
 	public boolean printInformation() {
@@ -51,25 +32,10 @@ public class Consultant extends Employee {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * 
-	 * @param endDate
-	 */
-	public void setEndDate(int endDate) {
-		this.endDate = endDate;
-	}
+	public void setEndDate(int endDate)       { this.endDate = endDate; }
+	public void setClientCode(String code)    { this.activeClientCode = code; }
 
-	/**
-	 * 
-	 * @param clientCode
-	 */
-	public void setClientCode(String clientCode) {
-		// TODO - implement Consultant.setClientCode
-		throw new UnsupportedOperationException();
-	}
-
-	public String getActiveClientCode() {
-		return this.activeClientCode;
-	}
+	public String getActiveClientCode()       { return this.activeClientCode; }
+	public List<String> getKeySkills()        { return this.keySkills; }
 
 }

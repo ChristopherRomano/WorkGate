@@ -1,19 +1,20 @@
 import { createContext, useContext, useState } from 'react';
-import { users } from '../data/mockData';
+import { loginUser } from '../api/api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
 
-  const login = (username, password) => {
-    const user = users.find(u => u.username === username && u.password === password);
-    if (user) {
+  const login = async (username, password) => {
+    try {
+      const user = await loginUser(username, password);
       setCurrentUser(user);
       localStorage.setItem('role', user.role);
       return user;
+    } catch {
+      return null;
     }
-    return null;
   };
 
   const logout = () => {

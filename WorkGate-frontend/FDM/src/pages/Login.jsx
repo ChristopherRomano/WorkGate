@@ -32,10 +32,10 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const user = login(username.trim(), password);
+    const user = await login(username.trim(), password);
     if (user) {
       navigate(ROLE_HOME[user.role] ?? '/app');
     } else {
@@ -43,8 +43,8 @@ export default function Login() {
     }
   };
 
-  const quickLogin = (u) => {
-    const user = login(u, 'pass');
+  const quickLogin = async (u) => {
+    const user = await login(u, 'pass');
     if (user) navigate(ROLE_HOME[user.role] ?? '/app');
   };
 

@@ -140,6 +140,15 @@
   padding: 10px 14px;
 }
 
+.errorBanner {
+  font-size: 13px;
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
 .assignBtn { width: 100%; }
 
 .recentBody { padding: 8px 24px; }

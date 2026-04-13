@@ -1,50 +1,65 @@
 package com.workgate.fdm;
 
+import java.util.UUID;
+
 public abstract class User {
 
+	private String id;
 	private String email;
 	private String password;
+	private String username;
+	private String name;
+	private String initials;
 	private int failedAttempts;
 	private boolean isLocked;
 	private String language;
 
-	/**
-	 * 
-	 * @param email
-	 * @param password
-	 */
 	public User(String email, String password) {
-		// TODO - implement User.User
-		throw new UnsupportedOperationException();
+		this.id = UUID.randomUUID().toString();
+		this.email = email;
+		this.password = password;
+		this.failedAttempts = 0;
+		this.isLocked = false;
 	}
 
-	/**
-	 * 
-	 * @param Username
-	 * @param Password
-	 */
-	public boolean Login(String Username, String Password) {
-		// TODO - implement User.Login
-		throw new UnsupportedOperationException();
+	public boolean Login(String username, String password) {
+		if (isLocked) return false;
+		if (this.email.equals(username) && this.password.equals(password)) {
+			this.failedAttempts = 0;
+			return true;
+		}
+		this.failedAttempts++;
+		if (this.failedAttempts >= 5) this.isLocked = true;
+		return false;
+	}
+
+	public boolean checkPassword(String password) {
+		return this.password.equals(password);
 	}
 
 	public void requestPasswordReset() {
-		// TODO - implement User.requestPasswordReset
-		throw new UnsupportedOperationException();
+		// TODO - implement password reset flow
 	}
 
-	/**
-	 * 
-	 * @param language
-	 */
 	public void changeLanguage(String language) {
-		// TODO - implement User.changeLanguage
-		throw new UnsupportedOperationException();
+		this.language = language;
 	}
 
 	public void unlock() {
-		// TODO - implement User.unlock
-		throw new UnsupportedOperationException();
+		this.isLocked = false;
+		this.failedAttempts = 0;
 	}
+
+	public String getId()       { return this.id; }
+	public String getEmail()    { return this.email; }
+	public String getUsername() { return this.username; }
+	public String getName()     { return this.name; }
+	public String getInitials() { return this.initials; }
+	public boolean isLocked()   { return this.isLocked; }
+
+	public void setId(String id)           { this.id = id; }
+	public void setUsername(String username) { this.username = username; }
+	public void setName(String name)         { this.name = name; }
+	public void setInitials(String initials) { this.initials = initials; }
 
 }

@@ -6,60 +6,38 @@ public class Manager extends Poster {
 
 	private String teamCode;
 
-	/**
-	 * 
-	 * @param email
-	 * @param password
-	 */
 	public Manager(String email, String password) {
-        super(email, password);
-        // TODO - implement Manager.Manager
-		throw new UnsupportedOperationException();
+		super(email, password);
 	}
 
 	public List<ManagerRequest> getManagerRequest() {
-		// TODO - implement Manager.getManagerRequest
-		throw new UnsupportedOperationException();
+		return Registry.getRegistry().getActiveManagerRequests(this);
 	}
 
-	/**
-	 * 
-	 * @param emp
-	 * @param tid
-	 * @param completion
-	 * @param desc
-	 * @param title
-	 * @param priority
-	 */
 	public void assignTask(Employee emp, int tid, boolean completion, String desc, String title, PRIORITY priority) {
-		// TODO - implement Manager.assignTask
-		throw new UnsupportedOperationException();
+		Task task = new Task(tid, completion, desc, title, priority);
+		emp.getTaskList().addTask(task);
 	}
 
-	/**
-	 * 
-	 * @param name
-	 */
+	public void assignTask(Employee emp, int tid, boolean completion, String desc, String title, PRIORITY priority, String dueDate, String category) {
+		Task task = new Task(tid, completion, desc, title, priority, dueDate, category);
+		emp.getTaskList().addTask(task);
+	}
+
 	public Employee searchEmployee(String name) {
-		// TODO - implement Manager.searchEmployee
-		throw new UnsupportedOperationException();
+		return Registry.getRegistry().findEmployeeByName(name);
 	}
 
-	/**
-	 * 
-	 * @param e
-	 */
 	public TaskList getEmployeeTasks(Employee e) {
-		// TODO - implement Manager.getEmployeeTasks
-		throw new UnsupportedOperationException();
+		return e.getTaskList();
 	}
 
-	/**
-	 * 
-	 * @param teamCode
-	 */
 	public void setTeamCode(String teamCode) {
 		this.teamCode = teamCode;
+	}
+
+	public String getTeamCode() {
+		return this.teamCode;
 	}
 
 	public float getPendingExpenseTotal() {
