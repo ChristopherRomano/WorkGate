@@ -86,7 +86,7 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className={styles.twoCol}>
+      <div className={isConsultant ? styles.twoCol : styles.fullWidth}>
         {/* Personal Details */}
         <div className="card">
           <div className="card-header">
@@ -98,8 +98,8 @@ export default function Profile() {
               <tbody>
                 {detailRows.map(([label, value]) => (
                   <tr key={label}>
-                    <td style={{ color: 'var(--text-dim)', fontSize: 10, fontFamily: 'var(--mono)', width: 130, paddingLeft: 20 }}>{label}</td>
-                    <td style={{ paddingRight: 20 }}><strong>{value}</strong></td>
+                    <td className={styles.detailLabel}>{label}</td>
+                    <td className={styles.detailValue}>{value}</td>
                   </tr>
                 ))}
               </tbody>

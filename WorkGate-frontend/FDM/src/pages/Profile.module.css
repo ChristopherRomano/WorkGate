@@ -1,11 +1,12 @@
+/* ── Header ── */
 .profileHeader {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 26px;
+  padding: 28px 32px;
   display: flex;
   align-items: flex-start;
-  gap: 22px;
+  gap: 24px;
   margin-bottom: 18px;
   position: relative;
   overflow: hidden;
@@ -17,8 +18,9 @@
   height: 3px;
   background: linear-gradient(90deg, var(--lime), #a8d900);
 }
+
 .bigAvatar {
-  width: 70px; height: 70px;
+  width: 72px; height: 72px;
   background: var(--lime);
   border-radius: var(--radius);
   display: flex;
@@ -30,15 +32,53 @@
   color: var(--black);
   flex-shrink: 0;
 }
-.profileMeta { flex: 1; }
-.profileName { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--text); }
-.profileRole { color: var(--text-dim); font-size: 13px; margin-top: 4px; }
-.profileTags { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
-.profileActions { display: flex; gap: 10px; flex-shrink: 0; }
 
-.twoCol { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.profileMeta  { flex: 1; min-width: 0; }
+.profileName  { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--text); }
+.profileRole  { color: var(--text-dim); font-size: 13px; margin-top: 5px; }
+.profileTags  { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+.profileActions { display: flex; gap: 10px; align-items: flex-start; flex-shrink: 0; }
 
-.skillsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+/* ── Body layout ── */
+
+/* Two-column: consultant view (personal details narrow, skills wide) */
+.twoCol {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 16px;
+}
+
+/* Single-column: non-consultant, cards span full width */
+.fullWidth {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Details table ── */
+.detailLabel {
+  color: var(--text-dim);
+  font-size: 10px;
+  font-family: var(--mono);
+  letter-spacing: 0.5px;
+  width: 130px;
+  padding-left: 20px;
+  white-space: nowrap;
+}
+.detailValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  padding-right: 20px;
+}
+
+/* ── Skills ── */
+.skillsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
 .skillTag {
   background: var(--surface-3);
   border: 1px solid var(--border);
@@ -50,6 +90,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 6px;
+  word-break: break-word;
 }
 .skillTag button {
   background: none;
@@ -59,17 +101,12 @@
   font-size: 15px;
   line-height: 1;
   padding: 0;
+  flex-shrink: 0;
   transition: color var(--transition);
 }
 .skillTag button:hover { color: var(--red); }
 
-@media (max-width: 900px) {
-  .profileHeader { flex-wrap: wrap; }
-  .profileActions { flex-direction: column; width: 100%; }
-  .twoCol { grid-template-columns: 1fr; }
-  .skillsGrid { grid-template-columns: repeat(2, 1fr); }
-}
-
+/* ── Mobile: preferences + sign-out ── */
 .mobileSignOut {
   display: none;
 }
@@ -99,10 +136,7 @@
   font-weight: 500;
   color: var(--text);
 }
-.themeButtons {
-  display: flex;
-  gap: 6px;
-}
+.themeButtons { display: flex; gap: 6px; }
 .themeBtn {
   padding: 6px 14px;
   font-size: 11px;
@@ -116,26 +150,36 @@
   transition: all var(--transition);
   letter-spacing: 0.3px;
 }
-.themeBtn:hover {
-  background: var(--surface-3);
-  color: var(--text);
-}
-.themeBtnActive {
-  background: var(--green);
-  color: var(--black);
-  border-color: var(--green);
+.themeBtn:hover { background: var(--surface-3); color: var(--text); }
+.themeBtnActive { background: var(--green); color: var(--black); border-color: var(--green); }
+
+/* ── Tablet ── */
+@media (max-width: 900px) {
+  .twoCol { grid-template-columns: 1fr; }
+  .skillsGrid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 768px) {
-  .profileHeader { padding: 18px 16px; gap: 14px; }
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .profileHeader {
+    padding: 16px;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
   .bigAvatar { width: 54px; height: 54px; font-size: 18px; }
   .profileName { font-size: 17px; }
-  .profileActions { flex-direction: row; flex-wrap: wrap; width: 100%; }
-  .skillsGrid { grid-template-columns: repeat(2, 1fr); }
+  .profileRole { font-size: 12px; }
+  .profileActions { width: 100%; }
+  .profileActions .btn { flex: 1; justify-content: center; }
+
+  .detailLabel { width: 110px; padding-left: 14px; }
+  .detailValue { padding-right: 14px; }
+
+  .skillsGrid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
   .mobileSignOut {
     display: block;
-    margin-top: 24px;
+    margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid var(--border);
   }

@@ -127,10 +127,7 @@
   transition: background var(--transition);
 }
 
-.calDayHasItems {
-  cursor: pointer;
-}
-
+.calDayHasItems { cursor: pointer; }
 .calDayHasItems:hover { background: var(--surface-2); }
 
 .calDaySelected {
