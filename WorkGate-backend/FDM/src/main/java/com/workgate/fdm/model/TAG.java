@@ -6,6 +6,7 @@ public enum TAG {
 	DEPLOYED,
 	IT,
 	MANAGER,
+	EMPLOYEE,
 	HR,
 	OTHER,
 	;

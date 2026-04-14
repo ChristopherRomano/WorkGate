@@ -33,7 +33,7 @@ public class Administrator extends User {
 		return true;
 	}
 
-	public boolean addCllientCode(String clientCode) {
+	public boolean addClientCode(ClientCode clientCode) {
 		Registry.getRegistry().addClientCode(clientCode);
 		return true;
 	}

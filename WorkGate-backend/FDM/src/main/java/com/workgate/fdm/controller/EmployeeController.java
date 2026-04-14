@@ -32,7 +32,7 @@ public class EmployeeController {
      * GET /api/employees/{email}
      * Returns a single employee by email.
      */
-    @GetMapping("/{email}")
+    @GetMapping("/{email:.+}")
     public ResponseEntity<?> getEmployee(@PathVariable String email) {
         Employee emp = registry.findEmployeeByEmail(email);
         if (emp == null) return ResponseEntity.notFound().build();
@@ -48,6 +48,7 @@ public class EmployeeController {
         m.put("role",     resolveRole(emp));
         m.put("tag",      emp.getTag() != null ? emp.getTag().name() : null);
         m.put("manager",  emp.getManager() != null ? emp.getManager().getName() : null);
+        m.put("active",   emp.isActive());
         return m;
     }
 

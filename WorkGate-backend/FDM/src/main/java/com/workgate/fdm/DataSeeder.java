@@ -72,6 +72,14 @@ public class DataSeeder {
         chris.setName("Chris Morgan");
         chris.setInitials("CM");
         reg.addUser(chris);
+
+        // client codes
+        reg.addClientCode(new ClientCode("CLIENT-001", "HSBC",         "Banking"));
+        reg.addClientCode(new ClientCode("CLIENT-002", "NatWest",      "Banking"));
+        reg.addClientCode(new ClientCode("CLIENT-003", "Barclays",     "Banking"));
+        reg.addClientCode(new ClientCode("CLIENT-004", "Deloitte",     "Consulting"));
+        reg.addClientCode(new ClientCode("CLIENT-005", "KPMG",         "Consulting"));
+        reg.addClientCode(new ClientCode("INTERNAL",   "FDM Internal", "Internal"));
     }
 
 }

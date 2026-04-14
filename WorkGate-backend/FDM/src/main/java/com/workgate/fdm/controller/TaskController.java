@@ -64,7 +64,7 @@ public class TaskController {
      * GET /api/tasks/employee/{email}
      * Returns all tasks assigned to the employee with the given email.
      */
-    @GetMapping("/employee/{email}")
+    @GetMapping("/employee/{email:.+}")
     public ResponseEntity<?> getEmployeeTasks(@PathVariable String email) {
         Employee employee = registry.findEmployeeByEmail(email);
         if (employee == null) {

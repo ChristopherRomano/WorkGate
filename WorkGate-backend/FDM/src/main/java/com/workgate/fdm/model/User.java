@@ -12,6 +12,7 @@ public abstract class User {
 	private String initials;
 	private int failedAttempts;
 	private boolean isLocked;
+	private boolean active;
 
 	public User(String email, String password) {
 		this.id = UUID.randomUUID().toString();
@@ -19,6 +20,7 @@ public abstract class User {
 		this.password = password;
 		this.failedAttempts = 0;
 		this.isLocked = false;
+		this.active = true;
 	}
 
 	public boolean Login(String username, String password) {
@@ -51,10 +53,12 @@ public abstract class User {
 	public String getName()     { return this.name; }
 	public String getInitials() { return this.initials; }
 	public boolean isLocked()   { return this.isLocked; }
+	public boolean isActive()   { return this.active; }
 
-	public void setId(String id)           { this.id = id; }
+	public void setId(String id)             { this.id = id; }
 	public void setUsername(String username) { this.username = username; }
 	public void setName(String name)         { this.name = name; }
 	public void setInitials(String initials) { this.initials = initials; }
+	public void setActive(boolean active)    { this.active = active; }
 
 }
