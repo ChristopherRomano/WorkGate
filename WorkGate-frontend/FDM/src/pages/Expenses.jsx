@@ -383,7 +383,7 @@ export default function Expenses() {
             </div>
           </div>
           <div className="modal-actions">
-            <button className="btn btn-primary" onClick={submitPersonal}>Submit Claim</button>
+            <button className="btn btn-primary" onClick={submit}>Submit Claim</button>
           </div>
         </div>
       </Modal>
