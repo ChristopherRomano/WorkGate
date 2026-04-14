@@ -3,8 +3,9 @@ import { createEmployee, fetchEmployees, fetchClientCodes } from '../api/api';
 import '../styles/components.css';
 import styles from './AddEmployee.module.css';
 
+const DOMAIN = '@fdmgroup.com';
 const EMPTY = {
-  firstName: '', lastName: '', email: '', role: 'consultant',
+  firstName: '', lastName: '', email: DOMAIN, role: 'consultant',
   consultantStatus: 'BENCH', managerEmail: '', clientCode: '',
 };
 
@@ -123,7 +124,25 @@ export default function AddEmployee() {
 
             <div className="form-group">
               <label>Email Address</label>
-              <input className="field" type="email" placeholder="firstname.lastname@fdmgroup.com" {...field('email')} />
+              <input
+                className="field"
+                type="text"
+                placeholder={`firstname.lastname${DOMAIN}`}
+                {...field('email')}
+                onFocus={e => {
+                  const pos = e.target.value.indexOf('@');
+                  if (pos !== -1) e.target.setSelectionRange(pos, pos);
+                }}
+                onChange={e => {
+                  // Always keep the domain suffix intact
+                  let val = e.target.value;
+                  if (!val.endsWith(DOMAIN)) {
+                    const prefix = val.includes('@') ? val.split('@')[0] : val;
+                    val = prefix + DOMAIN;
+                  }
+                  setForm(f => ({ ...f, email: val }));
+                }}
+              />
               {form.firstName.trim() && form.lastName.trim() && (
                 <div className={styles.usernamePreview}>
                   Username will be: <strong>{deriveUsername(form.firstName.trim(), form.lastName.trim())}</strong>

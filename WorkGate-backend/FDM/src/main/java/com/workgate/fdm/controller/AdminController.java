@@ -109,6 +109,18 @@ public class AdminController {
         return ResponseEntity.ok(Map.of("message", "Account deleted."));
     }
 
+    /**
+     * PUT /api/admin/employees/{email}/unlock
+     * Clears the failed-attempt lockout on a user account.
+     */
+    @PutMapping("/employees/{email:.+}/unlock")
+    public ResponseEntity<?> unlockEmployee(@PathVariable String email) {
+        User user = registry.findUserByEmail(email);
+        if (user == null) return ResponseEntity.notFound().build();
+        user.unlock();
+        return ResponseEntity.ok(Map.of("message", "Account unlocked."));
+    }
+
     private String generateTempPassword() {
         String chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
         StringBuilder sb = new StringBuilder("Temp#");

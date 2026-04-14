@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { itTickets as initial } from '../data/mockData';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { createItTicket, fetchItTickets } from '../api/api';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './IT.module.css';
@@ -32,51 +33,47 @@ const KB = [
   },
 ];
 
+const STATUS_BADGE = { OPEN: 'open', IN_PROGRESS: 'pending', RESOLVED: 'approved' };
+const STATUS_LABEL = { OPEN: 'OPEN', IN_PROGRESS: 'IN PROGRESS', RESOLVED: 'RESOLVED' };
+
 export default function IT() {
-  const [tickets, setTickets] = useState(initial);
+  const { currentUser } = useAuth();
+  const [tickets, setTickets]     = useState([]);
+  const [loading, setLoading]     = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [faqItem, setFaqItem] = useState(null);
-  const [search, setSearch] = useState('');
-  const [form, setForm] = useState({ title: '', category: 'Software', priority: 'Medium', desc: '' });
+  const [submitError, setSubmitError] = useState('');
+  const [submitting, setSubmitting]   = useState(false);
+  const [faqItem, setFaqItem]     = useState(null);
+  const [search, setSearch]       = useState('');
+  const [form, setForm]           = useState({ title: '', category: 'Software', priority: 'Medium', desc: '' });
 
+  const username = currentUser?.username ?? currentUser?.email ?? '';
 
-  const createRequest = async (enteredTitle,info,category,evidence) => {
+  useEffect(() => {
+    fetchItTickets()
+      .then(all => setTickets(all.filter(t => t.username === username)))
+      .finally(() => setLoading(false));
+  }, [username]);
 
-    const request = {
-      username: "john",
-      creationTime: (new Date()).getTime(),
-      title : enteredTitle,
-      description: info,
-      category: category,
-      evidence: ["Image","Image"],
-    };
-
+  const submit = async () => {
+    if (!form.title.trim()) return;
+    setSubmitError('');
+    setSubmitting(true);
     try {
-      const response = await fetch("http://localhost:8080/api/createItTicket", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(request)
+      const created = await createItTicket({
+        username,
+        title:       form.title.trim(),
+        description: form.desc.trim(),
+        category:    form.category,
       });
-      if (!response.ok) {
-        throw new Error("Failed to create ticket");
-      }
-    } 
-    catch (error) {
-        console.error(error);
+      setTickets(prev => [created, ...prev]);
+      setShowModal(false);
+      setForm({ title: '', category: 'Software', priority: 'Medium', desc: '' });
+    } catch (e) {
+      setSubmitError(e.message);
+    } finally {
+      setSubmitting(false);
     }
-  };
-
-  const submit = () => {
-    if (!form.title) return;
-    setTickets(prev => [
-      { id: `IT-${String(Math.floor(Math.random() * 900) + 100)}`, title: form.title, desc: form.desc, category: form.category, date: 'Today', status: 'open' },
-      ...prev,
-    ]);
-    setShowModal(false);
-    createRequest(form.title,form.desc,form.category)
-    setForm({ title: '', category: 'Software', priority: 'Medium', desc: '' });
   };
 
   const filteredKB = KB.filter(k => k.q.toLowerCase().includes(search.toLowerCase()));
@@ -90,15 +87,21 @@ export default function IT() {
           <button className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}>+ Raise Ticket</button>
         </div>
         <div style={{ padding: '10px 20px' }}>
+          {loading && <div style={{ padding: '16px 0', color: 'var(--text-muted)', fontSize: 13 }}>Loading tickets…</div>}
+          {!loading && tickets.length === 0 && (
+            <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--text-dim)', fontSize: 13 }}>No tickets raised yet.</div>
+          )}
           {tickets.map(t => (
             <div key={t.id} className={styles.ticketCard}>
-              <div className={styles.ticketId}>{t.id}</div>
+              <div className={styles.ticketId}>#{t.id}</div>
               <div style={{ flex: 1 }}>
                 <div className={styles.ticketTitle}>{t.title}</div>
-                <div className={styles.ticketDesc}>{t.desc}</div>
+                <div className={styles.ticketDesc}>{t.description}</div>
                 <div className={styles.ticketFooter}>
-                  <span>{t.category} · {t.date}</span>
-                  <span className={`badge badge-${t.status}`}>{t.status.replace('progress', 'IN PROGRESS').toUpperCase()}</span>
+                  <span>{t.category} · {t.claimedByEmail ? `Claimed by ${t.claimedByEmail}` : 'Awaiting claim'}</span>
+                  <span className={`badge badge-${STATUS_BADGE[t.status] ?? 'open'}`}>
+                    {STATUS_LABEL[t.status] ?? t.status}
+                  </span>
                 </div>
               </div>
             </div>
@@ -143,7 +146,7 @@ export default function IT() {
         </div>
       </Modal>
 
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Raise IT Ticket">
+      <Modal isOpen={showModal} onClose={() => { setShowModal(false); setSubmitError(''); }} title="Raise IT Ticket">
         <div className="form-grid">
           <div className="form-group">
             <label>Title</label>
@@ -175,9 +178,16 @@ export default function IT() {
               <div className="upload-zone-sub">PNG, JPG — max 5MB</div>
             </div>
           </div>
+          {submitError && (
+            <div style={{ fontSize: 13, color: 'var(--danger)', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: '10px 14px' }}>
+              {submitError}
+            </div>
+          )}
           <div className="modal-actions">
-            <button className="btn btn-primary" onClick={submit}>Submit Ticket</button>
-            <button className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
+            <button className="btn btn-primary" onClick={submit} disabled={!form.title.trim() || submitting}>
+              {submitting ? 'Submitting…' : 'Submit Ticket'}
+            </button>
+            <button className="btn btn-ghost" onClick={() => { setShowModal(false); setSubmitError(''); }}>Cancel</button>
           </div>
         </div>
       </Modal>

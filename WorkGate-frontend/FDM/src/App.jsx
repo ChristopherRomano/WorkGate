@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { hasPermission } from './permissions';
 import Layout from './components/Layout';
 import Login          from './pages/Login';
 import Dashboard      from './pages/Dashboard';
@@ -28,31 +29,51 @@ function ProtectedRoute({ children }) {
   return currentUser ? children : <Navigate to="/login" replace />;
 }
 
+function RoleRoute({ permission, children }) {
+  const { currentUser } = useAuth();
+  if (!currentUser) return <Navigate to="/login" replace />;
+  if (!hasPermission(currentUser.role, permission)) return <Navigate to="/app" replace />;
+  return children;
+}
+
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/app" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route index             element={<Dashboard />} />
-        <Route path="profile"        element={<Profile />} />
-        <Route path="timesheet"      element={<Timesheet />} />
-        <Route path="tasks"          element={<Tasks />} />
-        <Route path="leave"          element={<Leave />} />
-        <Route path="expenses"       element={<Expenses />} />
-        <Route path="news"           element={<News />} />
-        <Route path="it"             element={<IT />} />
-        <Route path="hr"             element={<HR />} />
-        <Route path="posting"        element={<Posting />} />
-        <Route path="leave-approval"    element={<LeaveApproval />} />
-        <Route path="expense-approval"   element={<ExpenseApproval />} />
-        <Route path="set-task"       element={<SetTask />} />
-        <Route path="it-management"  element={<ITManagement />} />
-        <Route path="hr-management"  element={<HRManagement />} />
-        <Route path="admin"              element={<AdminDashboard />} />
-        <Route path="admin/employees"    element={<ManageEmployees />} />
-        <Route path="admin/add-employee" element={<AddEmployee />} />
-        <Route path="admin/client-codes" element={<ClientCodes />} />
+        {/* Universally accessible once logged in */}
+        <Route index           element={<Dashboard />} />
+        <Route path="profile"  element={<Profile />} />
+        <Route path="news"     element={<RoleRoute permission="news"><News /></RoleRoute>} />
+
+        {/* Employee base permissions */}
+        <Route path="tasks"    element={<RoleRoute permission="tasks"><Tasks /></RoleRoute>} />
+        <Route path="leave"    element={<RoleRoute permission="leave"><Leave /></RoleRoute>} />
+        <Route path="expenses" element={<RoleRoute permission="expenses"><Expenses /></RoleRoute>} />
+        <Route path="it"       element={<RoleRoute permission="it-support"><IT /></RoleRoute>} />
+        <Route path="hr"       element={<RoleRoute permission="hr-support"><HR /></RoleRoute>} />
+
+        {/* Consultant + Manager (extends Employee) */}
+        <Route path="timesheet" element={<RoleRoute permission="timesheet"><Timesheet /></RoleRoute>} />
+
+        {/* Manager only (extends Employee) */}
+        <Route path="leave-approval"    element={<RoleRoute permission="leave-approval"><LeaveApproval /></RoleRoute>} />
+        <Route path="expense-approval"  element={<RoleRoute permission="expense-approval"><ExpenseApproval /></RoleRoute>} />
+        <Route path="set-task"          element={<RoleRoute permission="set-task"><SetTask /></RoleRoute>} />
+        <Route path="posting"           element={<RoleRoute permission="posting"><Posting /></RoleRoute>} />
+
+        {/* ItTechnician only (extends Employee) */}
+        <Route path="it-management" element={<RoleRoute permission="it-management"><ITManagement /></RoleRoute>} />
+
+        {/* HrRep only (extends Employee) */}
+        <Route path="hr-management" element={<RoleRoute permission="hr-management"><HRManagement /></RoleRoute>} />
+
+        {/* Administrator only (separate User branch) */}
+        <Route path="admin"                element={<RoleRoute permission="admin-dashboard"><AdminDashboard /></RoleRoute>} />
+        <Route path="admin/employees"      element={<RoleRoute permission="manage-employees"><ManageEmployees /></RoleRoute>} />
+        <Route path="admin/add-employee"   element={<RoleRoute permission="add-employee"><AddEmployee /></RoleRoute>} />
+        <Route path="admin/client-codes"   element={<RoleRoute permission="client-codes"><ClientCodes /></RoleRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>

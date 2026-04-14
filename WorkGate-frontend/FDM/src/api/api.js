@@ -82,6 +82,34 @@ export function deleteEmployee(email) {
   return request(`/admin/employees/${encodeURIComponent(email)}`, { method: 'DELETE' });
 }
 
+// ── IT Tickets ────────────────────────────────────────────────────────────────
+
+export function fetchItTickets() {
+  return request('/it-tickets');
+}
+
+export function createItTicket({ username, title, description, category }) {
+  return request('/it-tickets', {
+    method: 'POST',
+    body: JSON.stringify({ username, title, description, category }),
+  });
+}
+
+export function claimTicket(id, techEmail) {
+  return request(`/it-tickets/${id}/claim`, {
+    method: 'PUT',
+    body: JSON.stringify({ techEmail }),
+  });
+}
+
+export function advanceTicket(id) {
+  return request(`/it-tickets/${id}/advance`, { method: 'PUT' });
+}
+
+export function unlockAccount(email) {
+  return request(`/admin/employees/${encodeURIComponent(email)}/unlock`, { method: 'PUT' });
+}
+
 // ── Client Codes ──────────────────────────────────────────────────────────────
 
 export function fetchClientCodes() {

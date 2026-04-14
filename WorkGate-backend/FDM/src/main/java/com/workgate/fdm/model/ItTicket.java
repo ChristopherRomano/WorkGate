@@ -1,42 +1,40 @@
 package com.workgate.fdm.model;
 
-import java.util.List;
-
 public class ItTicket extends Request {
 
-	private String title;
-	private String description;
-	private String category;
-	private List<String> evidence;
+    private String title;
+    private String description;
+    private String category;
+    private String claimedByEmail; // null = unclaimed
 
-	/**
-	 * 
-	 * @param employee
-	 * @param creationTIme
-	 * @param title
-	 * @param description
-	 * @param category
-	 * @param evidence
-	 */
-	public ItTicket(Employee employee, int creationTIme, String title, String description, String category, List<String> evidence) {
-		// TODO - implement ItTicket.ItTicket
-		throw new UnsupportedOperationException();
-	}
+    public ItTicket(String username, long creationTime, String title, String description, String category) {
+        super(username, creationTime);
+        this.title       = title;
+        this.description = description;
+        this.category    = category;
+    }
 
-	public String getTitle() {
-		return this.title;
-	}
+    // ── Status helpers ────────────────────────────────────────────────────────
 
-	public String getDescription() {
-		return this.description;
-	}
+    /** Advance: OPEN → IN_PROGRESS → RESOLVED */
+    public boolean advance() {
+        if (getStatus() == STATUS.OPEN) {
+            updateStatus(STATUS.IN_PROGRESS);
+            return true;
+        }
+        if (getStatus() == STATUS.IN_PROGRESS) {
+            updateStatus(STATUS.RESOLVED);
+            return true;
+        }
+        return false;
+    }
 
-	public String getCategory() {
-		return this.category;
-	}
+    // ── Getters / setters ─────────────────────────────────────────────────────
 
-	public List<String> getEvidence() {
-		return this.evidence;
-	}
+    public String getTitle()          { return title; }
+    public String getDescription()    { return description; }
+    public String getCategory()       { return category; }
+    public String getClaimedByEmail() { return claimedByEmail; }
 
+    public void setClaimedByEmail(String email) { this.claimedByEmail = email; }
 }

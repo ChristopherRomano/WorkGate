@@ -23,21 +23,12 @@ public abstract class Request {
 	}
 	
 	public void updateStatus(STATUS status) {
-		// TODO - implement Request.updateStatus
-		throw new UnsupportedOperationException();
+		this.status = status;
 	}
 
-	
-	public String getEmployeeUsername() {
-		return this.username;
-	}
-
-	public long getCreationTime() {
-		return this.creationTime;
-	}
-
-	public STATUS getStatus() {
-		return this.status;
-	}
+	public String getEmployeeUsername() { return this.username; }
+	public long getCreationTime()       { return this.creationTime; }
+	public STATUS getStatus()           { return this.status; }
+	public int getId()                  { return this.id; }
 
 }
