@@ -21,6 +21,7 @@ import AddEmployee     from './pages/AddEmployee';
 import ClientCodes     from './pages/ClientCodes';
 import ITManagement    from './pages/ITManagement';
 import HRManagement    from './pages/HRManagement';
+import ExpenseApproval from './pages/ExpenseApproval';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -43,7 +44,8 @@ function AppRoutes() {
         <Route path="it"             element={<IT />} />
         <Route path="hr"             element={<HR />} />
         <Route path="posting"        element={<Posting />} />
-        <Route path="leave-approval" element={<LeaveApproval />} />
+        <Route path="leave-approval"    element={<LeaveApproval />} />
+        <Route path="expense-approval"   element={<ExpenseApproval />} />
         <Route path="set-task"       element={<SetTask />} />
         <Route path="it-management"  element={<ITManagement />} />
         <Route path="hr-management"  element={<HRManagement />} />

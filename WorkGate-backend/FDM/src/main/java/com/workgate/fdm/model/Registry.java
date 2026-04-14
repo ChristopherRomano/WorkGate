@@ -9,7 +9,7 @@ public class Registry {
 
 	private static Registry instance;
 	private List<User> userList;
-	private List<String> clientCodeList;
+	private List<ClientCode> clientCodeList;
 	private List<ItTicket> itTickets;
 	private List<EmployeeReport> hrTickets;
 	private List<ManagerRequest> managerRequest;
@@ -73,12 +73,39 @@ public class Registry {
 		this.userList.add(user);
 	}
 
-	public void addClientCode(String clientCode) {
+	public boolean removeUser(String email) {
+		return userList.removeIf(u -> u.getEmail().equalsIgnoreCase(email));
+	}
+
+	public boolean deactivateUser(String email) {
+		User u = findUserByEmail(email);
+		if (u == null) return false;
+		u.setActive(false);
+		return true;
+	}
+
+	public boolean reactivateUser(String email) {
+		User u = findUserByEmail(email);
+		if (u == null) return false;
+		u.setActive(true);
+		return true;
+	}
+
+	public List<ClientCode> getClientCodes() {
+		return this.clientCodeList;
+	}
+
+	public boolean clientCodeExists(String code) {
+		return clientCodeList.stream()
+				.anyMatch(c -> c.getCode().equalsIgnoreCase(code));
+	}
+
+	public void addClientCode(ClientCode clientCode) {
 		this.clientCodeList.add(clientCode);
 	}
 
-	public boolean removeClientCode(String clientCode) {
-		return this.clientCodeList.remove(clientCode);
+	public boolean removeClientCode(String code) {
+		return clientCodeList.removeIf(c -> c.getCode().equalsIgnoreCase(code));
 	}
 
 	public List<ItTicket> getItTickets() {

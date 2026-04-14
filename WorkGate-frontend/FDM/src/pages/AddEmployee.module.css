@@ -19,16 +19,28 @@
 
 .optional { color: var(--text-dim); font-size: 11px; font-weight: 400; }
 
-.successBanner {
-  background: rgba(134,239,172,0.12);
-  border: 1px solid rgba(134,239,172,0.3);
+.usernamePreview {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 5px;
+  font-family: var(--mono);
+}
+
+.errorBanner {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: 8px;
   padding: 10px 14px;
   font-size: 13px;
-  color: var(--green);
+  color: var(--danger);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .createBtn { width: 100%; justify-content: center; }
+
+/* ── Recently Created panel ─────────────────────────────────────────────────── */
 
 .recentBody { padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; }
 .recentEmpty { padding: 24px 0; text-align: center; color: var(--text-dim); font-size: 13px; }
@@ -51,3 +63,65 @@
 
 .recentName { font-size: 13px; font-weight: 600; color: var(--text); }
 .recentMeta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+/* ── Credentials box ────────────────────────────────────────────────────────── */
+
+.credBox {
+  margin-top: 8px;
+  background: var(--surface-3);
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.credRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.credLabel {
+  font-size: 10px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.credValue {
+  font-size: 12px;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--lime);
+  letter-spacing: 0.5px;
+}
+
+.copyBtn {
+  margin-top: 6px;
+  width: 100%;
+  padding: 5px 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border-bright);
+  border-radius: 5px;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.copyBtn:hover {
+  background: var(--lime-dim);
+  border-color: var(--lime-border);
+  color: var(--lime);
+}
+
+.credNote {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  line-height: 1.4;
+}

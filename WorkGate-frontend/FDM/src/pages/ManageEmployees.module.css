@@ -153,6 +153,7 @@
 .colEmp     { width: 22%; }
 .colRole    { width: 12%; white-space: nowrap; }
 .colClient  { width: 11%; white-space: nowrap; }
+.colTag     { width: 11%; white-space: nowrap; }
 .colManager { width: 14%; }
 .colStatus  { width: 10%; white-space: nowrap; text-align: center; }
 .colActions { width: 27%; }

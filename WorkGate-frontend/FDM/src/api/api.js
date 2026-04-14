@@ -61,6 +61,44 @@ export function deleteTask(taskId, employeeEmail) {
   });
 }
 
+// ── Admin ─────────────────────────────────────────────────────────────────────
+
+export function createEmployee({ email, username, name, initials, role, tag, managerEmail }) {
+  return request('/admin/employees', {
+    method: 'POST',
+    body: JSON.stringify({ email, username, name, initials, role, tag, managerEmail }),
+  });
+}
+
+export function deactivateEmployee(email) {
+  return request(`/admin/employees/${encodeURIComponent(email)}/deactivate`, { method: 'PUT' });
+}
+
+export function reactivateEmployee(email) {
+  return request(`/admin/employees/${encodeURIComponent(email)}/reactivate`, { method: 'PUT' });
+}
+
+export function deleteEmployee(email) {
+  return request(`/admin/employees/${encodeURIComponent(email)}`, { method: 'DELETE' });
+}
+
+// ── Client Codes ──────────────────────────────────────────────────────────────
+
+export function fetchClientCodes() {
+  return request('/client-codes');
+}
+
+export function addClientCode({ code, client, sector }) {
+  return request('/client-codes', {
+    method: 'POST',
+    body: JSON.stringify({ code, client, sector }),
+  });
+}
+
+export function removeClientCode(code) {
+  return request(`/client-codes/${encodeURIComponent(code)}`, { method: 'DELETE' });
+}
+
 // ── Field mapping: backend Task → frontend task shape ─────────────────────────
 
 export function mapTask(t) {

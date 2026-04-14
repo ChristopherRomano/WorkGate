@@ -34,6 +34,27 @@
   --amber: #ffaa00;
   --blue: #44aaff;
 
+  /* Role-specific accent colors — dark mode */
+  --role-manager-blue: #44aaff;
+  --role-manager-blue-dim: rgba(68, 170, 255, 0.12);
+  --role-manager-blue-glow: rgba(68, 170, 255, 0.22);
+  --role-manager-blue-border: rgba(68, 170, 255, 0.35);
+
+  --role-admin-red: #ff6b6b;
+  --role-admin-red-dim: rgba(255, 107, 107, 0.12);
+  --role-admin-red-glow: rgba(255, 107, 107, 0.22);
+  --role-admin-red-border: rgba(255, 107, 107, 0.35);
+
+  --role-hr-yellow: #ffd93d;
+  --role-hr-yellow-dim: rgba(255, 217, 61, 0.12);
+  --role-hr-yellow-glow: rgba(255, 217, 61, 0.22);
+  --role-hr-yellow-border: rgba(255, 217, 61, 0.35);
+
+  --role-ittech-purple: #da70d6;
+  --role-ittech-purple-dim: rgba(218, 112, 214, 0.12);
+  --role-ittech-purple-glow: rgba(218, 112, 214, 0.22);
+  --role-ittech-purple-border: rgba(218, 112, 214, 0.35);
+
   /* Typography */
   --mono: 'Space Mono', monospace;
   --sans: 'DM Sans', sans-serif;
@@ -67,6 +88,27 @@
   --text: #1a1a1a;
   --text-muted: #555555;
   --text-dim: #888888;
+
+  /* Role-specific accent colors — light mode */
+  --role-manager-blue: #0066cc;
+  --role-manager-blue-dim: rgba(0, 102, 204, 0.1);
+  --role-manager-blue-glow: rgba(0, 102, 204, 0.16);
+  --role-manager-blue-border: rgba(0, 102, 204, 0.3);
+
+  --role-admin-red: #cc0000;
+  --role-admin-red-dim: rgba(204, 0, 0, 0.1);
+  --role-admin-red-glow: rgba(204, 0, 0, 0.16);
+  --role-admin-red-border: rgba(204, 0, 0, 0.3);
+
+  --role-hr-yellow: #cc9900;
+  --role-hr-yellow-dim: rgba(204, 153, 0, 0.1);
+  --role-hr-yellow-glow: rgba(204, 153, 0, 0.16);
+  --role-hr-yellow-border: rgba(204, 153, 0, 0.3);
+
+  --role-ittech-purple: #9933cc;
+  --role-ittech-purple-dim: rgba(153, 51, 204, 0.1);
+  --role-ittech-purple-glow: rgba(153, 51, 204, 0.16);
+  --role-ittech-purple-border: rgba(153, 51, 204, 0.3);
 }
 
 *, *::before, *::after {
