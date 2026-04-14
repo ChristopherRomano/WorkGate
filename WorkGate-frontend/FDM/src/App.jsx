@@ -8,6 +8,7 @@ import Profile        from './pages/Profile';
 import Timesheet      from './pages/Timesheet';
 import Tasks          from './pages/Tasks';
 import Leave          from './pages/Leave';
+import Expenses       from './pages/Expenses';
 import News           from './pages/News';
 import IT             from './pages/IT';
 import HR             from './pages/HR';
@@ -20,6 +21,7 @@ import AddEmployee     from './pages/AddEmployee';
 import ClientCodes     from './pages/ClientCodes';
 import ITManagement    from './pages/ITManagement';
 import HRManagement    from './pages/HRManagement';
+import ExpenseApproval from './pages/ExpenseApproval';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -37,11 +39,13 @@ function AppRoutes() {
         <Route path="timesheet"      element={<Timesheet />} />
         <Route path="tasks"          element={<Tasks />} />
         <Route path="leave"          element={<Leave />} />
+        <Route path="expenses"       element={<Expenses />} />
         <Route path="news"           element={<News />} />
         <Route path="it"             element={<IT />} />
         <Route path="hr"             element={<HR />} />
         <Route path="posting"        element={<Posting />} />
-        <Route path="leave-approval" element={<LeaveApproval />} />
+        <Route path="leave-approval"    element={<LeaveApproval />} />
+        <Route path="expense-approval"   element={<ExpenseApproval />} />
         <Route path="set-task"       element={<SetTask />} />
         <Route path="it-management"  element={<ITManagement />} />
         <Route path="hr-management"  element={<HRManagement />} />

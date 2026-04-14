@@ -10,10 +10,29 @@ const NAV = [
     { to: '/app',         icon: '◈', label: 'Dashboard',  roles: ['employee', 'consultant', 'manager'], mobile: true },
     { to: '/app/profile', icon: '◉', label: 'My Profile', roles: ['employee', 'consultant', 'manager'], mobile: true },
   ]},
+  { section: 'Management', roleSection: 'manager', items: [
+    { to: '/app/leave-approval',   icon: '📋', label: 'Leave Approvals',   roles: ['manager'] },
+    { to: '/app/expense-approval', icon: '💸', label: 'Expense Approval',  roles: ['manager'] },
+    { to: '/app/set-task',         icon: '✎',  label: 'Set Task',          roles: ['manager'] },
+    { to: '/app/posting',          icon: '📝', label: 'Create Posting',    roles: ['manager'] },
+  ]},
+  { section: 'IT Operations', roleSection: 'ittech', items: [
+    { to: '/app/it-management', icon: '🖥', label: 'Ticket Management', roles: ['ittech'] },
+  ]},
+  { section: 'HR Operations', roleSection: 'hr', items: [
+    { to: '/app/hr-management', icon: '📋', label: 'Report Management', roles: ['hr'] },
+  ]},
+  { section: 'Admin', roleSection: 'admin', items: [
+    { to: '/app/admin',                icon: '⚙', label: 'Admin Dashboard',  roles: ['admin'] },
+    { to: '/app/admin/employees',      icon: '👥', label: 'Manage Employees', roles: ['admin'] },
+    { to: '/app/admin/add-employee',   icon: '➕', label: 'Add Employee',     roles: ['admin'] },
+    { to: '/app/admin/client-codes',   icon: '🏢', label: 'Client Codes',     roles: ['admin'] },
+  ]},
   { section: 'Work', items: [
     { to: '/app/timesheet', icon: '⏱', label: 'Timesheet', roles: ['consultant', 'manager'] },
     { to: '/app/tasks',     icon: '✓', label: 'Tasks',     roles: ['employee', 'consultant', 'manager'], badge: 3, mobile: true },
     { to: '/app/leave',     icon: '📅', label: 'Leave',    roles: ['employee', 'consultant', 'manager'] },
+    { to: '/app/expenses',  icon: '£', label: 'Expenses',  roles: ['employee', 'consultant', 'manager'] },
   ]},
   { section: 'Company', items: [
     { to: '/app/news', icon: '📢', label: 'News Feed', roles: ['employee', 'consultant', 'manager', 'ittech', 'hr'], badge: 2 },
@@ -21,24 +40,6 @@ const NAV = [
   { section: 'Support', items: [
     { to: '/app/it', icon: '🖥', label: 'IT Support',  roles: ['employee', 'consultant', 'manager'] },
     { to: '/app/hr', icon: '📋', label: 'HR Reports',  roles: ['employee', 'consultant', 'manager'] },
-  ]},
-  { section: 'Management', items: [
-    { to: '/app/leave-approval', icon: '📋', label: 'Leave Approvals', roles: ['manager'] },
-    { to: '/app/set-task',       icon: '✎',  label: 'Set Task',        roles: ['manager'] },
-    { to: '/app/posting',        icon: '📝', label: 'Create Posting',  roles: ['manager'] },
-  ]},
-  { section: 'IT Operations', items: [
-    { to: '/app/it-management', icon: '🖥', label: 'Ticket Management', roles: ['ittech'] },
-  ]},
-  { section: 'HR Operations', items: [
-    { to: '/app/hr-management', icon: '📋', label: 'Report Management', roles: ['hr'] },
-  ]},
-  { section: 'Admin', items: [
-    { to: '/app/admin',                icon: '⚙', label: 'Admin Dashboard',  roles: ['admin'] },
-    { to: '/app/admin/employees',      icon: '👥', label: 'Manage Employees', roles: ['admin'] },
-    { to: '/app/admin/add-employee',   icon: '➕', label: 'Add Employee',     roles: ['admin'] },
-    { to: '/app/admin/client-codes',   icon: '🏢', label: 'Client Codes',     roles: ['admin'] },
-
   ]},
 ];
 
@@ -87,28 +88,37 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className={styles.nav}>
-        {NAV.map(({ section, items }) => {
+        {NAV.map(({ section, roleSection, items }) => {
           const visible = items.filter(item => !item.roles || item.roles.includes(currentUser.role));
           if (visible.length === 0) return null;
+          const sectionLabelClass = roleSection ? `${styles.sectionLabel} ${styles[`sectionLabel${roleSection}`]}` : styles.sectionLabel;
+          const sectionWrapperClass = roleSection && roleSection === currentUser.role
+            ? `${styles.sectionWrapper} ${styles[`sectionWrapper${roleSection}`]}`
+            : styles.sectionWrapper;
           return (
-            <div key={section}>
-              <div className={styles.sectionLabel}>{section}</div>
-              {visible.map(({ to, icon, label, badge }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={to === '/app' || to === '/app/admin'}
-                  className={({ isActive }) =>
-                    `${styles.navItem} ${isActive ? styles.active : ''}`
-                  }
-                >
-                  <span className={styles.navIcon}>{icon}</span>
-                  {label}
-                  {badge != null && (
-                    <span className={styles.navBadge}>{badge}</span>
-                  )}
-                </NavLink>
-              ))}
+            <div key={section} className={sectionWrapperClass}>
+              <div className={sectionLabelClass}>{section}</div>
+              {visible.map(({ to, icon, label, badge }) => {
+                const itemClass = roleSection && roleSection === currentUser.role
+                  ? `${styles.navItem} ${styles[`navItem${roleSection}`]}`
+                  : styles.navItem;
+                return (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    end={to === '/app' || to === '/app/admin'}
+                    className={({ isActive }) =>
+                      `${itemClass} ${isActive ? styles.active : ''}`
+                    }
+                  >
+                    <span className={styles.navIcon}>{icon}</span>
+                    {label}
+                    {badge != null && (
+                      <span className={styles.navBadge}>{badge}</span>
+                    )}
+                  </NavLink>
+                );
+              })}
             </div>
           );
         })}

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { tasks, leaveRequests, newsPosts } from '../data/mockData';
+import { tasks, leaveRequests, expenses, newsPosts } from '../data/mockData';
 import '../styles/components.css';
 import styles from './Dashboard.module.css';
 
@@ -56,26 +56,49 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Leave */}
-      <div className="card">
-        <div className="card-header">
-          <span className="card-title">Leave Requests</span>
-          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/app/leave')}>View all</button>
+      <div className={styles.twoCol}>
+        {/* Expenses */}
+        <div className="card">
+          <div className="card-header">
+            <span className="card-title">Recent Expenses</span>
+          </div>
+          <div className="card-body" style={{ padding: '8px 20px' }}>
+            {expenses.slice(0, 3).map(e => (
+              <div key={e.id} className={styles.expenseRow}>
+                <div className={styles.expenseInfo}>
+                  <div className={styles.expenseTitle}>{e.description}</div>
+                  <div className={styles.expenseDate}>{e.date} · {e.project}</div>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <div className={styles.expenseAmount}>{e.amount}</div>
+                  <span className={`badge badge-${e.status}`}>{e.status.toUpperCase()}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="card-body">
-          <div className="table-wrap">
-            <table>
-              <thead><tr><th>Period</th><th>Days</th><th>Status</th></tr></thead>
-              <tbody>
-                {leaveRequests.slice(0, 3).map(lr => (
-                  <tr key={lr.id}>
-                    <td><strong>{lr.start} – {lr.end}</strong></td>
-                    <td>{lr.days}</td>
-                    <td><span className={`badge badge-${lr.status}`}>{lr.status.toUpperCase()}</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+        {/* Leave */}
+        <div className="card">
+          <div className="card-header">
+            <span className="card-title">Leave Requests</span>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/app/leave')}>View all</button>
+          </div>
+          <div className="card-body">
+            <div className="table-wrap">
+              <table>
+                <thead><tr><th>Period</th><th>Days</th><th>Status</th></tr></thead>
+                <tbody>
+                  {leaveRequests.slice(0, 3).map(lr => (
+                    <tr key={lr.id}>
+                      <td><strong>{lr.start} – {lr.end}</strong></td>
+                      <td>{lr.days}</td>
+                      <td><span className={`badge badge-${lr.status}`}>{lr.status.toUpperCase()}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

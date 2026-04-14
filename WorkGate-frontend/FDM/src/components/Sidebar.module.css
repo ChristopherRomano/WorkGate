@@ -78,6 +78,47 @@
   padding: 10px 0;
   overflow-y: auto;
 }
+
+.sectionWrapper {
+  /* default: no special styling */
+}
+
+/* Role-specific section backgrounds */
+.sectionWrappermanager {
+  background: var(--role-manager-blue-dim);
+  margin: 8px 0;
+  border-radius: 6px;
+  margin-left: 6px;
+  margin-right: 6px;
+  padding: 2px 0;
+}
+
+.sectionWrapperadmin {
+  background: var(--role-admin-red-dim);
+  margin: 8px 0;
+  border-radius: 6px;
+  margin-left: 6px;
+  margin-right: 6px;
+  padding: 2px 0;
+}
+
+.sectionWrapperhr {
+  background: var(--role-hr-yellow-dim);
+  margin: 8px 0;
+  border-radius: 6px;
+  margin-left: 6px;
+  margin-right: 6px;
+  padding: 2px 0;
+}
+
+.sectionWrapperittech {
+  background: var(--role-ittech-purple-dim);
+  margin: 8px 0;
+  border-radius: 6px;
+  margin-left: 6px;
+  margin-right: 6px;
+  padding: 2px 0;
+}
 .sectionLabel {
   font-size: 9px;
   font-family: var(--mono);
@@ -85,6 +126,20 @@
   color: var(--text-dim);
   padding: 12px 18px 5px;
   text-transform: uppercase;
+}
+
+/* Role-specific section label colors */
+.sectionLabelmanager {
+  color: var(--role-manager-blue);
+}
+.sectionLabeladmin {
+  color: var(--role-admin-red);
+}
+.sectionLabelhr {
+  color: var(--role-hr-yellow);
+}
+.sectionLabelittech {
+  color: var(--role-ittech-purple);
 }
 .navItem {
   display: flex;
@@ -109,6 +164,55 @@
   background: var(--lime-dim);
   color: var(--lime);
   border-left-color: var(--lime);
+  font-weight: 600;
+}
+
+/* Role-specific nav item styles */
+.navItemmanager:hover {
+  background: var(--role-manager-blue-dim);
+  color: var(--role-manager-blue);
+  border-left-color: rgba(68, 170, 255, 0.5);
+}
+.navItemmanager.active {
+  background: var(--role-manager-blue-dim);
+  color: var(--role-manager-blue);
+  border-left-color: var(--role-manager-blue);
+  font-weight: 600;
+}
+
+.navItemadmin:hover {
+  background: var(--role-admin-red-dim);
+  color: var(--role-admin-red);
+  border-left-color: rgba(255, 107, 107, 0.5);
+}
+.navItemadmin.active {
+  background: var(--role-admin-red-dim);
+  color: var(--role-admin-red);
+  border-left-color: var(--role-admin-red);
+  font-weight: 600;
+}
+
+.navItemhr:hover {
+  background: var(--role-hr-yellow-dim);
+  color: var(--role-hr-yellow);
+  border-left-color: rgba(255, 217, 61, 0.5);
+}
+.navItemhr.active {
+  background: var(--role-hr-yellow-dim);
+  color: var(--role-hr-yellow);
+  border-left-color: var(--role-hr-yellow);
+  font-weight: 600;
+}
+
+.navItemittech:hover {
+  background: var(--role-ittech-purple-dim);
+  color: var(--role-ittech-purple);
+  border-left-color: rgba(218, 112, 214, 0.5);
+}
+.navItemittech.active {
+  background: var(--role-ittech-purple-dim);
+  color: var(--role-ittech-purple);
+  border-left-color: var(--role-ittech-purple);
   font-weight: 600;
 }
 .navIcon {
