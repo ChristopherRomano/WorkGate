@@ -2,83 +2,49 @@ package com.workgate.fdm.model;
 
 public class Administrator extends User {
 
-	/**
-	 * 
-	 * @param email
-	 * @param password
-	 */
 	public Administrator(String email, String password) {
-        super(email, password);
-		// TODO - implement Administrator.Administrator
-		throw new UnsupportedOperationException();
+		super(email, password);
 	}
 
-	/**
-	 * 
-	 * @param email
-	 * @param password
-	 * @param type
-	 */
 	public boolean createEmployee(String email, String password, String type) {
-		// TODO - implement Administrator.createEmployee
-		throw new UnsupportedOperationException();
+		Employee emp;
+		switch (type.toLowerCase()) {
+			case "consultant":   emp = new Consultant(email, password);   break;
+			case "manager":      emp = new Manager(email, password);      break;
+			case "hr":           emp = new HrRep(email, password);        break;
+			case "ittech":       emp = new ItTechnician(email, password); break;
+			default:             emp = new Employee(email, password);     break;
+		}
+		Registry.getRegistry().addUser(emp);
+		return true;
 	}
 
-	/**
-	 * 
-	 * @param email
-	 * @param password
-	 */
 	public boolean createAdmin(String email, String password) {
-		// TODO - implement Administrator.createAdmin
-		throw new UnsupportedOperationException();
+		Registry.getRegistry().addUser(new Administrator(email, password));
+		return true;
 	}
 
-	/**
-	 * 
-	 * @param employee
-	 */
 	public void removeEmployee(Employee employee) {
-		// TODO - implement Administrator.removeEmployee
-		throw new UnsupportedOperationException();
+		Registry.getRegistry().getUserList().remove(employee);
 	}
 
-	/**
-	 * 
-	 * @param employee
-	 * @param newTag
-	 */
 	public boolean updateTag(Employee employee, TAG newTag) {
-		// TODO - implement Administrator.updateTag
-		throw new UnsupportedOperationException();
+		employee.setTag(newTag);
+		return true;
 	}
 
-	/**
-	 * 
-	 * @param clientCode
-	 */
 	public boolean addCllientCode(String clientCode) {
-		// TODO - implement Administrator.addCllientCode
-		throw new UnsupportedOperationException();
+		Registry.getRegistry().addClientCode(clientCode);
+		return true;
 	}
 
-	/**
-	 * 
-	 * @param clientCode
-	 */
 	public boolean removeClientCode(String clientCode) {
-		// TODO - implement Administrator.removeClientCode
-		throw new UnsupportedOperationException();
+		return Registry.getRegistry().removeClientCode(clientCode);
 	}
 
-	/**
-	 * 
-	 * @param employee
-	 * @param manager
-	 */
 	public boolean assignManger(Employee employee, Manager manager) {
-		// TODO - implement Administrator.assignManger
-		throw new UnsupportedOperationException();
+		employee.setManager(manager);
+		return true;
 	}
 
 }

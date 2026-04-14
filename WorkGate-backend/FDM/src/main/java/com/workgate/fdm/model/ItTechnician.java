@@ -1,61 +1,38 @@
 package com.workgate.fdm.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItTechnician extends Employee {
 
 	private List<ItTicket> assignedTickets;
 
-	/**
-	 * 
-	 * @param email
-	 * @param password
-	 */
 	public ItTechnician(String email, String password) {
-        super(email, password);
-		// TODO - implement ItTechnician.ItTechnician
-		throw new UnsupportedOperationException();
+		super(email, password);
+		this.assignedTickets = new ArrayList<>();
 	}
 
 	public List<ItTicket> viewClaimedTickets() {
-		// TODO - implement ItTechnician.viewClaimedTickets
-		throw new UnsupportedOperationException();
+		return this.assignedTickets;
 	}
 
-	/**
-	 * 
-	 * @param status
-	 */
 	public void updateTicket(STATUS status) {
 		// TODO - implement ItTechnician.updateTicket
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * 
-	 * @param email
-	 */
 	public void searchEmployee(String email) {
 		// TODO - implement ItTechnician.searchEmployee
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * 
-	 * @param email
-	 */
 	public void unlockAccount(String email) {
-		// TODO - implement ItTechnician.unlockAccount
-		throw new UnsupportedOperationException();
+		Employee emp = Registry.getRegistry().findEmployeeByEmail(email);
+		if (emp != null) emp.unlock();
 	}
 
-	/**
-	 * 
-	 * @param itTicket
-	 */
 	public void claimTicket(ItTicket itTicket) {
-		// TODO - implement ItTechnician.claimTicket
-		throw new UnsupportedOperationException();
+		assignedTickets.add(itTicket);
 	}
 
 }

@@ -1,96 +1,128 @@
 package com.workgate.fdm.model;
 
+import java.util.ArrayList;
 import java.util.List;
-
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Registry {
 
-	private static Registry Instance;
+	private static Registry instance;
 	private List<User> userList;
 	private List<String> clientCodeList;
 	private List<ItTicket> itTickets;
 	private List<EmployeeReport> hrTickets;
 	private List<ManagerRequest> managerRequest;
+	private final AtomicInteger taskIdCounter = new AtomicInteger(1);
 
 	private Registry() {
-		// TODO - implement Registry.Registry
-		throw new UnsupportedOperationException();
+		this.userList = new ArrayList<>();
+		this.clientCodeList = new ArrayList<>();
+		this.itTickets = new ArrayList<>();
+		this.hrTickets = new ArrayList<>();
+		this.managerRequest = new ArrayList<>();
 	}
 
 	public static Registry getRegistry() {
-		// TODO - implement Registry.getRegistry
-		throw new UnsupportedOperationException();
+		if (instance == null) {
+			instance = new Registry();
+		}
+		return instance;
+	}
+
+	public int nextTaskId() {
+		return taskIdCounter.getAndIncrement();
 	}
 
 	public List<Employee> searchUserList() {
-		// TODO - implement Registry.searchUserList
-		throw new UnsupportedOperationException();
+		return userList.stream()
+				.filter(u -> u instanceof Employee)
+				.map(u -> (Employee) u)
+				.collect(Collectors.toList());
+	}
+
+	public Employee findEmployeeByEmail(String email) {
+		return searchUserList().stream()
+				.filter(e -> e.getEmail().equalsIgnoreCase(email))
+				.findFirst()
+				.orElse(null);
+	}
+
+	public Employee findEmployeeByName(String name) {
+		return searchUserList().stream()
+				.filter(e -> name.equalsIgnoreCase(e.getName()))
+				.findFirst()
+				.orElse(null);
+	}
+
+	public User findUserByEmail(String email) {
+		return userList.stream()
+				.filter(u -> u.getEmail().equalsIgnoreCase(email))
+				.findFirst()
+				.orElse(null);
+	}
+
+	public User findUserByUsername(String username) {
+		return userList.stream()
+				.filter(u -> username.equalsIgnoreCase(u.getUsername()))
+				.findFirst()
+				.orElse(null);
+	}
+
+	public void addUser(User user) {
+		this.userList.add(user);
+	}
+
+	public void addClientCode(String clientCode) {
+		this.clientCodeList.add(clientCode);
+	}
+
+	public boolean removeClientCode(String clientCode) {
+		return this.clientCodeList.remove(clientCode);
 	}
 
 	public List<ItTicket> getItTickets() {
 		return this.itTickets;
 	}
 
-	/**
-	 * 
-	 * @param itTickets
-	 */
-	public boolean addItTicket(ItTicket itTickets) {
-		// TODO - implement Registry.addItTicket
-		throw new UnsupportedOperationException();
+	public boolean addItTicket(ItTicket itTicket) {
+		return this.itTickets.add(itTicket);
 	}
 
 	public List<User> getUserList() {
 		return this.userList;
 	}
 
-	/**
-	 * 
-	 * @param userList
-	 */
 	public void setUserList(List<User> userList) {
 		this.userList = userList;
 	}
 
 	public List<EmployeeReport> getEmployeeReports() {
-		// TODO - implement Registry.getEmployeeReports
-		throw new UnsupportedOperationException();
+		return this.hrTickets;
 	}
 
-	/**
-	 * 
-	 * @param employeeReport
-	 */
 	public void addEmployeeReportt(EmployeeReport employeeReport) {
-		// TODO - implement Registry.addEmployeeReportt
-		throw new UnsupportedOperationException();
+		this.hrTickets.add(employeeReport);
 	}
 
-	/**
-	 * 
-	 * @param manager
-	 */
 	public List<ManagerRequest> getActiveManagerRequests(Manager manager) {
-		// TODO - implement Registry.getActiveManagerRequests
-		throw new UnsupportedOperationException();
+		return managerRequest.stream()
+				.filter(r -> r.getAssignedManager() != null
+						&& r.getAssignedManager().equals(manager)
+						&& r.getStatus() == STATUS.OPEN)
+				.collect(Collectors.toList());
 	}
 
-	/**
-	 * 
-	 * @param manager
-	 */
 	public List<ManagerRequest> getCompletedManagerRequests(Manager manager) {
-		// TODO - implement Registry.getCompletedManagerRequests
-		throw new UnsupportedOperationException();
+		return managerRequest.stream()
+				.filter(r -> r.getAssignedManager() != null
+						&& r.getAssignedManager().equals(manager)
+						&& r.getStatus() != STATUS.OPEN)
+				.collect(Collectors.toList());
 	}
 
-	/**
-	 * 
-	 * @param managerRequest
-	 */
 	public void addManagerRequest(ManagerRequest managerRequest) {
-		// TODO - implement Registry.addManagerRequest
-		throw new UnsupportedOperationException();
+		this.managerRequest.add(managerRequest);
 	}
 
 }

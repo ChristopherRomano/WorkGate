@@ -2,35 +2,39 @@ package com.workgate.fdm.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TaskList {
 
 	private List<Task> tasks;
 
 	public TaskList() {
-		tasks = new ArrayList<>();
+		this.tasks = new ArrayList<>();
+	}
+
+	public List<Task> searchByName(String title) {
+		return tasks.stream()
+				.filter(t -> t.getTitle().toLowerCase().contains(title.toLowerCase()))
+				.collect(Collectors.toList());
+	}
+
+	public boolean addTask(Task t) {
+		return tasks.add(t);
+	}
+
+	public boolean removeTask(int taskId) {
+		return tasks.removeIf(t -> t.getTaskId() == taskId);
+	}
+
+	public Task getById(int taskId) {
+		return tasks.stream()
+				.filter(t -> t.getTaskId() == taskId)
+				.findFirst()
+				.orElse(null);
 	}
 
 	public List<Task> getTasks() {
-		return tasks;
-	}
-
-	/**
-	 * 
-	 * @param title
-	 */
-	public List<Task> searchByName(String title) {
-		// TODO - implement TaskList.searchByName
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * 
-	 * @param t
-	 */
-	public boolean addTask(Task t) {
-		// TODO - implement TaskList.addTask
-		throw new UnsupportedOperationException();
+		return this.tasks;
 	}
 
 }

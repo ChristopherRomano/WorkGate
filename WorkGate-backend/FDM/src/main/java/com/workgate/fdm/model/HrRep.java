@@ -1,42 +1,25 @@
 package com.workgate.fdm.model;
 
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class HrRep extends Poster {
 
 	private List<EmployeeReport> hrTickets;
 
-	/**
-	 * 
-	 * @param email
-	 * @param password
-	 */
 	public HrRep(String email, String password) {
-        super(email, password);
-
-        // TODO - implement HrRep.HrRep
-		throw new UnsupportedOperationException();
+		super(email, password);
+		this.hrTickets = new ArrayList<>();
 	}
 
 	public List<EmployeeReport> viewClaimedRepots() {
-		// TODO - implement HrRep.viewClaimedRepots
-		throw new UnsupportedOperationException();
+		return this.hrTickets;
 	}
 
-	/**
-	 * 
-	 * @param employeeReport
-	 */
 	public boolean claimTIcket(EmployeeReport employeeReport) {
-		// TODO - implement HrRep.claimTIcket
-		throw new UnsupportedOperationException();
+		return hrTickets.add(employeeReport);
 	}
 
-	/**
-	 * 
-	 * @param status
-	 */
 	public boolean updateTicket(STATUS status) {
 		// TODO - implement HrRep.updateTicket
 		throw new UnsupportedOperationException();

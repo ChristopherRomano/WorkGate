@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { tasks as initialTasks } from '../data/mockData';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { fetchMyTasks, completeTask, deleteTask, updateTask, assignTask, mapTask } from '../api/api';
 import '../styles/components.css';
 import styles from './Tasks.module.css';
 
@@ -7,42 +8,99 @@ const PRIORITIES = ['high', 'medium', 'low'];
 const TYPES = ['Onboarding', 'Operational', 'Upskilling'];
 
 export default function Tasks() {
-  const isManager = localStorage.getItem('role') === 'manager';
-  const [items, setItems] = useState(initialTasks);
+  const { currentUser } = useAuth();
+  const isManager = currentUser?.role === 'manager';
+
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState('All');
   const [draft, setDraft] = useState(null);
   const [adding, setAdding] = useState(false);
   const [newTask, setNewTask] = useState({ title: '', description: '', dueDate: '', priority: 'medium', type: 'Onboarding' });
   const [addErrors, setAddErrors] = useState([]);
 
-  const addTask = () => {
+  useEffect(() => {
+    if (!currentUser?.email) return;
+    setLoading(true);
+    fetchMyTasks(currentUser.email)
+      .then(data => setItems(data.map(mapTask)))
+      .catch(() => setError('Could not load tasks.'))
+      .finally(() => setLoading(false));
+  }, [currentUser]);
+
+  const addTask = async () => {
     const errors = [];
     if (newTask.title.trim().length < 3) errors.push('Title must be at least 3 characters.');
     if (newTask.description.trim().length < 10) errors.push('Description must be at least 10 characters.');
     if (!newTask.dueDate) errors.push('Due date is required.');
     else if (new Date(newTask.dueDate) < new Date(new Date().toDateString())) errors.push('Due date cannot be in the past.');
     if (errors.length) { setAddErrors(errors); return; }
-    setItems(prev => [...prev, { ...newTask, id: `t${Date.now()}`, due: newTask.dueDate, done: false }]);
-    setNewTask({ title: '', description: '', dueDate: '', priority: 'medium', type: 'Onboarding' });
-    setAddErrors([]);
-    setAdding(false);
+
+    try {
+      const res = await assignTask({
+        managerEmail: currentUser.email,
+        employeeEmail: currentUser.email,
+        title: newTask.title.trim(),
+        description: newTask.description.trim(),
+        priority: newTask.priority.toUpperCase(),
+        dueDate: newTask.dueDate,
+        category: newTask.type,
+      });
+      setItems(prev => [...prev, mapTask({
+        taskId: res.taskId,
+        title: newTask.title.trim(),
+        description: newTask.description.trim(),
+        completion: false,
+        priority: newTask.priority.toUpperCase(),
+        dueDate: newTask.dueDate,
+        category: newTask.type,
+      })]);
+      setNewTask({ title: '', description: '', dueDate: '', priority: 'medium', type: 'Onboarding' });
+      setAddErrors([]);
+      setAdding(false);
+    } catch (e) {
+      setAddErrors([e.message]);
+    }
   };
 
   const closeOverlay = () => setDraft(null);
 
-  const saveChanges = () => {
-    setItems(prev => prev.map(t => t.id === draft.id ? { ...draft } : t));
-    setDraft(null);
+  const saveChanges = async () => {
+    try {
+      await updateTask(draft.id, {
+        employeeEmail: currentUser.email,
+        title: draft.title,
+        description: draft.description,
+        priority: draft.priority.toUpperCase(),
+        dueDate: draft.due,
+        category: draft.type,
+      });
+      setItems(prev => prev.map(t => t.id === draft.id ? { ...draft } : t));
+      setDraft(null);
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
-  const deleteTask = () => {
-    setItems(prev => prev.filter(t => t.id !== draft.id));
-    setDraft(null);
+  const handleDelete = async () => {
+    try {
+      await deleteTask(draft.id, currentUser.email);
+      setItems(prev => prev.filter(t => t.id !== draft.id));
+      setDraft(null);
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
-  const markComplete = () => {
-    setItems(prev => prev.map(t => t.id === draft.id ? { ...t, done: true } : t));
-    setDraft(null);
+  const markComplete = async () => {
+    try {
+      await completeTask(draft.id, currentUser.email);
+      setItems(prev => prev.map(t => t.id === draft.id ? { ...t, done: true } : t));
+      setDraft(null);
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
   const types = ['All', 'Onboarding', 'Operational', 'Upskilling'];
@@ -52,6 +110,9 @@ export default function Tasks() {
     if (group.length) acc[type] = group;
     return acc;
   }, {});
+
+  if (loading) return <div className="animate-fade" style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading tasks…</div>;
+  if (error)   return <div className="animate-fade" style={{ padding: '2rem', color: 'var(--danger)' }}>{error}</div>;
 
   return (
     <div className="animate-fade">
@@ -81,25 +142,24 @@ export default function Tasks() {
                   <div className={`${styles.taskTitle} ${task.done ? styles.done : ''}`}>{task.title}</div>
                   <div className={styles.taskMeta}>{task.type} · {task.due}</div>
                 </div>
-
                 {!isManager && <span className={`pill pill-${task.priority}`}>{task.priority.toUpperCase()}</span>}
-
                 {task.done && <span className={styles.completedBadge}>✓ Completed</span>}
-
                 {isManager && (
-                  <button
-                    className={styles.editIconBtn}
-                    onClick={() => setDraft({ ...task })}
-                    title="Edit task"
-                  >
-                    ✏️
-                  </button>
+                  <button className={styles.editIconBtn} onClick={() => setDraft({ ...task })} title="Edit task">✏️</button>
                 )}
               </div>
             ))}
           </div>
         </div>
       ))}
+
+      {Object.keys(grouped).length === 0 && (
+        <div className="card">
+          <div className="card-body" style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
+            No tasks assigned yet.
+          </div>
+        </div>
+      )}
 
       {adding && (
         <div className="modal-overlay" onClick={() => { setAdding(false); setAddErrors([]); }}>
@@ -109,9 +169,7 @@ export default function Tasks() {
               <button className="modal-close" onClick={() => { setAdding(false); setAddErrors([]); }}>×</button>
             </div>
             {addErrors.length > 0 && (
-              <div className={styles.errorBar}>
-                {addErrors.map((e, i) => <div key={i}>{e}</div>)}
-              </div>
+              <div className={styles.errorBar}>{addErrors.map((e, i) => <div key={i}>{e}</div>)}</div>
             )}
             <div className="modal-body">
               <div className="form-grid">
@@ -121,7 +179,7 @@ export default function Tasks() {
                 </div>
                 <div className="form-group">
                   <label>Description</label>
-                  <textarea className="field" style={{ minHeight: 80 }} value={newTask.description} onChange={e => setNewTask(n => ({ ...n, description: e.target.value }))} placeholder="Optional description" />
+                  <textarea className="field" style={{ minHeight: 80 }} value={newTask.description} onChange={e => setNewTask(n => ({ ...n, description: e.target.value }))} placeholder="Task description" />
                 </div>
                 <div className="form-grid form-grid-2">
                   <div className="form-group">
@@ -159,7 +217,6 @@ export default function Tasks() {
               <button className="modal-close" onClick={closeOverlay}>×</button>
             </div>
             <div className="modal-body">
-
               {isManager ? (
                 <div className="form-grid">
                   <div className="form-group">
@@ -168,12 +225,12 @@ export default function Tasks() {
                   </div>
                   <div className="form-group">
                     <label>Description</label>
-                    <textarea className="field" style={{ minHeight: 80 }} value={draft.description ?? ''} onChange={e => setDraft(d => ({ ...d, description: e.target.value }))} placeholder="No description" />
+                    <textarea className="field" style={{ minHeight: 80 }} value={draft.description ?? ''} onChange={e => setDraft(d => ({ ...d, description: e.target.value }))} />
                   </div>
                   <div className="form-grid form-grid-2">
                     <div className="form-group">
                       <label>Due Date</label>
-                      <input className="field" type="date" value={draft.dueDate ?? ''} onChange={e => setDraft(d => ({ ...d, dueDate: e.target.value }))} />
+                      <input className="field" type="date" value={draft.due ?? ''} onChange={e => setDraft(d => ({ ...d, due: e.target.value }))} />
                     </div>
                     <div className="form-group">
                       <label>Priority</label>
@@ -190,7 +247,7 @@ export default function Tasks() {
                   </div>
                   <div className="modal-actions">
                     <button className="btn btn-primary" onClick={saveChanges}>Save Changes</button>
-                    <button className={`btn btn-ghost ${styles.deleteBtn}`} onClick={deleteTask}>Delete</button>
+                    <button className={`btn btn-ghost ${styles.deleteBtn}`} onClick={handleDelete}>Delete</button>
                     <button className="btn btn-ghost" onClick={closeOverlay}>Cancel</button>
                   </div>
                 </div>
@@ -218,7 +275,6 @@ export default function Tasks() {
                   </div>
                 </div>
               )}
-
             </div>
           </div>
         </div>

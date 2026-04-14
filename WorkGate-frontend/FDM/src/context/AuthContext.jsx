@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from 'react';
+import { loginUser } from '../api/api';
 
 const AuthContext = createContext(null);
 
@@ -26,6 +27,8 @@ export function AuthProvider({ children }) {
       return null;
     } finally {
       setLoading(false);
+    } catch {
+      return null;
     }
   };
 
