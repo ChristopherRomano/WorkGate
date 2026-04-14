@@ -1,6 +1,8 @@
 package com.workgate.fdm.model;
 
+import jakarta.persistence.Entity;
 
+@Entity
 public class AnnualLeaveRequest extends ManagerRequest {
 
 	private long startOfLeave;
@@ -10,13 +12,6 @@ public class AnnualLeaveRequest extends ManagerRequest {
 	private long creationTime;
 	private String assignedManager;
 
-	/**
-	 * 
-	 * @param employee
-	 * @param creationTime
-	 * @param assignedManger
-	 * @param reason
-	 */
 	public AnnualLeaveRequest(String username, long startOfleave, long creationTime, long endOfLeave, String assignedManger, String reason) {
 		super(username, creationTime, assignedManger);
 		this.startOfLeave = startOfleave;
@@ -25,10 +20,6 @@ public class AnnualLeaveRequest extends ManagerRequest {
 		this.username = username;
 		this.creationTime = creationTime;
 		this.assignedManager = assignedManger;
-		
-
-
-
 	}
 
 	public String getusername() {
@@ -54,11 +45,4 @@ public class AnnualLeaveRequest extends ManagerRequest {
 	public String getReason() {
 		return this.reason;
 	}
-
-	
-
-	
-
-	
-
 }

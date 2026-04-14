@@ -1,24 +1,25 @@
 package com.workgate.fdm.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+
 public abstract class Request {
 
+	@ManyToOne
+	@JoinColumn(name = "employee_email")
 	private String username;
 	private long creationTime;
 	private STATUS status;
-	private int id;
+	@Id
+	private Long id;
+
 	
-	private static int nextId = 0;
-
-	/**
-	 * 
-	 * @param status
-	 */
-
 	public Request(String username, long creationTime) {
 		this.username = username;
 		this.creationTime = creationTime;
 		this.status = STATUS.OPEN;
-		this.id = nextId++;
 		
 	}
 	
@@ -29,6 +30,6 @@ public abstract class Request {
 	public String getEmployeeUsername() { return this.username; }
 	public long getCreationTime()       { return this.creationTime; }
 	public STATUS getStatus()           { return this.status; }
-	public int getId()                  { return this.id; }
+	public long getId()                  { return this.id; }
 
 }

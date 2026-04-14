@@ -1,5 +1,8 @@
 package com.workgate.fdm.model;
 
+import jakarta.persistence.Entity;
+
+@Entity
 public class ExpenseRequest extends ManagerRequest {
 
 	private float amount;
@@ -15,6 +18,10 @@ public class ExpenseRequest extends ManagerRequest {
 		this.currency = currency;
 		this.evidence = evidence;
 		this.id = nextId++;
+
+	}
+
+	public ExpenseRequest() {
 
 	}
 

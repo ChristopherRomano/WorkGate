@@ -1,5 +1,9 @@
 package com.workgate.fdm.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+
+@Entity
 public abstract class ManagerRequest extends Request {
 
 	//private Manager assignedManager;

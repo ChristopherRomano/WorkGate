@@ -2,7 +2,14 @@ package com.workgate.fdm.model;
 
 import java.util.List;
 
+<<<<<<< HEAD
 public class Manager extends Employee {
+=======
+import jakarta.persistence.*;
+
+@Entity
+public class Manager extends Poster {
+>>>>>>> b39e9318dbdb935f5e53ce2992273ab28ff2223c
 
 	private String teamCode;
 
@@ -10,14 +17,11 @@ public class Manager extends Employee {
 		super(email, password);
 	}
 
-	public List<ManagerRequest> getManagerRequest() {
-		return Registry.getRegistry().getActiveManagerRequests(this);
-	}
+    public Manager() {
+        super();
+    }
 
-	public void assignTask(Employee emp, int tid, boolean completion, String desc, String title, PRIORITY priority) {
-		Task task = new Task(tid, completion, desc, title, priority);
-		emp.getTaskList().addTask(task);
-	}
+
 
 	public void assignTask(Employee emp, int tid, boolean completion, String desc, String title, PRIORITY priority, String dueDate, String category) {
 		Task task = new Task(tid, completion, desc, title, priority, dueDate, category);

@@ -1,5 +1,11 @@
 package com.workgate.fdm.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "posts")
+
+
 public class Post {
 
 	private String title;
@@ -7,26 +13,58 @@ public class Post {
 	private boolean pinned;
 	private VISIBILITY visibility;
 	private String authorUsername;
-	private int timePosted;
-	private int id;
-	private static int nextId = 0;
+	private long timePosted;
+    @Id
+    private Long id;
 
-	public Post(String title, String content, boolean pinned, VISIBILITY visibility, int timePosted, String author) {
+	/**
+	 * 
+	 * @param title
+	 * @param content
+	 * @param pinned
+	 * @param visibility
+	 * @param timePosted
+	 * @param authorUsername
+	 */
+
+	public Post(String title, String content, boolean pinned, VISIBILITY visibility, long timePosted, String authorUsername) {
 		this.title = title;
 		this.content = content;
 		this.pinned = pinned;
 		this.visibility = visibility;
 		this.timePosted = timePosted;
-		this.authorUsername = author;
-		this.id = nextId++;
+		this.authorUsername = authorUsername;
+	}
+	public Post() {}
+
+	public String getTitle() {
+		return this.title;
 	}
 
-	public String getTitle() { return this.title; }
-	public boolean getPinned() { return this.pinned; }
-	public VISIBILITY getVisibility() { return this.visibility; }
-	public String getAuthor() { return this.authorUsername; }
-	public int getTimePosted() { return this.timePosted; }
-	public String getAuthorUsername() {	return authorUsername; }
-	public String getContent() { return content; }
-	public int getId() { return id; }
+	public boolean getPinned() {
+		return this.pinned;
+	}
+
+	public VISIBILITY getVisibility() {
+		return this.visibility;
+	}
+
+	public String getAuthorUsername() {
+		return this.authorUsername;
+	}
+	public long getTimePosted() {
+		return this.timePosted;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public Long getId() {
+		return id;
+	}
 }

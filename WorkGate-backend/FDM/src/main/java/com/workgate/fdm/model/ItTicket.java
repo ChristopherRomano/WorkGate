@@ -1,5 +1,10 @@
 package com.workgate.fdm.model;
 
+import jakarta.persistence.Entity;
+
+import java.util.List;
+
+@Entity
 public class ItTicket extends Request {
 
     private String title;
@@ -14,8 +19,9 @@ public class ItTicket extends Request {
         this.category    = category;
     }
 
-    // ── Status helpers ────────────────────────────────────────────────────────
+	public ItTicket() {
 
+	}
     /** Advance: OPEN → IN_PROGRESS → RESOLVED */
     public boolean advance() {
         if (getStatus() == STATUS.OPEN) {
