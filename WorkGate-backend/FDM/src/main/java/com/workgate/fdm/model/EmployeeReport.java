@@ -1,5 +1,8 @@
 package com.workgate.fdm.model;
 
+import jakarta.persistence.Entity;
+
+@Entity
 public class EmployeeReport extends Request {
 
 	private String content;
@@ -17,6 +20,10 @@ public class EmployeeReport extends Request {
 	public EmployeeReport(Employee employee, int creationTime, String content, String title, boolean privacy) {
 		// TODO - implement EmployeeReport.EmployeeReport
 		throw new UnsupportedOperationException();
+	}
+
+	public EmployeeReport() {
+
 	}
 
 	public String getContent() {

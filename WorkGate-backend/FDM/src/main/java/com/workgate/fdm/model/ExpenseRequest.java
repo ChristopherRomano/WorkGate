@@ -1,5 +1,8 @@
 package com.workgate.fdm.model;
 
+import jakarta.persistence.Entity;
+
+@Entity
 public class ExpenseRequest extends ManagerRequest {
 
 	private int amount;
@@ -18,6 +21,10 @@ public class ExpenseRequest extends ManagerRequest {
 	public ExpenseRequest(Employee employee, int creationTime, float amount, CURRENCY currency, String evidence, Manager assignedManager) {
 		// TODO - implement ExpenseRequest.ExpenseRequest
 		throw new UnsupportedOperationException();
+	}
+
+	public ExpenseRequest() {
+
 	}
 
 	public int getAmount() {

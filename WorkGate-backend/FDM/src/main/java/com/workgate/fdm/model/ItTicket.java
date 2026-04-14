@@ -1,7 +1,10 @@
 package com.workgate.fdm.model;
 
+import jakarta.persistence.Entity;
+
 import java.util.List;
 
+@Entity
 public class ItTicket extends Request {
 
 	private String title;
@@ -21,6 +24,10 @@ public class ItTicket extends Request {
 	public ItTicket(Employee employee, int creationTIme, String title, String description, String category, List<String> evidence) {
 		// TODO - implement ItTicket.ItTicket
 		throw new UnsupportedOperationException();
+	}
+
+	public ItTicket() {
+
 	}
 
 	public String getTitle() {

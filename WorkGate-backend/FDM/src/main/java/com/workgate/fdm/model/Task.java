@@ -1,5 +1,9 @@
 package com.workgate.fdm.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
 public class Task {
 
 	private int taskId;
@@ -9,19 +13,17 @@ public class Task {
 	private PRIORITY priority;
 	private String dueDate;
 	private String category;
+    @Id
+    private Long id;
 
-	public Task(int taskId, boolean completion, String description, String title, PRIORITY priority) {
-		this.taskId = taskId;
-		this.completion = completion;
-		this.description = description;
-		this.title = title;
-		this.priority = priority;
-	}
 
 	public Task(int taskId, boolean completion, String description, String title, PRIORITY priority, String dueDate, String category) {
-		this(taskId, completion, description, title, priority);
-		this.dueDate = dueDate;
-		this.category = category;
+
+
+	}
+
+	public Task() {
+
 	}
 
 	public int getTaskId() {
@@ -51,6 +53,13 @@ public class Task {
 		return this.priority;
 	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getId() {
+		return id;
+	}
 	public String getDueDate() {
 		return this.dueDate;
 	}

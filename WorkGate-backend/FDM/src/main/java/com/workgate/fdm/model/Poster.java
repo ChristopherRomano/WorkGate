@@ -6,6 +6,10 @@ public abstract class Poster extends Employee {
         super(email, password);
     }
 
+	public Poster() {
+		super();
+	}
+
 	/**
 	 * 
 	 * @param post

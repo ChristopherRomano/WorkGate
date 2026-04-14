@@ -2,60 +2,93 @@ package com.workgate.fdm.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.persistence.*;
 
+@Entity
 public class Employee extends User {
 
+	@Enumerated(EnumType.STRING)
 	private TAG tag;
+
 	private String address;
 	private String phoneNumber;
 	private String emergencyContact;
 	private String profilePicture;
-	private Manager manager;
-	private List<Request> requestList;
-	private TaskList taskList;
-	private int annualLeaveBalance;
 
+	@ManyToOne
+	private Manager manager;
+
+	@OneToMany(mappedBy = "employee")
+	private List<Request> requestList;
+
+
+	@OneToOne
+	private TaskList taskList;
+
+	private int annualLeaveBalance;
+	private String name;
+    @Id
+    private long id;
+
+
+	/**
+	 * 
+	 * @param email
+	 * @param password
+	 */
 	public Employee(String email, String password) {
 		super(email, password);
-		this.taskList = new TaskList();
-		this.requestList = new ArrayList<>();
+		this.address = "";
+		this.phoneNumber = "";
+		this.emergencyContact = "";
+		this.profilePicture = "";
+		this.name = "";
+        this.taskList = new TaskList();
+        this.requestList = new ArrayList<>();
 	}
 
+	public Employee() {
+
+	}
+
+
 	public boolean submitHrReport() {
-		// TODO - implement Employee.submitHrReport
 		throw new UnsupportedOperationException();
 	}
 
 	public boolean submitItTicket() {
-		// TODO - implement Employee.submitItTicket
 		throw new UnsupportedOperationException();
 	}
 
 	public boolean submitExpenseReport() {
-		// TODO - implement Employee.submitExpenseReport
 		throw new UnsupportedOperationException();
 	}
 
 	public boolean submitAnnualLeaveRequest() {
-		// TODO - implement Employee.submitAnnualLeaveRequest
 		throw new UnsupportedOperationException();
 	}
 
 	public List<Request> viewRequests() {
-		return this.requestList;
+		return requestList;
 	}
 
 	public boolean cancelRequest(Request request) {
+
 		return this.requestList.remove(request);
 	}
 
 	public List<Task> viewTasks() {
+
 		return this.taskList.getTasks();
 	}
 
 	public void completeTask(Task task) {
-		task.setCompletion(true);
+		throw new UnsupportedOperationException();
 	}
+
+
+
+
 
 	public void setTag(TAG tag)                             { this.tag = tag; }
 	public void setAddress(String address)                  { this.address = address; }
@@ -72,5 +105,10 @@ public class Employee extends User {
 	public Manager getManager()             { return this.manager; }
 	public String getAddress()              { return this.address; }
 	public String getPhoneNumber()          { return this.phoneNumber; }
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
 
 }

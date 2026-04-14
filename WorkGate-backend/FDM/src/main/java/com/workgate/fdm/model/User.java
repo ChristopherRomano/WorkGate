@@ -21,6 +21,8 @@ public abstract class User {
 		this.isLocked = false;
 	}
 
+	public User(){}
+
 	public boolean Login(String username, String password) {
 		if (isLocked) return false;
 		if (this.email.equals(username) && this.password.equals(password)) {
