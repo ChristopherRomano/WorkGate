@@ -12,12 +12,6 @@ public class TaskList {
 		this.tasks = new ArrayList<>();
 	}
 
-	public List<Task> searchByName(String title) {
-		return tasks.stream()
-				.filter(t -> t.getTitle().toLowerCase().contains(title.toLowerCase()))
-				.collect(Collectors.toList());
-	}
-
 	public boolean addTask(Task t) {
 		return tasks.add(t);
 	}

@@ -14,28 +14,15 @@ public class Consultant extends Employee {
 		this.keySkills = new ArrayList<>();
 	}
 
-	public boolean updateTimeSheet(int hours) {
-		// TODO - implement Consultant.updateTimeSheet
-		throw new UnsupportedOperationException();
-	}
+	public boolean addKeySkill(String skill) { return keySkills.add(skill); }
 
-	public boolean addKeySkill(String skill) {
-		return keySkills.add(skill);
-	}
+	public boolean removeKeySkill(String skill) { return keySkills.remove(skill); }
 
-	public boolean removeKeySkill(String skill) {
-		return keySkills.remove(skill);
-	}
+	public void setEndDate(int endDate) { this.endDate = endDate; }
+	public void setClientCode(String code) { this.activeClientCode = code; }
 
-	public boolean printInformation() {
-		// TODO - implement Consultant.printInformation
-		throw new UnsupportedOperationException();
-	}
-
-	public void setEndDate(int endDate)       { this.endDate = endDate; }
-	public void setClientCode(String code)    { this.activeClientCode = code; }
-
-	public String getActiveClientCode()       { return this.activeClientCode; }
-	public List<String> getKeySkills()        { return this.keySkills; }
+	public String getActiveClientCode() { return this.activeClientCode; }
+	public List<String> getKeySkills() { return this.keySkills; }
+	public int getEndDate() { return endDate; }
 
 }

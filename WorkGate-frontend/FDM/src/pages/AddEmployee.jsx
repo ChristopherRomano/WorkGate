@@ -37,14 +37,30 @@ export default function AddEmployee() {
   const [errors, setErrors] = useState([]);
   const [copied, setCopied] = useState(null); // id of entry whose creds were copied
 
-  useEffect(() => {
-    fetchEmployees()
-      .then(list => setManagers(list.filter(e => e.role === 'manager')))
-      .catch(() => {});
-    fetchClientCodes()
-      .then(setClientCodes)
-      .catch(() => {});
-  }, []);
+  const createRequest = async (username,manager,tag) => {
+
+    const request = {
+      username: username,
+      email: manager,
+      tag : tag
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/createEmployee", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create ticket");
+      }
+    } 
+    catch (error) {
+        console.error(error);
+    }
+  };
 
   const field = (key) => ({
     value: form[key],
@@ -75,24 +91,18 @@ export default function AddEmployee() {
     const name = `${form.firstName.trim()} ${form.lastName.trim()}`;
     const username = deriveUsername(form.firstName.trim(), form.lastName.trim());
     const initials = `${form.firstName[0]}${form.lastName[0]}`.toUpperCase();
-
-    try {
-      const result = await createEmployee({
-        email: form.email.trim(),
-        username,
-        name,
-        initials,
-        role: form.role,
-        tag,
-        managerEmail: form.managerEmail || undefined,
-      });
-      setCreated(prev => [{ ...result, clientCode: form.clientCode || 'INTERNAL' }, ...prev]);
-      setForm(EMPTY);
-    } catch (e) {
-      setErrors([e.message]);
-    } finally {
-      setSubmitting(false);
-    }
+    const newEmp = {
+      id: `e-new-${Date.now()}`,
+      name, initials,
+      email: form.email.trim(),
+      role: form.role,
+      tag: form.tag,
+      manager: form.manager,
+    };
+    setCreated(prev => [newEmp, ...prev]);
+    setForm(EMPTY);
+    createRequest()
+    setTimeout(() => setShowSuccess(false), 3500);
   };
 
   const copyCredentials = (emp) => {
@@ -110,18 +120,6 @@ export default function AddEmployee() {
         <div className="card">
           <div className="card-header"><span className="card-title">New Employee Account</span></div>
           <div className={styles.formBody}>
-
-            <div className={styles.twoCol}>
-              <div className="form-group">
-                <label>First Name</label>
-                <input className="field" placeholder="First name" {...field('firstName')} />
-              </div>
-              <div className="form-group">
-                <label>Last Name</label>
-                <input className="field" placeholder="Last name" {...field('lastName')} />
-              </div>
-            </div>
-
             <div className="form-group">
               <label>Email Address</label>
               <input
@@ -182,16 +180,6 @@ export default function AddEmployee() {
                   <option key={m.email} value={m.email}>
                     {m.name} ({m.email})
                   </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Client Project Code <span className={styles.optional}>(optional)</span></label>
-              <select className="field" {...field('clientCode')}>
-                <option value="">— None / Internal —</option>
-                {clientCodes.map(c => (
-                  <option key={c.id} value={c.code}>{c.code} – {c.client}</option>
                 ))}
               </select>
             </div>

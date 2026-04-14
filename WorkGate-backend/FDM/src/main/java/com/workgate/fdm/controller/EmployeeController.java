@@ -1,5 +1,6 @@
 package com.workgate.fdm.controller;
 
+import com.workgate.fdm.DTO.NewEmployeeRequest;
 import com.workgate.fdm.model.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,4 +61,10 @@ public class EmployeeController {
         return "employee";
     }
 
+    @PostMapping("/createEmployee")
+    private void createEmployee (@RequestBody NewEmployeeRequest request){
+        
+    }
+
+    
 }

@@ -1,6 +1,5 @@
 package com.workgate.fdm.DTO;
 
-import com.workgate.fdm.model.Poster;
 import com.workgate.fdm.model.VISIBILITY;
 
 public class PostRequest {

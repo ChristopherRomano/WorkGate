@@ -2,7 +2,7 @@ package com.workgate.fdm.model;
 
 import java.util.List;
 
-public class Manager extends Poster {
+public class Manager extends Employee {
 
 	private String teamCode;
 
