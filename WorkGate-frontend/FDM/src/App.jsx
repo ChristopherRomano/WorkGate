@@ -8,7 +8,6 @@ import Profile        from './pages/Profile';
 import Timesheet      from './pages/Timesheet';
 import Tasks          from './pages/Tasks';
 import Leave          from './pages/Leave';
-import Expenses       from './pages/Expenses';
 import News           from './pages/News';
 import IT             from './pages/IT';
 import HR             from './pages/HR';
@@ -38,7 +37,6 @@ function AppRoutes() {
         <Route path="timesheet"      element={<Timesheet />} />
         <Route path="tasks"          element={<Tasks />} />
         <Route path="leave"          element={<Leave />} />
-        <Route path="expenses"       element={<Expenses />} />
         <Route path="news"           element={<News />} />
         <Route path="it"             element={<IT />} />
         <Route path="hr"             element={<HR />} />

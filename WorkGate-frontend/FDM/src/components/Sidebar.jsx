@@ -14,7 +14,6 @@ const NAV = [
     { to: '/app/timesheet', icon: '⏱', label: 'Timesheet', roles: ['consultant', 'manager'] },
     { to: '/app/tasks',     icon: '✓', label: 'Tasks',     roles: ['employee', 'consultant', 'manager'], badge: 3, mobile: true },
     { to: '/app/leave',     icon: '📅', label: 'Leave',    roles: ['employee', 'consultant', 'manager'] },
-    { to: '/app/expenses',  icon: '£', label: 'Expenses',  roles: ['employee', 'consultant', 'manager'] },
   ]},
   { section: 'Company', items: [
     { to: '/app/news', icon: '📢', label: 'News Feed', roles: ['employee', 'consultant', 'manager', 'ittech', 'hr'], badge: 2 },
