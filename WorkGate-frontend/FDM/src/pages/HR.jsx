@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Modal from '../components/Modal';
 import '../styles/components.css';
+import styles from './HR.module.css';
 
 const initial = [
   { id: 'hr1', title: 'Workplace Feedback – Team Communication', excerpt: 'General feedback about team communication processes on client site. Submitted anonymously.', date: '20 Mar 2026', status: 'resolved', anon: true },
@@ -11,6 +12,32 @@ export default function HR() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ title: '', content: '', anon: false });
 
+  const createRequest = async (content,title,anonymous) => {
+
+    const request = {
+      username: "john",
+      content: content,
+      title: title,
+      anonymous: anonymous,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/createEmployeeReport", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create ticket");
+      }
+    } 
+    catch (error) {
+        console.error(error);
+    }
+  };
+
   const submit = () => {
     if (!form.title) return;
     setReports(prev => [
@@ -18,6 +45,7 @@ export default function HR() {
       ...prev,
     ]);
     setShowModal(false);
+    createRequest(form.content,form.title,form.anon)
     setForm({ title: '', content: '', anon: false });
   };
 
@@ -28,32 +56,28 @@ export default function HR() {
           <span className="card-title">My HR Reports</span>
           <button className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}>+ Submit Report</button>
         </div>
-        <div className="card-body" style={{ padding: '4px 20px' }}>
+        <div className={`card-body ${styles.reportBody}`}>
           {reports.map(r => (
-            <div key={r.id} style={{ padding: '16px 0', borderBottom: '1px solid var(--border)' }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>{r.title}</div>
-              <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>{r.excerpt}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>
+            <div key={r.id} className={styles.reportItem}>
+              <div className={styles.reportTitle}>{r.title}</div>
+              <div className={styles.reportExcerpt}>{r.excerpt}</div>
+              <div className={styles.reportFooter}>
                 <span>{r.date}</span>
                 <span className={`badge badge-${r.status === 'resolved' ? 'resolved' : 'pending'}`}>{r.status.toUpperCase()}</span>
-                {r.anon && (
-                  <span style={{ padding: '1px 7px', borderRadius: 3, background: 'var(--surface-3)', border: '1px solid var(--border)', fontSize: 9 }}>ANONYMOUS</span>
-                )}
+                {r.anon && <span className={styles.anonBadge}>ANONYMOUS</span>}
               </div>
             </div>
           ))}
-          {reports.length === 0 && (
-            <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--text-dim)', fontSize: 13 }}>No reports submitted yet.</div>
-          )}
+          {reports.length === 0 && <div className={styles.empty}>No reports submitted yet.</div>}
         </div>
       </div>
 
-      <div className="card" style={{ marginTop: 16, padding: '18px 20px' }}>
-        <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-          <span style={{ fontSize: 28 }}>🔒</span>
+      <div className={`card ${styles.confidentialCard}`}>
+        <div className={styles.confidentialInner}>
+          <span className={styles.confidentialIcon}>🔒</span>
           <div>
-            <div style={{ fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 700, color: 'var(--text)', marginBottom: 5 }}>Your reports are confidential</div>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+            <div className={styles.confidentialTitle}>Your reports are confidential</div>
+            <div className={styles.confidentialBody}>
               Anonymous reports are processed by HR without revealing your identity. Non-anonymous reports allow HR to follow up with you directly via the portal.
             </div>
           </div>
@@ -70,10 +94,10 @@ export default function HR() {
             <label>Details</label>
             <textarea className="field" style={{ minHeight: 120 }} placeholder="Describe your feedback or complaint..." value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} />
           </div>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 8 }}>
-            <input type="checkbox" id="anon" checked={form.anon} onChange={() => setForm(f => ({ ...f, anon: !f.anon }))} style={{ width: 'auto', marginTop: 2, accentColor: 'var(--lime)' }} />
-            <label htmlFor="anon" style={{ textTransform: 'none', letterSpacing: 0, fontSize: 13, color: 'var(--text-muted)', cursor: 'pointer' }}>
-              <strong style={{ color: 'var(--text)', display: 'block', marginBottom: 2 }}>Submit anonymously</strong>
+          <div className={styles.anonCheckRow}>
+            <input type="checkbox" id="anon" className={styles.anonCheckbox} checked={form.anon} onChange={() => setForm(f => ({ ...f, anon: !f.anon }))} />
+            <label htmlFor="anon" className={styles.anonLabel}>
+              <strong className={styles.anonLabelTitle}>Submit anonymously</strong>
               Your identity will not be shared with HR or line management.
             </label>
           </div>

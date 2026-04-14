@@ -1,32 +1,14 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { currentUser, tasks, leaveRequests, expenses, newsPosts } from '../data/mockData';
+import { tasks, leaveRequests, expenses, newsPosts } from '../data/mockData';
 import '../styles/components.css';
 import styles from './Dashboard.module.css';
 
-function StatCard({ icon, value, label, delta, deltaType, highlight }) {
-  return (
-    <div className={`${styles.statCard} ${highlight ? styles.highlight : ''}`}>
-      <div className={styles.statIcon}>{icon}</div>
-      <div className={styles.statNum}>{value}</div>
-      <div className={styles.statLabel}>{label}</div>
-      {delta && <div className={`${styles.statDelta} ${styles[deltaType]}`}>{delta}</div>}
-    </div>
-  );
-}
-
 function TaskRow({ task }) {
-  const [done, setDone] = useState(task.done);
   return (
     <div className={styles.taskRow}>
-      <div
-        className={`${styles.check} ${done ? styles.checkDone : ''}`}
-        onClick={() => setDone(d => !d)}
-        role="checkbox"
-        aria-checked={done}
-      />
+      <div className={`${styles.check} ${task.done ? styles.checkDone : ''}`} />
       <div className={styles.taskInfo}>
-        <div className={`${styles.taskTitle} ${done ? styles.taskDone : ''}`}>{task.title}</div>
+        <div className={`${styles.taskTitle} ${task.done ? styles.taskDone : ''}`}>{task.title}</div>
         <div className={styles.taskMeta}>{task.type} · {task.due}</div>
       </div>
       <span className={`pill pill-${task.priority}`}>{task.priority.toUpperCase()}</span>
@@ -40,20 +22,12 @@ export default function Dashboard() {
 
   return (
     <div className="animate-fade">
-      {/* Stats */}
-      <div className={styles.statsGrid}>
-        <StatCard icon="⏱" value="38.5" label="Hours this week" delta="↑ 2.5h vs last week" deltaType="up" highlight />
-        <StatCard icon="✓" value={pendingTasks} label="Tasks pending" delta="3 due this week" deltaType="warn" />
-        <StatCard icon="📅" value={currentUser.leaveBalance} label="Leave days remaining" delta={`of ${currentUser.leaveTotal} total`} />
-        <StatCard icon="🎯" value={currentUser.skillScore} label="Skill score" delta="↑ 3 this month" deltaType="up" />
-      </div>
-
       <div className={styles.twoCol}>
         {/* Tasks */}
         <div className="card">
           <div className="card-header">
             <span className="card-title">My Tasks</span>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/tasks')}>View all</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/app/tasks')}>View all</button>
           </div>
           <div className="card-body" style={{ padding: '8px 20px' }}>
             {tasks.slice(0, 4).map(t => <TaskRow key={t.id} task={t} />)}
@@ -64,7 +38,7 @@ export default function Dashboard() {
         <div className="card">
           <div className="card-header">
             <span className="card-title">News Feed</span>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/news')}>View all</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/app/news')}>View all</button>
           </div>
           <div className="card-body" style={{ padding: '4px 20px' }}>
             {newsPosts.slice(0, 2).map(p => (
@@ -108,7 +82,7 @@ export default function Dashboard() {
         <div className="card">
           <div className="card-header">
             <span className="card-title">Leave Requests</span>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/leave')}>View all</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate('/app/leave')}>View all</button>
           </div>
           <div className="card-body">
             <div className="table-wrap">

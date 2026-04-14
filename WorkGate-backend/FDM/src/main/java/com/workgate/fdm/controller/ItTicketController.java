@@ -1,0 +1,30 @@
+package com.workgate.fdm.controller;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.*;
+
+import com.workgate.fdm.DTO.ItTicketRequest;
+import com.workgate.fdm.model.ItTicket;
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:5173")
+public class ItTicketController {
+
+    @RequestMapping("/itTickets")
+    public List<ItTicket> getItTickets (@RequestParam String username) {
+        return List.of();
+    }
+
+    @PostMapping("/createItTicket")
+    public void createItTicket (@RequestBody ItTicketRequest request) {
+        System.out.println("Created IT ticket");
+    }
+
+    @PostMapping("/claimTicket")
+    public void claimTicket (@RequestParam String username) {
+        System.out.println("Claimed IT ticket");
+    }
+
+}
