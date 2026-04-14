@@ -6,42 +6,27 @@ public class Post {
 	private String content;
 	private boolean pinned;
 	private VISIBILITY visibility;
-	private Poster author;
+	private String authorUsername;
 	private int timePosted;
+	private int id;
+	private static int nextId = 0;
 
-	/**
-	 * 
-	 * @param title
-	 * @param content
-	 * @param pinned
-	 * @param visibility
-	 * @param timePosted
-	 * @param parameter
-	 * @param author
-	 */
-	public Post(String title, String content, boolean pinned, VISIBILITY visibility, int timePosted, String parameter, Poster author) {
-		// TODO - implement Post.Post
-		throw new UnsupportedOperationException();
+	public Post(String title, String content, boolean pinned, VISIBILITY visibility, int timePosted, String author) {
+		this.title = title;
+		this.content = content;
+		this.pinned = pinned;
+		this.visibility = visibility;
+		this.timePosted = timePosted;
+		this.authorUsername = author;
+		this.id = nextId++;
 	}
 
-	public String getTitle() {
-		return this.title;
-	}
-
-	public boolean getPinned() {
-		return this.pinned;
-	}
-
-	public VISIBILITY getVisibility() {
-		return this.visibility;
-	}
-
-	public Poster getAuthor() {
-		return this.author;
-	}
-
-	public int getTimePosted() {
-		return this.timePosted;
-	}
-
+	public String getTitle() { return this.title; }
+	public boolean getPinned() { return this.pinned; }
+	public VISIBILITY getVisibility() { return this.visibility; }
+	public String getAuthor() { return this.authorUsername; }
+	public int getTimePosted() { return this.timePosted; }
+	public String getAuthorUsername() {	return authorUsername; }
+	public String getContent() { return content; }
+	public int getId() { return id; }
 }

@@ -15,6 +15,31 @@ export default function AddEmployee() {
   const [created, setCreated] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const createRequest = async (username,manager,tag) => {
+
+    const request = {
+      username: username,
+      email: manager,
+      tag : tag
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/createEmployee", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create ticket");
+      }
+    } 
+    catch (error) {
+        console.error(error);
+    }
+  };
+
   const field = (key) => ({
     value: form[key],
     onChange: (e) => setForm(f => ({ ...f, [key]: e.target.value })),
@@ -33,13 +58,10 @@ export default function AddEmployee() {
       role: form.role,
       tag: form.tag,
       manager: form.manager,
-      clientCode: form.clientCode || 'INTERNAL',
-      client: clientCodes.find(c => c.code === form.clientCode)?.client || 'FDM Internal',
-      active: true,
     };
     setCreated(prev => [newEmp, ...prev]);
     setForm(EMPTY);
-    setShowSuccess(true);
+    createRequest()
     setTimeout(() => setShowSuccess(false), 3500);
   };
 
@@ -49,18 +71,6 @@ export default function AddEmployee() {
         <div className="card">
           <div className="card-header"><span className="card-title">New Employee Account</span></div>
           <div className={styles.formBody}>
-
-            <div className={styles.twoCol}>
-              <div className="form-group">
-                <label>First Name</label>
-                <input className="field" placeholder="First name" {...field('firstName')} />
-              </div>
-              <div className="form-group">
-                <label>Last Name</label>
-                <input className="field" placeholder="Last name" {...field('lastName')} />
-              </div>
-            </div>
-
             <div className="form-group">
               <label>Email Address</label>
               <input className="field" type="email" placeholder="firstname.lastname@fdmgroup.com" {...field('email')} />
@@ -88,16 +98,6 @@ export default function AddEmployee() {
               <select className="field" {...field('manager')}>
                 <option value="">— Select manager —</option>
                 {managers.map(m => <option key={m} value={m}>{m}</option>)}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Client Project Code <span className={styles.optional}>(optional)</span></label>
-              <select className="field" {...field('clientCode')}>
-                <option value="">— None / Internal —</option>
-                {clientCodes.map(c => (
-                  <option key={c.id} value={c.code}>{c.code} – {c.client}</option>
-                ))}
               </select>
             </div>
 

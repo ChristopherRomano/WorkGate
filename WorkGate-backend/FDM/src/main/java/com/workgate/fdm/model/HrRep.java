@@ -3,7 +3,7 @@ package com.workgate.fdm.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HrRep extends Poster {
+public class HrRep extends Employee {
 
 	private List<EmployeeReport> hrTickets;
 
@@ -19,10 +19,4 @@ public class HrRep extends Poster {
 	public boolean claimTIcket(EmployeeReport employeeReport) {
 		return hrTickets.add(employeeReport);
 	}
-
-	public boolean updateTicket(STATUS status) {
-		// TODO - implement HrRep.updateTicket
-		throw new UnsupportedOperationException();
-	}
-
 }

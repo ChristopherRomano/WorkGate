@@ -1,5 +1,7 @@
 package com.workgate.fdm.model;
 
+import java.util.Locale.Category;
+
 public class Task {
 
 	private int taskId;
@@ -7,56 +9,27 @@ public class Task {
 	private String description;
 	private String title;
 	private PRIORITY priority;
-	private String dueDate;
-	private String category;
+	private TASK_CATEGORY category;
 
-	public Task(int taskId, boolean completion, String description, String title, PRIORITY priority) {
+	public Task(int taskId, boolean completion, String description, String title, PRIORITY priority,TASK_CATEGORY category) {
 		this.taskId = taskId;
 		this.completion = completion;
 		this.description = description;
 		this.title = title;
 		this.priority = priority;
-	}
-
-	public Task(int taskId, boolean completion, String description, String title, PRIORITY priority, String dueDate, String category) {
-		this(taskId, completion, description, title, priority);
-		this.dueDate = dueDate;
 		this.category = category;
 	}
-
-	public int getTaskId() {
-		return this.taskId;
-	}
-
-	public boolean getCompletion() {
-		return this.completion;
-	}
-
+	
 	public void setCompletion(boolean completion) { this.completion = completion; }
-	public void setTitle(String title)             { this.title = title; }
+	public void setTitle(String title) { this.title = title; }
 	public void setDescription(String description) { this.description = description; }
-	public void setDueDate(String dueDate)         { this.dueDate = dueDate; }
-	public void setCategory(String category)       { this.category = category; }
-	public void setPriority(PRIORITY priority)     { this.priority = priority; }
+	public void setCategory(TASK_CATEGORY category) { this.category = category; }
+	public void setPriority(PRIORITY priority) { this.priority = priority; }
 
-	public String getDescription() {
-		return this.description;
-	}
-
-	public String getTitle() {
-		return this.title;
-	}
-
-	public PRIORITY getPriority() {
-		return this.priority;
-	}
-
-	public String getDueDate() {
-		return this.dueDate;
-	}
-
-	public String getCategory() {
-		return this.category;
-	}
-
+	public int getTaskId() { return this.taskId; }
+	public String getDescription() {return this.description;}
+	public String getTitle() { return this.title; }
+	public PRIORITY getPriority() { return this.priority; }
+	public TASK_CATEGORY getCategory() { return this.category; }
+	public boolean getCompletion() { return this.completion; }
 }

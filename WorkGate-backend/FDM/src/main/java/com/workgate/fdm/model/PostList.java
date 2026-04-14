@@ -1,5 +1,6 @@
 package com.workgate.fdm.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostList {
@@ -8,44 +9,41 @@ public class PostList {
 	private static PostList instance;
 
 	private PostList() {
-		// TODO - implement PostList.PostList
-		throw new UnsupportedOperationException();
+		this.posts = new ArrayList<>();
 	}
 
 	public static PostList getInstance() {
+		if (instance == null){
+			instance = new PostList();
+		}
 		return instance;
 	}
 
-	/**
-	 * 
-	 * @param area
-	 */
 	public List<Post> filter(VISIBILITY area) {
-		// TODO - implement PostList.filter
-		throw new UnsupportedOperationException();
+		List<Post> filtedPosts = new ArrayList<>();
+
+		for (int i = 0; i < this.posts.size(); i++){
+			if (this.posts.get(i).getVisibility() == area){
+				filtedPosts.add(this.posts.get(i));
+			}
+		}
+		return filtedPosts;
 	}
 
 	public List<Post> getPostList() {
-		// TODO - implement PostList.getPostList
-		throw new UnsupportedOperationException();
+		return posts;
 	}
 
-	/**
-	 * 
-	 * @param post
-	 */
-	public boolean addPost(Post post) {
-		// TODO - implement PostList.addPost
-		throw new UnsupportedOperationException();
+	public void addPost(Post post) {
+		this.posts.add(post);
 	}
 
-	/**
-	 * 
-	 * @param post
-	 */
-	public boolean deletePost(Post post) {
-		// TODO - implement PostList.deletePost
-		throw new UnsupportedOperationException();
+	public void deletePost(int id) {
+		for (int i = 0; i < this.posts.size(); i++){
+			if (this.posts.get(i).getId() == id){
+				this.posts.remove(i);
+			}
+		}
 	}
 
 }

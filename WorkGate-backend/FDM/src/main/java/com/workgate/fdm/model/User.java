@@ -36,10 +36,6 @@ public abstract class User {
 		return this.password.equals(password);
 	}
 
-	public void requestPasswordReset() {
-		// TODO - implement password reset flow
-	}
-
 	public void unlock() {
 		this.isLocked = false;
 		this.failedAttempts = 0;
