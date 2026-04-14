@@ -18,27 +18,32 @@ const ACCOUNTS = [
 
 const ROLE_HOME = {
   admin: '/app/admin',
-  ittech: '/app/it-management',
+  it: '/app/it-management',
   hr: '/app/hr-management',
 };
 
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const user = login(username.trim(), password);
-    if (user) {
-      navigate(ROLE_HOME[user.role] ?? '/app');
-    } else {
+
+    const user = await login(username.trim(), password);
+
+    if (!user) {
       setError('Invalid username or password.');
+      return;
     }
+
+    navigate(ROLE_HOME[user.role] ?? '/app');
   };
+
 
   const quickLogin = (u) => {
     const user = login(u, 'pass');

@@ -19,6 +19,12 @@ public class ExpenseRequestController {
     @PostMapping("/createExpense")
     public void createExpenseRequest(@RequestBody ExpenseRequestRequest request){
         System.out.println("Created Expense ticket");
+        
+    }
+
+    @PostMapping("/expenseRequestApproved")
+    public void createExpenseRequest(@RequestBody int id){
+        System.out.println("Created Expense ticket");
     }
     
 }

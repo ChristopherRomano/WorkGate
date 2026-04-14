@@ -13,7 +13,7 @@ public class EmployeeController{
 
     @GetMapping("/employeeInfo")
     public Employee getEmployeeInfo(@RequestParam String username) {
-
+        System.out.println(username);
         return new Employee("testFdm@fdm.com", "password");
     }
 

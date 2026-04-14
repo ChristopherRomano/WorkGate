@@ -16,8 +16,11 @@ public class TaskController {
         return List.of(new Task(0, false, "", "", PRIORITY.LOW));
     }
     @PostMapping("/newTask")
-    public boolean newTask (@RequestBody TaskRequest taskRequest){
+    public void newTask (@RequestBody TaskRequest taskRequest){
         System.out.println("Task Created");
-        return true;
+    }
+    @GetMapping("/completeTask")
+    public void completedTask (@RequestBody String username){
+        System.out.println("Task completed");
     }
 }

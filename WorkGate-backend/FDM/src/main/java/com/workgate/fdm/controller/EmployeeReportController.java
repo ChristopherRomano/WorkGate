@@ -13,15 +13,19 @@ import com.workgate.fdm.model.EmployeeReport;
 
 public class EmployeeReportController{
 
-    @GetMapping("/EmployeeReports")
+    @GetMapping("/employeeReports")
     public List<EmployeeReport> getEmployeeReports(@RequestParam String username) {
-
         return List.of();
     }
 
     @PostMapping("/createEmployeeReport")
     public void updateEmployeeInfo(@RequestBody EmployeeReportRequest info){
-        System.out.println("Created Employee Report ticket");
-
+        System.out.println("Created Employee report ticket");
     }
+
+    @GetMapping("/claimEmployeeReport")
+    public void claimEmployeeReport(@RequestParam String username) {
+        System.out.println("Claimed Employee report");
+    }
+
 }

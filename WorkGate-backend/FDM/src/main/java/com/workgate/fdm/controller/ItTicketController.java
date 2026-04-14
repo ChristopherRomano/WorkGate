@@ -13,7 +13,7 @@ import com.workgate.fdm.model.ItTicket;
 public class ItTicketController {
 
     @RequestMapping("/itTickets")
-    public List<ItTicket> getItTickets (@RequestParam String Username) {
+    public List<ItTicket> getItTickets (@RequestParam String username) {
         return List.of();
     }
 
@@ -21,4 +21,10 @@ public class ItTicketController {
     public void createItTicket (@RequestBody ItTicketRequest request) {
         System.out.println("Created IT ticket");
     }
+
+    @PostMapping("/claimTicket")
+    public void claimTicket (@RequestParam String username) {
+        System.out.println("Claimed IT ticket");
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.workgate.fdm.controller;
 
+import java.io.Console;
+
 import org.springframework.web.bind.annotation.*;
 
 import com.workgate.fdm.DTO.LoginRequest;
@@ -12,7 +14,6 @@ public class LoginController {
     @PostMapping("/login")
     public String loginAuthenication(@RequestBody LoginRequest request){
         final String[] TYPES_OF_USERS = {"employee", "consultant","admin","it","hr","manager"};
-
         // validate here, return the type of employee
         if (true){
 
