@@ -14,21 +14,15 @@ public class EmployeeReport extends Request {
 	 * @param title
 	 * @param privacy
 	 */
-	public EmployeeReport(Employee employee, int creationTime, String content, String title, boolean privacy) {
-		// TODO - implement EmployeeReport.EmployeeReport
-		throw new UnsupportedOperationException();
+	public EmployeeReport(String username, long creationTime, String content, String title, boolean privacy) {
+		super(username, creationTime);
+		this.title = title;
+		this.anonymous = privacy;
+		this.content = content;
+
 	}
 
-	public String getContent() {
-		return this.content;
-	}
-
-	public String getTitle() {
-		return this.title;
-	}
-
-	public boolean getAnonymous() {
-		return this.anonymous;
-	}
-
+	public String getContent() { return this.content; }
+	public String getTitle() { return this.title; }
+	public boolean getAnonymous() { return this.anonymous; }
 }

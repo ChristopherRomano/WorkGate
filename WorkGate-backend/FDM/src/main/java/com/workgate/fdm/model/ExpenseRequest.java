@@ -2,25 +2,23 @@ package com.workgate.fdm.model;
 
 public class ExpenseRequest extends ManagerRequest {
 
-	private int amount;
+	private float amount;
 	private CURRENCY currency;
 	private String evidence;
+	private int id;
+	private static int nextId = 0;
 
-	/**
-	 * 
-	 * @param employee
-	 * @param creationTime
-	 * @param amount
-	 * @param currency
-	 * @param evidence
-	 * @param assignedManager
-	 */
-	public ExpenseRequest(Employee employee, int creationTime, float amount, CURRENCY currency, String evidence, Manager assignedManager) {
-		// TODO - implement ExpenseRequest.ExpenseRequest
-		throw new UnsupportedOperationException();
+	
+	public ExpenseRequest(String employee, long creationTime, float amount, CURRENCY currency, String evidence, String assignedManager) {
+		super(employee,creationTime,assignedManager);
+		this.amount = amount;
+		this.currency = currency;
+		this.evidence = evidence;
+		this.id = nextId++;
+
 	}
 
-	public int getAmount() {
+	public float getAmount() {
 		return this.amount;
 	}
 
@@ -32,4 +30,7 @@ public class ExpenseRequest extends ManagerRequest {
 		return this.evidence;
 	}
 
+	public int getId() {
+		return id;
+	}
 }
