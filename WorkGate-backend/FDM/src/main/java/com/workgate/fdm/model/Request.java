@@ -2,24 +2,37 @@ package com.workgate.fdm.model;
 
 public abstract class Request {
 
-	private Employee employee;
-	private int creationTime;
+	private String username;
+	private long creationTime;
 	private STATUS status;
+	private int id;
+	
+	private static int nextId = 0;
 
 	/**
 	 * 
 	 * @param status
 	 */
+
+	public Request(String username, long creationTime) {
+		this.username = username;
+		this.creationTime = creationTime;
+		this.status = STATUS.OPEN;
+		this.id = nextId++;
+		
+	}
+	
 	public void updateStatus(STATUS status) {
 		// TODO - implement Request.updateStatus
 		throw new UnsupportedOperationException();
 	}
 
-	public Employee getEmployee() {
-		return this.employee;
+	
+	public String getEmployeeUsername() {
+		return this.username;
 	}
 
-	public int getCreationTime() {
+	public long getCreationTime() {
 		return this.creationTime;
 	}
 
