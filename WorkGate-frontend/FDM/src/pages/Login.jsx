@@ -20,9 +20,9 @@ const ACCOUNTS = [
 ];
 
 const ROLE_HOME = {
-  admin:  '/app/admin',
-  ittech: '/app/it-management',
-  hr:     '/app/hr-management',
+  admin: '/app/admin',
+  it: '/app/it-management',
+  hr: '/app/hr-management',
 };
 
 export default function Login() {
@@ -48,8 +48,8 @@ export default function Login() {
   };
 
 
-  const quickLogin = async (u) => {
-    const user = await login(u, 'pass');
+  const quickLogin = (u) => {
+    const user = login(u, 'pass');
     if (user) navigate(ROLE_HOME[user.role] ?? '/app');
   };
 

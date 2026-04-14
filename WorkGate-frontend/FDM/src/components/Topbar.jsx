@@ -10,6 +10,7 @@ const PAGE_META = {
   '/app/timesheet':            { title: 'Timesheet',          sub: () => 'Log and submit your working hours' },
   '/app/tasks':                { title: 'Tasks',              sub: () => 'Your assigned and upskilling tasks' },
   '/app/leave':                { title: 'Annual Leave',       sub: () => 'Request and track your leave' },
+  '/app/expenses':             { title: 'Expense Claims',     sub: () => 'Submit and monitor expense claims' },
   '/app/news':                 { title: 'News Feed',          sub: () => 'Company announcements and updates' },
   '/app/it':                   { title: 'IT Support',         sub: () => 'Raise tickets and browse the knowledge base' },
   '/app/hr':                   { title: 'HR Reports',         sub: () => 'Submit feedback and reports to HR' },

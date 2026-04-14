@@ -118,6 +118,23 @@ export const leaveRequests = [
   { id: 'lr4', start: '10 Feb 2026', end: '11 Feb 2026', days: 2, status: 'rejected' },
 ];
 
+export const expenses = [
+  { id: 'ex1', description: 'Train – London to Manchester', date: '28 Mar 2026', project: 'CLIENT-003', amount: '£124.50', status: 'approved' },
+  { id: 'ex2', description: 'Hotel – Client Site Visit', date: '1 Apr 2026', project: 'CLIENT-003', amount: '£189.00', status: 'pending' },
+  { id: 'ex3', description: 'Lunch – Client Meeting', date: '2 Apr 2026', project: 'CLIENT-003', amount: '£34.00', status: 'pending' },
+  { id: 'ex4', description: 'Taxi – Airport Transfer', date: '15 Mar 2026', project: 'CLIENT-003', amount: '£47.20', status: 'approved' },
+];
+
+export const teamExpenses = [
+  { id: 'te1', employee: 'Marcus Reyes',  initials: 'MR', description: 'Train – London to Birmingham',  date: '2026-04-07', project: 'CLIENT-001', amount: '£89.50',  status: 'pending' },
+  { id: 'te2', employee: 'Aisha Patel',   initials: 'AP', description: 'Hotel – Client Overnight Stay', date: '2026-04-08', project: 'CLIENT-003', amount: '£210.00', status: 'pending' },
+  { id: 'te3', employee: 'Tom O\'Brien',  initials: 'TO', description: 'Taxi – Airport Transfer',       date: '2026-04-02', project: 'CLIENT-002', amount: '£42.00',  status: 'approved' },
+  { id: 'te4', employee: 'Marcus Reyes',  initials: 'MR', description: 'Lunch – Team Meeting',          date: '2026-04-10', project: 'CLIENT-001', amount: '£28.50',  status: 'pending' },
+  { id: 'te5', employee: 'Aisha Patel',   initials: 'AP', description: 'Flight – Manchester Return',    date: '2026-03-25', project: 'CLIENT-003', amount: '£156.00', status: 'approved' },
+  { id: 'te6', employee: 'Tom O\'Brien',  initials: 'TO', description: 'Train – Client Site Visit',     date: '2026-04-11', project: 'CLIENT-002', amount: '£67.30',  status: 'rejected' },
+  { id: 'te7', employee: 'Marcus Reyes',  initials: 'MR', description: 'Hotel – Overnight Conference',  date: '2026-04-14', project: 'CLIENT-001', amount: '£195.00', status: 'pending' },
+  { id: 'te8', employee: 'Aisha Patel',   initials: 'AP', description: 'Taxi – Late Night Client Site', date: '2026-04-14', project: 'CLIENT-003', amount: '£31.80',  status: 'pending' },
+];
 
 export const newsPosts = [
   { id: 'n1', title: 'Q2 Policy Update: Remote Working Guidelines', excerpt: 'Updated guidelines effective from 1 May 2026. All consultants on the bench must attend the office a minimum of 3 days per week. Deployed consultants should follow client site requirements.', author: 'HR Team', date: '1 Apr 2026', category: 'Global', pinned: true },
