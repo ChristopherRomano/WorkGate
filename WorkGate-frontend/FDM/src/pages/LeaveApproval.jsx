@@ -1,14 +1,60 @@
-import { useState } from 'react';
+
 import { employeeLeaveRequests } from '../data/mockData';
+import { useState, useEffect } from 'react';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './LeaveApproval.module.css';
 
+
 export default function LeaveApproval() {
-  const [requests, setRequests] = useState(employeeLeaveRequests);
+
+  //const [requests, setRequests] = useState(employeeLeaveRequests);
+  const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState('pending');
   const [rejectTarget, setRejectTarget] = useState(null);
   const [rejectComment, setRejectComment] = useState('');
+
+
+  const fetchLeaveRequests = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:8080/api/annualLeave?Username=john"
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch leave requests");
+    }
+
+    const data = await response.json();
+
+    console.log(data);
+    
+    const formatted = data.map((item, index) => ({
+      id: index,
+
+      employee: item.username ?? item.name ?? "Unknown",
+      type: "Annual Leave",
+
+      start: item.start ?? item.startDate ?? "",
+      end: item.end ?? item.endDate ?? "",
+
+      days: 1,
+      reason: item.reason ?? "",
+
+      status: "pending",
+      comment: ""
+    }));
+
+    setRequests(formatted);
+
+  } catch (error) {
+    console.error(error);
+  }
+  };
+
+  useEffect(() => {
+  fetchLeaveRequests();
+}, []);
 
   const approve = (id) =>
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved', comment: '' } : r));
@@ -41,7 +87,6 @@ export default function LeaveApproval() {
           {filtered.length === 0 && <div className={styles.empty}>No requests found.</div>}
           {filtered.map(req => (
             <div key={req.id} className={styles.requestRow}>
-              <div className={styles.avatar}>{req.initials}</div>
               <div className={styles.info}>
                 <div className={styles.employeeName}>{req.employee}</div>
                 <div className={styles.meta}>
