@@ -1,6 +1,6 @@
 package com.workgate.fdm.controller;
 
-import com.workgate.fdm.*;
+import com.workgate.fdm.model.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

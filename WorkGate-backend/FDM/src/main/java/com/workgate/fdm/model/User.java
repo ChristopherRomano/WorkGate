@@ -40,10 +40,6 @@ public abstract class User {
 		// TODO - implement password reset flow
 	}
 
-	public void changeLanguage(String language) {
-		this.language = language;
-	}
-
 	public void unlock() {
 		this.isLocked = false;
 		this.failedAttempts = 0;

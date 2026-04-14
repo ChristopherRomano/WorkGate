@@ -1,11 +1,12 @@
 package com.workgate.fdm.controller;
 
-import com.workgate.fdm.*;
+import com.workgate.fdm.model.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/tasks")
