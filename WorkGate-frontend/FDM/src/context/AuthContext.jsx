@@ -27,8 +27,6 @@ export function AuthProvider({ children }) {
       return null;
     } finally {
       setLoading(false);
-    } catch {
-      return null;
     }
   };
 
@@ -91,3 +89,7 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+
+export const useAuth = () => {
+  return useContext(AuthContext);
+};

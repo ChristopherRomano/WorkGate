@@ -2,6 +2,7 @@ package com.workgate.fdm;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
+import com.workgate.fdm.model.*;;
 
 @Component
 public class DataSeeder {
