@@ -31,8 +31,16 @@ export default function Topbar() {
   const meta = PAGE_META[pathname] ?? { title: 'WorkGate', sub: () => '' };
   const firstName = currentUser?.name?.split(' ')[0] ?? '';
 
+  const getRoleClass = () => {
+    if (currentUser?.role === 'manager') return styles.topbarManager;
+    if (currentUser?.role === 'admin') return styles.topbarAdmin;
+    if (currentUser?.role === 'hr') return styles.topbarHr;
+    if (currentUser?.role === 'ittech') return styles.topbarIttech;
+    return '';
+  };
+
   return (
-    <header className={styles.topbar}>
+    <header className={`${styles.topbar} ${getRoleClass()}`}>
       <div>
         <div className={styles.title}>{meta.title}</div>
         <div className={styles.subtitle}>{meta.sub(firstName)}</div>

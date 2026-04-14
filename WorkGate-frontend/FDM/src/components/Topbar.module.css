@@ -9,14 +9,29 @@
   position: sticky;
   top: 0;
   z-index: 50;
+  transition: background-color 0.3s ease;
 }
-.title {
-  font-family: var(--mono);
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.3px;
+
+.topbarManager {
+  background: linear-gradient(90deg, var(--black-2) 0%, rgba(68, 170, 255, 0.08) 100%);
+  border-bottom-color: var(--role-manager-blue-border);
 }
+
+.topbarAdmin {
+  background: linear-gradient(90deg, var(--black-2) 0%, rgba(255, 107, 107, 0.08) 100%);
+  border-bottom-color: var(--role-admin-red-border);
+}
+
+.topbarHr {
+  background: linear-gradient(90deg, var(--black-2) 0%, rgba(255, 217, 61, 0.08) 100%);
+  border-bottom-color: var(--role-hr-yellow-border);
+}
+
+.topbarIttech {
+  background: linear-gradient(90deg, var(--black-2) 0%, rgba(218, 112, 214, 0.08) 100%);
+  border-bottom-color: var(--role-ittech-purple-border);
+}
+
 .subtitle {
   font-size: 12px;
   color: var(--text-dim);
