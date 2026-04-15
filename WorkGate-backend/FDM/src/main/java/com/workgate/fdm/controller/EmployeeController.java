@@ -100,7 +100,7 @@ public class EmployeeController {
         }
 
         String managerEmail = validateManagerEmail(request.getManagerEmail(), request.getEmail());
-        Employee employee = new Employee(request.getEmail().trim(), request.getPassword() == null ? "" : request.getPassword());
+        Employee employee = new Employee(request.getEmail().trim(), request.getPassword() == null ? "pass" : request.getPassword());
         employee.setActive(true);
         employee.setName(request.getName());
         employee.setManagerEmail(managerEmail);
