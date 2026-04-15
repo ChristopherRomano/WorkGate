@@ -13,6 +13,7 @@
 /Users/rusel/WorkGate/WorkGate-backend/FDM/src/main/java/com/workgate/fdm/DTO/UpdateInfoRequest.java
 /Users/rusel/WorkGate/WorkGate-backend/FDM/src/main/java/com/workgate/fdm/FdmApplication.java
 /Users/rusel/WorkGate/WorkGate-backend/FDM/src/main/java/com/workgate/fdm/config/CorsConfig.java
+/Users/rusel/WorkGate/WorkGate-backend/FDM/src/main/java/com/workgate/fdm/controller/AdminController.java
 /Users/rusel/WorkGate/WorkGate-backend/FDM/src/main/java/com/workgate/fdm/controller/AuthController.java
 /Users/rusel/WorkGate/WorkGate-backend/FDM/src/main/java/com/workgate/fdm/controller/ClientCodeController.java
 /Users/rusel/WorkGate/WorkGate-backend/FDM/src/main/java/com/workgate/fdm/controller/EmployeeController.java

@@ -14,8 +14,7 @@ const NAV = [
     { to: '/app/profile', icon: '◉', label: 'My Profile', permission: 'profile',    mobile: true },
   ]},
   { section: 'Work', items: [
-    { to: '/app/timesheet', icon: '⏱', label: 'Timesheet', permission: 'timesheet' },
-    { to: '/app/tasks',     icon: '✓', label: 'Tasks',     permission: 'tasks',     mobile: true },
+{ to: '/app/tasks',     icon: '✓', label: 'Tasks',     permission: 'tasks',     mobile: true },
     { to: '/app/leave',     icon: '📅', label: 'Leave',    permission: 'leave' },
     { to: '/app/expenses',  icon: '£', label: 'Expenses',  permission: 'expenses' },
   ]},

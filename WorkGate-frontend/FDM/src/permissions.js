@@ -30,11 +30,9 @@ export const ROLE_PERMISSIONS = {
   ],
   consultant: [
     ...EMPLOYEE_BASE,
-    'timesheet',
   ],
   manager: [
     ...EMPLOYEE_BASE,
-    'timesheet',
     'leave-approval',
     'expense-approval',
     'set-task',

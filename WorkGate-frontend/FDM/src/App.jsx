@@ -6,7 +6,6 @@ import Layout from './components/Layout';
 import Login          from './pages/Login';
 import Dashboard      from './pages/Dashboard';
 import Profile        from './pages/Profile';
-import Timesheet      from './pages/Timesheet';
 import Tasks          from './pages/Tasks';
 import Leave          from './pages/Leave';
 import Expenses       from './pages/Expenses';
@@ -78,9 +77,6 @@ function AppRoutes() {
         <Route path="expenses" element={<RoleRoute permission="expenses"><Expenses /></RoleRoute>} />
         <Route path="it"       element={<RoleRoute permission="it-support"><IT /></RoleRoute>} />
         <Route path="hr"       element={<RoleRoute permission="hr-support"><HR /></RoleRoute>} />
-
-        {/* Consultant + Manager (extends Employee) */}
-        <Route path="timesheet" element={<RoleRoute permission="timesheet"><Timesheet /></RoleRoute>} />
 
         {/* Manager only (extends Employee) */}
         <Route path="leave-approval"    element={<RoleRoute permission="leave-approval"><LeaveApproval /></RoleRoute>} />
