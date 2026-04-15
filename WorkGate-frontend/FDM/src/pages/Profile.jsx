@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchEmployeeProfile, updateEmployeeProfile, updateEmployeeSkills } from '../api/api';
+import { fetchEmployeeProfile, fetchClientCodes, updateEmployeeProfile, updateEmployeeSkills } from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Modal from '../components/Modal';
@@ -59,7 +59,7 @@ function deriveInitials(firstName, surname, fallback) {
   return letters || fallback || 'WG';
 }
 
-function mapBackendProfileToUser(profile, currentUser) {
+function mapBackendProfileToUser(profile, currentUser, clientName) {
   const existingName = splitDisplayName(currentUser);
   const firstName = profile?.name ?? existingName.firstName;
   const surname = profile?.surname ?? existingName.surname;
@@ -78,6 +78,8 @@ function mapBackendProfileToUser(profile, currentUser) {
     initials: deriveInitials(firstName, surname, currentUser?.initials),
     tag: profile?.tag ?? currentUser?.tag,
     skills: profile?.keySkills ?? currentUser?.skills ?? [],
+    clientCode: profile?.activeClientCode ?? currentUser?.clientCode,
+    clientName: clientName ?? currentUser?.clientName,
   };
 }
 
@@ -111,18 +113,23 @@ export default function Profile() {
     let cancelled = false;
     setProfileLoading(true);
 
-    fetchEmployeeProfile(currentUser.email)
-      .then((profile) => {
+    const isConsultantUser = currentUser?.role === 'consultant';
+
+    Promise.all([
+      fetchEmployeeProfile(currentUser.email),
+      isConsultantUser ? fetchClientCodes() : Promise.resolve([]),
+    ])
+      .then(([profile, codes]) => {
         if (cancelled || !profile) return;
-        updateCurrentUser((previous) => mapBackendProfileToUser(profile, previous));
+        const code = profile?.activeClientCode ?? currentUser?.clientCode;
+        const clientName = (codes ?? []).find((c) => c.code === code)?.client ?? currentUser?.clientName;
+        updateCurrentUser((previous) => mapBackendProfileToUser(profile, previous, clientName));
       })
       .catch(() => {
-        // Keep mock user data when the profile has not been persisted yet.
+        // Keep existing user data when the profile has not been persisted yet.
       })
       .finally(() => {
-        if (!cancelled) {
-          setProfileLoading(false);
-        }
+        if (!cancelled) setProfileLoading(false);
       });
 
     return () => {
