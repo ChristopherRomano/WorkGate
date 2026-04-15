@@ -10,6 +10,7 @@ import com.workgate.fdm.DTO.UpdateInfoRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import com.workgate.fdm.repository.EmployeeRepository;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,24 +26,39 @@ public class EmployeeController {
     private EmployeeRepository employeeRepository;
 
     @PostMapping("/updateEmployee")
-    public void createEmployeeInfo(@RequestBody EmployeeReportRequest info){
-        System.out.println("Created Employee report ticket");
+    public void updateEmployeeInfo(@RequestBody NewEmployeeRequest request){
+        Employee e = employeeRepository.findByEmail(request.getEmail());
+
+        e.setEmail(request.getEmail());
+        e.setName(request.getName());
+        e.setPassword(request.getPassword());
+        e.setManagerEmail(request.getManagerEmail());
+        e.setTag(request.getTag());
+
+        employeeRepository.save(e);
     }
 
 
     @GetMapping("/employeeInfo")
-    public Employee getEmployeeInfo(@RequestParam String username) {
+    public Employee getEmployeeInfo(@RequestParam String email) {
+        try {
+            Employee e = employeeRepository.findByEmail(email);
 
-        return new Employee("fdsfs", "fdsdfs", "password", TAG.ADMIN);
+            if (e == null) {
+                throw new RuntimeException();
+            }
+            return e;
+        } catch (Exception ex) {
+            throw new RuntimeException();
+        }
     }
 
     @PostMapping("/createEmployee")
     public void createEmployee (@RequestBody NewEmployeeRequest request){
-        System.out.println("CHris sucks");
         Employee e = new Employee(
             request.getEmail(),
-            request.getManagerEmail(),
             request.getPassword(),
+            request.getManagerEmail(),
             request.getTag()
         );
 

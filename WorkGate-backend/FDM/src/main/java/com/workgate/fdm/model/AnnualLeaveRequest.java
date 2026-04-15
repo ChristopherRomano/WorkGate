@@ -11,6 +11,8 @@ public class AnnualLeaveRequest extends ManagerRequest {
 	private String username;
 	private long creationTime;
 	private String assignedManager;
+	private CURRENCY currency;
+	private int amount;
 
 	public AnnualLeaveRequest(String username, long startOfleave, long creationTime, long endOfLeave, String assignedManger, String reason) {
 		super(username, creationTime, assignedManger);
@@ -49,4 +51,22 @@ public class AnnualLeaveRequest extends ManagerRequest {
 	public String getReason() {
 		return this.reason;
 	}
+
+	public void setStartOfLeave(long startOfLeave) {
+		this.startOfLeave = startOfLeave;
+	}
+
+	public void setEndOfLeave(long endOfLeave) {
+		this.endOfLeave = endOfLeave;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 }
+

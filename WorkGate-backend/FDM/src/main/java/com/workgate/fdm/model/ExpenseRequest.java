@@ -24,6 +24,13 @@ public class ExpenseRequest extends ManagerRequest {
 		this.amount = amount;
 	}
 
+	public void setCurrency(CURRENCY currency) {
+		this.currency = currency;
+	}
+
+	public void setEvidence(String evidence) {
+		this.evidence = evidence;
+	}
 	public float getAmount() {
 		return this.amount;
 	}

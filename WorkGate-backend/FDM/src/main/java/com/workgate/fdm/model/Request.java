@@ -34,6 +34,7 @@ public abstract class Request {
 	}
 	public String getemployeeEmail() { return this.employeeEmail; }
 	public long getCreationTime()       { return this.creationTime; }
+	public long setCreationTime(long creationTime) { return this.creationTime = creationTime; }
 	public STATUS getStatus()           { return this.status; }
 	public long getId()                  { return this.id; }
 
