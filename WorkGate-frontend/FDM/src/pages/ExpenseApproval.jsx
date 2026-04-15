@@ -1,8 +1,10 @@
-import { useState, useMemo } from 'react';
-import { teamExpenses as teamInitial } from '../data/mockData';
+//Expense
+
+import { useState, useMemo, useEffect } from 'react';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './Expenses.module.css';
+import { useAuth } from '../context/AuthContext';
 
 const ICONS = { Train: '🚂', Hotel: '🏨', Lunch: '🍽', Taxi: '🚕', Flight: '✈️', Other: '📎' };
 const getIcon = (desc) => {
@@ -10,11 +12,81 @@ const getIcon = (desc) => {
   return ICONS[key] || '📎';
 };
 
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function getDaysInMonth(year, month) { return new Date(year, month + 1, 0).getDate(); }
+function getFirstDayOfWeek(year, month) { return (new Date(year, month, 1).getDay() + 6) % 7; }
+
+const CURRENCY_SYMBOLS = { USD: '$', GBP: '£', EUR: '€' };
+
 export default function ExpenseApproval() {
-  const [teamItems, setTeamItems] = useState(teamInitial);
+  const { currentUser } = useAuth();
+  const [teamItems, setTeamItems] = useState([]);
+  const [calDate, setCalDate]     = useState(new Date(2026, 3));
+  const [selectedDay, setSelectedDay] = useState(null);
   const [reviewTarget, setReviewTarget] = useState(null);
   const [rejectComment, setRejectComment] = useState('');
   const [teamFilter, setTeamFilter] = useState('pending');
+
+  const fetchExpenseRequests = async () => {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/expenses?username=${currentUser.name}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch expense requests");
+    }
+
+    const data = await response.json();
+
+    console.log(data);
+
+    const formatted = data.map((item, index) => {
+      const dateObj = new Date(item.creationTime);
+      const dateStr = dateObj.toISOString().split('T')[0];
+
+      const name = item.username ?? item.name ?? "Unknown";
+
+      const initials = name
+        .split(" ")
+        .map(p => p[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+
+      const symbol = CURRENCY_SYMBOLS[item.currency] ?? "";
+
+      return {
+        id: index,
+
+        employee: name,
+        initials,
+
+        description: item.reason ?? "Expense",
+        date: dateStr,
+
+        project: item.project ?? item.manager ?? "—",
+
+        amount: `${symbol}${parseFloat(item.amount || 0).toFixed(2)}`,
+
+        status: "pending",
+        comment: ""
+      };
+    });
+
+    setTeamItems(formatted);
+
+  } catch (error) {
+    console.error(error);
+  }
+  };
+
+  useEffect(() => {
+    fetchExpenseRequests();
+  }, [currentUser]);
+  
 
   const approveTeam = (id) => setTeamItems(prev => prev.map(e => e.id === id ? { ...e, status: 'approved' } : e));
 
@@ -30,11 +102,26 @@ export default function ExpenseApproval() {
   const teamPending = teamItems.filter(e => e.status === 'pending');
   const teamPendingTotal = teamPending.reduce((sum, e) => sum + parseFloat(e.amount.replace(/[^0-9.]/g, '')), 0);
 
+  const year = calDate.getFullYear();
+  const month = calDate.getMonth();
+  const daysInMonth = getDaysInMonth(year, month);
+  const firstDayOffset = getFirstDayOfWeek(year, month);
+
+  const expensesByDay = useMemo(() => {
+    const map = {};
+    teamItems.forEach(e => {
+      if (!map[e.date]) map[e.date] = [];
+      map[e.date].push(e.status);
+    });
+    return map;
+  }, [teamItems]);
+
   const filteredTeam = useMemo(() => {
     let list = teamItems;
+    if (selectedDay) list = list.filter(e => e.date === selectedDay);
     if (teamFilter !== 'all') list = list.filter(e => e.status === teamFilter);
     return list;
-  }, [teamItems, teamFilter]);
+  }, [teamItems, selectedDay, teamFilter]);
 
   return (
     <div className="animate-fade">
@@ -53,6 +140,55 @@ export default function ExpenseApproval() {
         ))}
       </div>
 
+      {/* Calendar */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <div className={styles.calHeader}>
+          <button className="btn btn-ghost btn-sm" onClick={() => setCalDate(new Date(year, month - 1))}>‹</button>
+          <span className={styles.calTitle}>{MONTHS[month]} {year}</span>
+          <button className="btn btn-ghost btn-sm" onClick={() => setCalDate(new Date(year, month + 1))}>›</button>
+          {selectedDay && (
+            <button className={`btn btn-ghost btn-sm ${styles.calClearBtn}`} onClick={() => setSelectedDay(null)}>
+              Clear filter
+            </button>
+          )}
+        </div>
+        <div className={styles.calGrid}>
+          {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => (
+            <div key={d} className={styles.calDayName}>{d}</div>
+          ))}
+          {Array.from({ length: firstDayOffset }, (_, i) => <div key={`blank-${i}`} />)}
+          {Array.from({ length: daysInMonth }, (_, i) => {
+            const day = i + 1;
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const statuses = expensesByDay[dateStr] || [];
+            const isSelected = selectedDay === dateStr;
+            const hasPending  = statuses.includes('pending');
+            const hasApproved = statuses.includes('approved');
+            const hasRejected = statuses.includes('rejected');
+            return (
+              <div
+                key={day}
+                className={[
+                  styles.calDay,
+                  statuses.length > 0 ? styles.calDayHasItems : '',
+                  isSelected ? styles.calDaySelected : '',
+                ].join(' ')}
+                onClick={() => statuses.length > 0 && setSelectedDay(isSelected ? null : dateStr)}
+              >
+                <span className={styles.calDayNum}>{day}</span>
+                {statuses.length > 0 && (
+                  <div className={styles.calDots}>
+                    {hasPending  && <span className={styles.dotPending}  />}
+                    {hasApproved && <span className={styles.dotApproved} />}
+                    {hasRejected && <span className={styles.dotRejected} />}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Filter bar */}
       <div className={styles.teamFilters}>
         {[
@@ -67,6 +203,12 @@ export default function ExpenseApproval() {
             onClick={() => setTeamFilter(val)}
           >{label}</button>
         ))}
+        {selectedDay && (
+          <span className={styles.dayFilterBadge}>
+            Filtered: {selectedDay}
+            <button className={styles.dayFilterClear} onClick={() => setSelectedDay(null)}>×</button>
+          </span>
+        )}
       </div>
 
       {/* Team expense list */}
