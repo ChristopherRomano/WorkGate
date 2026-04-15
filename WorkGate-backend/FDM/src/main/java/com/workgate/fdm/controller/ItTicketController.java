@@ -55,6 +55,12 @@ public class ItTicketController {
     // RESOLVE TICKET
     @PostMapping("/createItTicket")
     public void createTicket(@RequestBody ItTicketRequest request) {
+        ItTicket ticket = new ItTicket();
 
+        ticket.setTitle(request.getTitle());
+        ticket.setDescription(request.getDescription());
+        ticket.setCategory(request.getCategory());
+
+        itTicketRepository.save(ticket);
     }
 }
