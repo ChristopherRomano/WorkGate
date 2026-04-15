@@ -109,6 +109,22 @@ public class EmployeeController {
         return employeeRepository.save(employee);
     }
 
+    @DeleteMapping("/deleteEmployee")
+    public void deleteEmployee(@RequestParam String email) {
+
+        if (email == null || email.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required.");
+        }
+
+        Employee employee = employeeRepository.findByEmail(email);
+
+        if (employee == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found.");
+        }
+
+        employeeRepository.delete(employee);
+    }
+
     private Employee findEmployeeByEmail(String email) {
         if (email == null || email.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required.");
