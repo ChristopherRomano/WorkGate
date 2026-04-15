@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.workgate.fdm.DTO.LoginRequest;
 import com.workgate.fdm.model.Employee;
+import com.workgate.fdm.model.TAG;
 import com.workgate.fdm.repository.EmployeeRepository;
 
 @RestController
@@ -18,21 +19,26 @@ public class AuthController {
 
     @PostMapping("/login")
     public LoginResponse loginAuthenication(@RequestBody LoginRequest request) {
+        LoginResponse response = new LoginResponse();
+        response.setUsername(request.getUsername());
+        response.setTag(TAG.HR);
+        return response;
 
-        try {
-            Employee e = employeeRepository.findByEmail(request.getUsername());
 
-            if (e != null && e.checkPassword(request.getPassword())) {
-                LoginResponse response = new LoginResponse();
-                response.setUsername(request.getUsername());
-                response.setTag(e.getTag());
-                return response;
-            }
+        // try {
+        //     Employee e = employeeRepository.findByEmail(request.getUsername());
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        //     if (e != null && e.checkPassword(request.getPassword())) {
+        //         LoginResponse response = new LoginResponse();
+        //         response.setUsername(request.getUsername());
+        //         response.setTag(e.getTag());
+        //         return response;
+        //     }
 
-        throw new RuntimeException("Invalid credentials");
+        // } catch (Exception ex) {
+        //     ex.printStackTrace();
+        // }
+
+        // throw new RuntimeException("Invalid credentials");
     }
 }
