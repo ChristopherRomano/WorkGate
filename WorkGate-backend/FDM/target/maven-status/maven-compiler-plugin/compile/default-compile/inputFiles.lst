@@ -37,14 +37,12 @@ E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\m
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\ManagerRequest.java
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\Post.java
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\Poster.java
-E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\PostList.java
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\PRIORITY.java
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\Request.java
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\STATUS.java
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\TAG.java
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\Task.java
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\TASK_CATEGORY.java
-E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\TaskList.java
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\User.java
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\model\VISIBILITY.java
 E:\New folder (2)\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\repository\ClientCodeRepository.java
