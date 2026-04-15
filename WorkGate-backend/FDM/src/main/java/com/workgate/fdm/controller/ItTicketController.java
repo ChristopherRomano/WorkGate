@@ -1,5 +1,6 @@
 package com.workgate.fdm.controller;
 
+import com.workgate.fdm.DTO.ItTicketRequest;
 import com.workgate.fdm.DTO.ItTicketUpdateRequest;
 import com.workgate.fdm.model.ItTicket;
 import com.workgate.fdm.model.STATUS;
@@ -40,14 +41,20 @@ public class ItTicketController {
 
     // RESOLVE TICKET
     @PostMapping("/resolveItTicket")
-    public void resolveTicket(@RequestParam long id, STATUS status) {
+    public void resolveTicket(@RequestParam long id) {
 
         ItTicket ticket = itTicketRepository.findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
 
-        ticket.updateStatus(status);
+        ticket.updateStatus(STATUS.RESOLVED);
 
         itTicketRepository.save(ticket);
+    }
+
+    // RESOLVE TICKET
+    @PostMapping("/createItTicket")
+    public void createTicket(@RequestBody ItTicketRequest request) {
+
     }
 }
