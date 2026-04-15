@@ -23,6 +23,7 @@ import ClientCodes     from './pages/ClientCodes';
 import ITManagement    from './pages/ITManagement';
 import HRManagement    from './pages/HRManagement';
 import ExpenseApproval from './pages/ExpenseApproval';
+import Settings from './pages/Settings';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -45,6 +46,7 @@ function AppRoutes() {
         {/* Universally accessible once logged in */}
         <Route index           element={<Dashboard />} />
         <Route path="profile"  element={<Profile />} />
+        <Route path="settings" element={<Settings />} />
         <Route path="news"     element={<RoleRoute permission="news"><News /></RoleRoute>} />
 
         {/* Employee base permissions */}

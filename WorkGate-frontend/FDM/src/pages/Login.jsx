@@ -25,6 +25,25 @@ const ROLE_HOME = {
   hr:     '/app/hr-management',
 };
 
+function getUserKey(user) {
+  return user?.username ?? user?.email ?? user?.id ?? user?.name ?? 'default-user';
+}
+
+function readJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function getPreferredHome(user) {
+  const homeByUser = readJson('wg-home-routes', {});
+  const userKey = getUserKey(user);
+  return homeByUser[userKey] ?? ROLE_HOME[user.role] ?? '/app';
+}
+
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -44,13 +63,15 @@ export default function Login() {
       return;
     }
 
-    navigate(ROLE_HOME[user.role] ?? '/app');
+    navigate(getPreferredHome(user));
   };
 
 
   const quickLogin = async (u) => {
     const user = await login(u, 'pass');
-    if (user) navigate(ROLE_HOME[user.role] ?? '/app');
+    if (user) {
+      navigate(getPreferredHome(user));
+    }
   };
 
   return (
