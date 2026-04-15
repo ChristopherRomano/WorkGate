@@ -26,7 +26,7 @@ public class Employee extends User {
 		this.profilePicture = "";
 		this.managerEmail = managerEmail;
 		this.surname = "";
-		this.annualLeaveBalance = 10;
+		this.annualLeaveBalance = 25;
 		this.tag = tag;
 	}
 
@@ -43,7 +43,7 @@ public class Employee extends User {
 		this.profilePicture = "";
 		this.managerEmail = "";
 		this.surname = "";
-		this.annualLeaveBalance = 10;
+		this.annualLeaveBalance = 25;
 	}
 
 	public void setTag(TAG tag)                                  { this.tag = tag; }

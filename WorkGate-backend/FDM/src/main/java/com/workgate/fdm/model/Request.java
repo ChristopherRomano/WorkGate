@@ -1,6 +1,7 @@
 package com.workgate.fdm.model;
 
 import jakarta.persistence.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -11,8 +12,19 @@ public abstract class Request {
 	private long creationTime;
 	private STATUS status;
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+
+	@PrePersist
+	private void ensureIdForSqlite() {
+		if (this.id == null) {
+			long candidate = System.currentTimeMillis() * 1000L + ThreadLocalRandom.current().nextInt(1000);
+			if (candidate < 0) {
+				candidate = Math.abs(candidate);
+			}
+			this.id = candidate;
+		}
+	}
 
 	
 	public Request(String employeeEmail, long creationTime) {
