@@ -7,8 +7,6 @@ import jakarta.persistence.*;
 
 public abstract class Request {
 
-	@ManyToOne
-	@JoinColumn(name = "employee_email")
 	private String username;
 	private long creationTime;
 	private STATUS status;
@@ -22,6 +20,10 @@ public abstract class Request {
 		this.status = STATUS.OPEN;
 		
 	}
+
+	public Request(){
+
+	};
 	
 	public void updateStatus(STATUS status) {
 		this.status = status;

@@ -27,12 +27,12 @@ public class PostController {
     public void createPost(@RequestBody PostRequest request){
 
         Post post = new Post(
-                request.getTitle(),
-                request.getContent(),
-                request.getPinned(),
-                request.getVisibility(),
-                request.getTimePosted(),
-                request.getAuthorUsername()
+            request.getTitle(),
+            request.getContent(),
+            request.getPinned(),
+            request.getVisibility(),
+            request.getTimePosted(),
+            request.getAuthorUsername()
 
         );
 

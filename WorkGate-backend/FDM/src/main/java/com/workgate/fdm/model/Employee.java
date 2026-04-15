@@ -18,11 +18,11 @@ public class Employee extends User {
 	@ManyToOne
 	private Manager manager;
 
-	@OneToMany(mappedBy = "employee")
+	@OneToMany(mappedBy = "username")
 	private List<Request> requestList;
 
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private TaskList taskList;
 
 	private int annualLeaveBalance;

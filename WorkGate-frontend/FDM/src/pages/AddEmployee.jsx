@@ -40,13 +40,13 @@ export default function AddEmployee() {
   const createRequest = async (username,manager,tag) => {
 
     const request = {
-      username: username,
-      email: manager,
+      email: username,
+      managerName: "manager",
       tag : tag
     };
-
+    console.log(request);
     try {
-      const response = await fetch("http://localhost:8080/api/createEmployee", {
+      const response = await fetch("http://localhost:8080/api/employees/createEmployee", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -74,8 +74,6 @@ export default function AddEmployee() {
 
   const validate = () => {
     const errs = [];
-    if (!form.firstName.trim()) errs.push('First name is required.');
-    if (!form.lastName.trim())  errs.push('Last name is required.');
     if (!form.email.trim())     errs.push('Email address is required.');
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) errs.push('Email address is not valid.');
     return errs;
@@ -101,7 +99,7 @@ export default function AddEmployee() {
     };
     setCreated(prev => [newEmp, ...prev]);
     setForm(EMPTY);
-    createRequest()
+    createRequest(form.email,form.manager,tag)
     setTimeout(() => setShowSuccess(false), 3500);
   };
 

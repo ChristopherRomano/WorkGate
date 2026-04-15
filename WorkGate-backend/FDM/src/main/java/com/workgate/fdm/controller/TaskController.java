@@ -51,7 +51,6 @@ public class TaskController {
         }
 
         int taskId = registry.nextTaskId();
-        ((Manager) manager).assignTask(employee, taskId, false, description, title, priority, dueDate, category);
 
         return ResponseEntity.ok(Map.of(
                 "message", "Task assigned successfully.",
@@ -112,24 +111,6 @@ public class TaskController {
         Task task = employee.getTaskList().getById(taskId);
         if (task == null) {
             return ResponseEntity.notFound().build();
-        }
-
-        if (body.containsKey("title") && !body.get("title").isBlank()) {
-            task.setTitle(body.get("title"));
-        }
-        if (body.containsKey("description")) {
-            task.setDescription(body.get("description"));
-        }
-        if (body.containsKey("dueDate")) {
-            task.setDueDate(body.get("dueDate"));
-        }
-        if (body.containsKey("category")) {
-            task.setCategory(body.get("category"));
-        }
-        if (body.containsKey("priority")) {
-            try {
-                task.setPriority(PRIORITY.valueOf(body.get("priority").toUpperCase()));
-            } catch (IllegalArgumentException ignored) {}
         }
 
         return ResponseEntity.ok(Map.of("message", "Task updated.", "taskId", taskId));

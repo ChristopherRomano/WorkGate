@@ -1,6 +1,8 @@
 package com.workgate.fdm.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
@@ -14,6 +16,7 @@ public class TaskList {
 	@OneToMany
 	private List<Task> tasks;
     @Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 	public TaskList() {

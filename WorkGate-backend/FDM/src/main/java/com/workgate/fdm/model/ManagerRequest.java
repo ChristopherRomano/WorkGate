@@ -14,6 +14,10 @@ public abstract class ManagerRequest extends Request {
 		this.manager = manager;
 	}
 
+	public ManagerRequest (){
+		super();
+	}
+
 	public String getAssignedManager() {
 		return this.manager;
 	}
