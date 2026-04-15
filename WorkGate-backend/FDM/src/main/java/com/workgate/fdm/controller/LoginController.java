@@ -2,6 +2,8 @@ package com.workgate.fdm.controller;
 
 import java.io.Console;
 
+import com.workgate.fdm.DTO.LoginResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.workgate.fdm.DTO.LoginRequest;
@@ -13,21 +15,20 @@ import com.workgate.fdm.repository.EmployeeRepository;
 @CrossOrigin(origins = "http://localhost:5173")
 public class LoginController {
 
-    private final EmployeeRepository employeeRepository;
-
-    public LoginController(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
-    }
+    @Autowired
+    EmployeeRepository employeeRepository;
 
     @PostMapping("/login")
-    public String loginAuthenication(@RequestBody LoginRequest request) {
+    public LoginResponse loginAuthenication(@RequestBody LoginRequest request) {
 
         try {
             Employee e = employeeRepository.findByEmail(request.getUsername());
 
             if (e != null && e.checkPassword(request.getPassword())) {
-
-                return "employee"; // or whatever logic you want
+                LoginResponse response = new LoginResponse();
+                response.setUsername(request.getUsername());
+                response.setTag(e.getTag());
+                return response;
             }
 
         } catch (Exception ex) {
