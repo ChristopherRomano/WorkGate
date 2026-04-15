@@ -1,36 +1,40 @@
 package com.workgate.fdm.controller;
 
-import com.workgate.fdm.model.*;
-import org.springframework.http.ResponseEntity;
+import java.io.Console;
+
+import com.workgate.fdm.DTO.LoginResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.workgate.fdm.DTO.LoginRequest;
+import com.workgate.fdm.model.Employee;
+import com.workgate.fdm.repository.EmployeeRepository;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
+    @Autowired
+    EmployeeRepository employeeRepository;
+
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        String password = body.get("password");
+    public LoginResponse loginAuthenication(@RequestBody LoginRequest request) {
 
-        if (username == null || password == null) {
-            return ResponseEntity.badRequest().body("Username and password are required.");
+        try {
+            Employee e = employeeRepository.findByEmail(request.getUsername());
+
+            if (e != null && e.checkPassword(request.getPassword())) {
+                LoginResponse response = new LoginResponse();
+                response.setUsername(request.getUsername());
+                response.setTag(e.getTag());
+                return response;
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
-        // Demo logic (replace with DB later)
-        if (!password.equals("pass")) {
-            return ResponseEntity.status(401).body("Invalid username or password.");
-        }
-
-
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("username", username);
-        response.put("role", "manager");
-
-        return ResponseEntity.ok(response);
+        throw new RuntimeException("Invalid credentials");
     }
 }
