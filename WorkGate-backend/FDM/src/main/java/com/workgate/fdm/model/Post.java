@@ -15,7 +15,6 @@ public class Post {
 	private String authorEmail;
 	private long timePosted;
     @Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 	/**

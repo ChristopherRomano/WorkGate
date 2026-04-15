@@ -1,10 +1,8 @@
 package com.workgate.fdm.model;
 
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("REPORT")
 public class EmployeeReport extends Request {
 
 	private String content;

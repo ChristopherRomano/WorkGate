@@ -10,6 +10,7 @@ com\workgate\fdm\model\Employee.class
 com\workgate\fdm\DTO\LoginResponse.class
 com\workgate\fdm\model\ItTicket.class
 com\workgate\fdm\model\Post.class
+com\workgate\fdm\model\PostList.class
 com\workgate\fdm\repository\LeaveRequestRepository.class
 com\workgate\fdm\model\TASK_CATEGORY.class
 com\workgate\fdm\model\AnnualLeaveRequest.class
@@ -48,6 +49,7 @@ com\workgate\fdm\model\Task.class
 com\workgate\fdm\model\VISIBILITY.class
 com\workgate\fdm\model\CURRENCY.class
 com\workgate\fdm\repository\RequestRepository.class
+com\workgate\fdm\model\TaskList.class
 com\workgate\fdm\controller\EmployeeController.class
 com\workgate\fdm\controller\ExpenseRequestController.class
 com\workgate\fdm\model\ClientCode.class

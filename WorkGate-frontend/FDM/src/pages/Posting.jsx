@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import styles from './Posting.module.css';
-import { useAuth } from '../context/AuthContext';
+
 export default function Posting() {
-    const { currentUser } = useAuth();
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -23,7 +22,7 @@ export default function Posting() {
 
     const createRequest = async (visibility,content,pinned,title,timePosted) => {
         const request = {
-            author: currentUser?.username ,
+            author: "john",
             timePosted:  (new Date()).getTime(),
             visibility : visibility.toUpperCase(),
             pinned: pinned,

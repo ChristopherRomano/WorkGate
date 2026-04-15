@@ -48,7 +48,7 @@ export default function Tasks() {
         category: newTask.type,
       });
       setItems(prev => [...prev, mapTask({
-        id: res.id,
+        taskId: res.taskId,
         title: newTask.title.trim(),
         description: newTask.description.trim(),
         completion: false,
