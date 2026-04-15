@@ -3,14 +3,11 @@ import java.util.List;
 
 
 import com.workgate.fdm.DTO.LeaveRequestRequest;
-import com.workgate.fdm.model.CURRENCY;
 import com.workgate.fdm.repository.LeaveRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.workgate.fdm.DTO.ExpenseRequestRequest;
 import com.workgate.fdm.model.AnnualLeaveRequest;
-import com.workgate.fdm.model.ExpenseRequest;
 
 @RestController
 @RequestMapping("/api")
