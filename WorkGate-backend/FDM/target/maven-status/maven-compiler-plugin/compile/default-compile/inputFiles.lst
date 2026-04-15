@@ -1,5 +1,4 @@
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\config\CorsConfig.java
-E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\controller\AdminController.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\controller\AuthController.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\controller\ClientCodeController.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\controller\EmployeeController.java
@@ -17,6 +16,7 @@ E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\ExpenseReque
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\ItTicketRequest.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\LeaveRequestRequest.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\LoginRequest.java
+E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\LoginResponse.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\ManagerRequest.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\NewEmployeeRequest.java
 E:\WorkGate\WorkGate-backend\FDM\src\main\java\com\workgate\fdm\DTO\PostRequest.java
