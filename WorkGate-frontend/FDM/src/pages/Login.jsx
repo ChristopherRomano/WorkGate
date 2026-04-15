@@ -11,12 +11,12 @@ const QUICK_STATS = [
 ];
 
 const ACCOUNTS = [
-  { username: 'employee',   role: 'Employee',      login: 'employee@workgate.com' },
-  { username: 'consultant', role: 'Consultant',    login: 'consultant@workgate.com' },
-  { username: 'manager',    role: 'Manager',       login: 'manager@workgate.com' },
-  { username: 'ittech',     role: 'IT Technician', login: 'ittech@workgate.com' },
-  { username: 'hr',         role: 'HR Rep',        login: 'hr@workgate.com' },
-  { username: 'admin',      role: 'Administrator', login: 'admin@workgate.com' },
+  { email: 'employee@workgate.com',   role: 'Employee' },
+  { email: 'consultant@workgate.com', role: 'Consultant' },
+  { email: 'manager@workgate.com',    role: 'Manager' },
+  { email: 'ittech@workgate.com',     role: 'IT Technician' },
+  { email: 'hr@workgate.com',         role: 'HR Rep' },
+  { email: 'admin@workgate.com',      role: 'Administrator' },
 ];
 
 const ROLE_HOME = {
@@ -67,8 +67,8 @@ export default function Login() {
   };
 
 
-  const quickLogin = async (u) => {
-    const user = await login(u, 'pass');
+  const quickLogin = async (email) => {
+    const user = await login(email, 'pass');
     if (user) {
       navigate(getPreferredHome(user));
     }
@@ -102,10 +102,10 @@ export default function Login() {
             <div className={styles.demoBox}>
               <div className={styles.demoLabel}>Demo accounts (tap to auto-login)</div>
               <div className={styles.demoGrid}>
-                {ACCOUNTS.map(({ username: u, role, login }) => (
-                  <button key={u} className={styles.demoBtn} onClick={() => quickLogin(u)}>
+                {ACCOUNTS.map(({ email, role }) => (
+                  <button key={email} className={styles.demoBtn} onClick={() => quickLogin(email)}>
                     <span className={styles.demoRole}>{role}</span>
-                    <span className={styles.demoUser}>{login}</span>
+                    <span className={styles.demoUser}>{email}</span>
                     <span className={styles.demoPass}>password: pass</span>
                   </button>
                 ))}
