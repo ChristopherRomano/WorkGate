@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { clientCodes } from '../data/mockData';
 import { fetchEmployees, deactivateEmployee, reactivateEmployee, deleteEmployee } from '../api/api';
 import Modal from '../components/Modal';
 import '../styles/components.css';
@@ -19,6 +18,92 @@ const TABS = [
   { key: 'support',    label: 'Support' },
 ];
 
+function mapTagToRole(tag) {
+  switch ((tag ?? '').toUpperCase()) {
+    case 'MANAGER':
+      return 'manager';
+    case 'HR':
+      return 'hr';
+    case 'IT':
+      return 'ittech';
+    case 'ADMIN':
+      return 'admin';
+    case 'BENCH':
+    case 'DEPLOYED':
+    case 'TRAINEE':
+      return 'consultant';
+    case 'EMPLOYEE':
+    default:
+      return 'employee';
+  }
+}
+
+function buildFullName(person) {
+  const baseName = person?.name?.trim() ?? '';
+  const surname = person?.surname?.trim() ?? '';
+
+  if (baseName && surname) {
+    if (baseName.toLowerCase().includes(surname.toLowerCase()) || baseName.includes(' ')) {
+      return baseName;
+    }
+    return `${baseName} ${surname}`;
+  }
+
+  if (baseName) {
+    return baseName;
+  }
+
+  if (surname) {
+    return surname;
+  }
+
+  const emailName = person?.email?.split('@')[0] ?? '';
+  if (!emailName) {
+    return 'Unknown Employee';
+  }
+
+  return emailName
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+    .join(' ');
+}
+
+function buildInitials(name, fallbackInitials) {
+  if (fallbackInitials?.trim()) {
+    return fallbackInitials.trim().toUpperCase();
+  }
+
+  const letters = (name ?? '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+
+  return letters || 'WG';
+}
+
+function normaliseEmployee(person) {
+  const name = buildFullName(person);
+  const role = mapTagToRole(person?.tag);
+
+  return {
+    id: person?.id,
+    name,
+    initials: buildInitials(name, person?.initials),
+    email: person?.email ?? '',
+    role,
+    tag: person?.tag ?? 'EMPLOYEE',
+    manager: person?.managerEmail ?? '',
+    active: person?.active ?? true,
+    phone: person?.phoneNumber ?? '',
+    address: person?.address ?? '',
+    emergencyContact: person?.emergencyContact ?? '',
+    emergencyPhone: person?.emergencyContactNumber ?? '',
+  };
+}
+
 export default function ManageEmployees() {
   const [people, setPeople]             = useState([]);
   const [loading, setLoading]           = useState(true);
@@ -37,7 +122,7 @@ export default function ManageEmployees() {
 
   useEffect(() => {
     fetchEmployees()
-      .then(data => setPeople(data))
+      .then((data) => setPeople((data ?? []).map(normaliseEmployee)))
       .catch(() => setError('Could not load employees.'))
       .finally(() => setLoading(false));
   }, []);
