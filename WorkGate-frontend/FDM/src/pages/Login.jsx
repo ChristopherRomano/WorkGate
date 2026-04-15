@@ -4,6 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import '../styles/components.css';
 import styles from './Login.module.css';
 
+const QUICK_STATS = [
+  { value: '1,200+', label: 'Consultants active' },
+  { value: '98.4%', label: 'Timesheets on time' },
+  { value: '24/7', label: 'IT support coverage' },
+];
+
 const ACCOUNTS = [
   { email: 'employee@workgate.com',   role: 'Employee' },
   { email: 'consultant@workgate.com', role: 'Consultant' },
@@ -71,44 +77,39 @@ export default function Login() {
   return (
     <div className={styles.page}>
       <div className={styles.shell}>
-        <section className={styles.workspace}>
-          <div className={styles.workspaceCard}>
-            <header className={styles.brandRow}>
-              <div>
-                <div className={styles.brandMark}>WorkGate</div>
-                <div className={styles.brandSub}>Employee Portal</div>
+        <section className={styles.hero}>
+          <div className={styles.heroInner}>
+            <div className={styles.brand}>
+              <div className={styles.brandMark}>WorkGate</div>
+              <div className={styles.brandSub}>Employee Portal</div>
+            </div>
+
+            <span className={styles.kicker}>Secure workforce access</span>
+            <h1 className={styles.title}>One place for shifts, leave, support, and delivery admin.</h1>
+            <p className={styles.copy}>
+              Sign in to manage your weekly work, keep certifications current, and stay aligned with client and company updates.
+            </p>
+
+            <div className={styles.metrics}>
+              {QUICK_STATS.map((item) => (
+                <div key={item.label} className={styles.metricCard}>
+                  <div className={styles.metricValue}>{item.value}</div>
+                  <div className={styles.metricLabel}>{item.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.demoBox}>
+              <div className={styles.demoLabel}>Demo accounts (tap to auto-login)</div>
+              <div className={styles.demoGrid}>
+                {ACCOUNTS.map(({ email, role }) => (
+                  <button key={email} className={styles.demoBtn} onClick={() => quickLogin(email)}>
+                    <span className={styles.demoRole}>{role}</span>
+                    <span className={styles.demoUser}>{email}</span>
+                    <span className={styles.demoPass}>password: pass</span>
+                  </button>
+                ))}
               </div>
-              <span className={styles.badge}>Internal Use</span>
-            </header>
-
-            <div className={styles.workspaceIntro}>
-              <h1 className={styles.title}>Sign in to your work environment</h1>
-              <p className={styles.copy}>
-                Access staffing, leave, approvals, and IT requests in one secure workspace for daily operations.
-              </p>
-            </div>
-
-            <div className={styles.infoGrid}>
-              <article className={styles.infoCard}>
-                <h2 className={styles.infoTitle}>Operations Status</h2>
-                <ul className={styles.infoList}>
-                  <li>Identity service: Operational</li>
-                  <li>Approvals queue: Normal load</li>
-                  <li>Last policy sync: Today, 08:15</li>
-                </ul>
-              </article>
-
-              <article className={styles.infoCard}>
-                <h2 className={styles.infoTitle}>Service Notice</h2>
-                <p className={styles.infoText}>
-                  Next scheduled maintenance: Sunday, 28 April, 01:00-02:30 BST. Some services may be temporarily unavailable.
-                </p>
-              </article>
-            </div>
-
-            <div className={styles.supportBar}>
-              <span className={styles.supportLabel}>Support</span>
-              <p className={styles.supportText}>For access issues, contact IT Service Desk at ext. 104 or it-support@workgate.com</p>
             </div>
           </div>
         </section>
@@ -116,9 +117,9 @@ export default function Login() {
         <section className={styles.panelWrap}>
           <div className={`${styles.panel} animate-fade`}>
             <div className={styles.panelHeader}>
-              <span className={styles.panelEyebrow}>Secure Access</span>
-              <h2 className={styles.panelTitle}>WorkGate Sign In</h2>
-              <p className={styles.panelCopy}>Enter your account credentials to continue to the portal.</p>
+              <span className={styles.panelEyebrow}>Portal Login</span>
+              <h2 className={styles.panelTitle}>Access your workspace</h2>
+              <p className={styles.panelCopy}>Enter your username and password to continue.</p>
             </div>
 
             <form className={styles.form} onSubmit={handleSubmit}>
@@ -154,18 +155,6 @@ export default function Login() {
                 Sign In
               </button>
             </form>
-
-            <div className={styles.demoBox}>
-              <div className={styles.demoLabel}>Demo accounts (password: pass)</div>
-              <div className={styles.demoGrid}>
-                {ACCOUNTS.map(({ email, role }) => (
-                  <button key={email} className={styles.demoBtn} onClick={() => quickLogin(email)}>
-                    <span className={styles.demoRole}>{role}</span>
-                    <span className={styles.demoUser}>{email}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         </section>
       </div>
