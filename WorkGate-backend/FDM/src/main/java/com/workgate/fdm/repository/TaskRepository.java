@@ -1,6 +1,5 @@
 package com.workgate.fdm.repository;
 
-import com.workgate.fdm.model.AnnualLeaveRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.workgate.fdm.model.Task;
 

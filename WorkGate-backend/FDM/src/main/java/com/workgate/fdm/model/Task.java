@@ -31,7 +31,7 @@ public class Task {
 	}
 	
 	public void setCompletion(boolean completion) { this.completion = completion; }
-	public void setTitle(String title) {  }
+	public void setTitle(String title) { this.title = title; }
 
 	public boolean isCompletion() {
 		return completion;
@@ -72,4 +72,5 @@ public class Task {
 	public void setCompletion(){ this.completion = true; }
 	public TASK_CATEGORY getCategory() {return category;}
 	public Long getId() { return id; }
+	public void setId(Long id) { this.id = id; }
 }

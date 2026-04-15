@@ -36,6 +36,7 @@ public class TaskController {
         }
 
         Task task = new Task();
+        task.setId(System.currentTimeMillis());
         task.setEmployeeEmail(request.getEmployeeName());
         task.setDescription(request.getDescription());
         task.setTitle(request.getTitle());
@@ -50,6 +51,7 @@ public class TaskController {
     public void createTask(@RequestBody TaskRequest request) {
         Task task = new Task();
 
+        task.setId(System.currentTimeMillis());
         task.setTaskId(request.getTaskId());
         task.setEmployeeEmail(request.getEmployeeName());
         task.setDescription(request.getDescription());
