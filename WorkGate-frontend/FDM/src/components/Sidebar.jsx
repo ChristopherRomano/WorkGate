@@ -32,10 +32,10 @@ const NAV = [
     { to: '/app/hr-management', icon: '📋', label: 'Report Management', permission: 'hr-management' },
   ]},
   { section: 'Admin', roleSection: 'admin', items: [
-    { to: '/app/admin',                icon: '⚙', label: 'Admin Dashboard',  permission: 'admin-dashboard' },
-    { to: '/app/admin/employees',      icon: '👥', label: 'Manage Employees', permission: 'manage-employees' },
-    { to: '/app/admin/add-employee',   icon: '➕', label: 'Add Employee',     permission: 'add-employee' },
-    { to: '/app/admin/client-codes',   icon: '🏢', label: 'Client Codes',     permission: 'client-codes' },
+    { to: '/app/admin',                icon: '⚙', label: 'Admin Dashboard',  permission: 'admin-dashboard',  mobile: true },
+    { to: '/app/admin/employees',      icon: '👥', label: 'Manage Employees', permission: 'manage-employees', mobile: true },
+    { to: '/app/admin/add-employee',   icon: '➕', label: 'Add Employee',     permission: 'add-employee',     mobile: true },
+    { to: '/app/admin/client-codes',   icon: '🏢', label: 'Client Codes',     permission: 'client-codes',     mobile: true },
   ]},
   { section: 'Company', items: [
     { to: '/app/news', icon: '📢', label: 'News Feed', permission: 'news', badge: 2 },
@@ -68,6 +68,8 @@ export default function Sidebar() {
   const mobileItems = NAV
     .flatMap(s => s.items)
     .filter(item => item.mobile && can(item.permission));
+
+  const showSettings = can('settings');
 
   return (
     <>
@@ -123,12 +125,14 @@ export default function Sidebar() {
         </nav>
 
         <div className={styles.bottom}>
-          <NavLink
-            to="/app/settings"
-            className={({ isActive }) => `${styles.settingsShortcut} ${isActive ? styles.settingsShortcutActive : ''}`}
-          >
-            Settings
-          </NavLink>
+          {showSettings && (
+            <NavLink
+              to="/app/settings"
+              className={({ isActive }) => `${styles.settingsShortcut} ${isActive ? styles.settingsShortcutActive : ''}`}
+            >
+              Settings
+            </NavLink>
+          )}
           <button className={styles.logoutBtn} onClick={handleLogout}>Sign Out</button>
         </div>
       </aside>
@@ -139,7 +143,7 @@ export default function Sidebar() {
             <NavLink
               key={to}
               to={to}
-              end={to === '/app'}
+              end={to === '/app' || to === '/app/admin'}
               className={({ isActive }) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`}
             >
               <span className={styles.mobileNavIcon}>{icon}</span>
