@@ -1,6 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import { hasPermission } from '../permissions';
 import styles from './Sidebar.module.css';
 
@@ -58,7 +57,6 @@ const ROLE_TAGS = {
 
 export default function Sidebar() {
   const { currentUser, logout } = useAuth();
-  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => { logout(); navigate('/login'); };
@@ -125,13 +123,12 @@ export default function Sidebar() {
         </nav>
 
         <div className={styles.bottom}>
-          <div className={styles.settingsWidget}>
-            <div className={styles.settingsLabel}>Appearance</div>
-            <div className={styles.themeButtons}>
-              <button className={`${styles.themeBtn} ${theme === 'light' ? styles.themeBtnActive : ''}`} onClick={() => setTheme('light')}>◑ Light</button>
-              <button className={`${styles.themeBtn} ${theme === 'dark' ? styles.themeBtnActive : ''}`} onClick={() => setTheme('dark')}>● Dark</button>
-            </div>
-          </div>
+          <NavLink
+            to="/app/settings"
+            className={({ isActive }) => `${styles.settingsShortcut} ${isActive ? styles.settingsShortcutActive : ''}`}
+          >
+            Settings
+          </NavLink>
           <button className={styles.logoutBtn} onClick={handleLogout}>Sign Out</button>
         </div>
       </aside>
