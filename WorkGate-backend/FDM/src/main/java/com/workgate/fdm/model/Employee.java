@@ -23,6 +23,8 @@ public class Employee extends User {
 	@CollectionTable(name = "employee_skills", joinColumns = @JoinColumn(name = "employee_id"))
 	@Column(name = "skill")
 	private List<String> keySkills = new ArrayList<>();
+
+	private String activeClientCode;
 	
 	
 	public Employee(String email, String managerEmail, String password, TAG tag) {
@@ -79,5 +81,7 @@ public class Employee extends User {
 	public String getSurname()              { return this.surname; }
 	public List<String> getKeySkills()      { return this.keySkills; }
 	public void setKeySkills(List<String> keySkills) { this.keySkills = keySkills != null ? keySkills : new ArrayList<>(); }
+	public String getActiveClientCode()     { return this.activeClientCode; }
+	public void setActiveClientCode(String code) { this.activeClientCode = code; }
 
 }

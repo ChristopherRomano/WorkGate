@@ -106,6 +106,9 @@ public class EmployeeController {
         employee.setSurname(request.getSurname());
         employee.setManagerEmail(managerEmail);
         employee.setTag(request.getTag() == null ? TAG.EMPLOYEE : request.getTag());
+        if (request.getClientCode() != null && !request.getClientCode().isBlank()) {
+            employee.setActiveClientCode(request.getClientCode().trim());
+        }
 
         return employeeRepository.save(employee);
     }
@@ -162,6 +165,9 @@ public class EmployeeController {
         }
         if (request.getKeySkills() != null) {
             employee.setKeySkills(request.getKeySkills());
+        }
+        if (request.getClientCode() != null) {
+            employee.setActiveClientCode(request.getClientCode().isBlank() ? null : request.getClientCode().trim());
         }
     }
 

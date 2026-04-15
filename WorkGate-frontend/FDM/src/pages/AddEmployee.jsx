@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { createEmployee, fetchManagers } from '../api/api';
+import { createEmployee, fetchManagers, fetchClientCodes } from '../api/api';
 import '../styles/components.css';
 import styles from './AddEmployee.module.css';
 
@@ -12,6 +12,7 @@ const EMPTY = {
   role: 'consultant',
   consultantStatus: 'BENCH',
   managerEmail: '',
+  clientCode: '',
 };
 
 const ROLES = [
@@ -59,12 +60,19 @@ function buildManagerName(manager) {
 export default function AddEmployee() {
   const [form, setForm] = useState(EMPTY);
   const [managers, setManagers] = useState([]);
+  const [clientCodes, setClientCodes] = useState([]);
   const [created, setCreated] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [loadingManagers, setLoadingManagers] = useState(true);
   const [errors, setErrors] = useState([]);
   const [copied, setCopied] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    fetchClientCodes()
+      .then((data) => setClientCodes(data ?? []))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetchManagers()
@@ -135,6 +143,7 @@ export default function AddEmployee() {
         tag,
         managerEmail: form.managerEmail,
         password: TEMP_PASSWORD,
+        clientCode: form.role === 'consultant' && form.consultantStatus === 'DEPLOYED' ? form.clientCode : '',
       });
 
       const newEmployee = {
@@ -234,6 +243,20 @@ export default function AddEmployee() {
                 </div>
               )}
             </div>
+
+            {form.role === 'consultant' && form.consultantStatus === 'DEPLOYED' && (
+              <div className="form-group">
+                <label>Client Code</label>
+                <select className="field" {...field('clientCode')}>
+                  <option value="">— None —</option>
+                  {clientCodes.map((cc) => (
+                    <option key={cc.code} value={cc.code}>
+                      {cc.code} — {cc.client}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="form-group">
               <label>Line Manager</label>

@@ -263,13 +263,26 @@
 .viewRow {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   gap: 12px;
   padding: 5px 0;
   font-size: 13px;
+  min-width: 0;
 }
-.viewRow > span:first-child { color: var(--text-dim); font-size: 12px; flex-shrink: 0; }
-.viewRow > span:last-child  { color: var(--text); text-align: right; word-break: break-all; }
+.viewRow > span:first-child {
+  color: var(--text-dim);
+  font-size: 12px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.viewRow > span:last-child {
+  color: var(--text);
+  text-align: right;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  max-width: 100%;
+}
 
 /* ── Edit header ── */
 .editHeader {
@@ -320,6 +333,15 @@
   line-height: 1.5;
 }
 .warnIcon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── View modal action row ── */
+.viewActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.viewActions .btn { flex: none; }
 
 /* ── Danger confirm button ── */
 .dangerBtn {

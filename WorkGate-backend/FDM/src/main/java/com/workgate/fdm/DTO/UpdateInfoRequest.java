@@ -13,6 +13,7 @@ public class UpdateInfoRequest {
 	private String name;
     private String surname;
     private List<String> keySkills;
+    private String clientCode;
 
     public UpdateInfoRequest(){}
 
@@ -37,4 +38,6 @@ public class UpdateInfoRequest {
     public void setEmergencyContactName(String emergencyContactName) { this.emergencyContactName = emergencyContactName; }
     public List<String> getKeySkills() { return keySkills; }
     public void setKeySkills(List<String> keySkills) { this.keySkills = keySkills; }
+    public String getClientCode() { return clientCode; }
+    public void setClientCode(String clientCode) { this.clientCode = clientCode; }
 }
