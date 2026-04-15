@@ -1,15 +1,12 @@
 package com.workgate.fdm.model;
 
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("EXPENSE")
 public class ExpenseRequest extends ManagerRequest {
 
 	private float amount;
 	private CURRENCY currency;
-	private String reason;
 	private String evidence;
 	
 	public ExpenseRequest(String employee, long creationTime, float amount, CURRENCY currency, String evidence, String assignedManager) {
@@ -44,13 +41,5 @@ public class ExpenseRequest extends ManagerRequest {
 
 	public String getEvidence() {
 		return this.evidence;
-	}
-
-	public String getReason (){
-		return this.reason;
-	}
-
-	public void setReason(String reason) {
-		this.reason = reason;
 	}
 }
