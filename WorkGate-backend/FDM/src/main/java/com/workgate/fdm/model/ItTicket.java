@@ -1,10 +1,12 @@
 package com.workgate.fdm.model;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 import java.util.List;
 
 @Entity
+@DiscriminatorValue("IT_TICKET")
 public class ItTicket extends Request {
 
     private String title;

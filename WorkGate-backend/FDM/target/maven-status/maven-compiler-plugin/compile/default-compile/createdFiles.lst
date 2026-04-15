@@ -47,7 +47,6 @@ com\workgate\fdm\DTO\ItTicketRequest.class
 com\workgate\fdm\model\EmployeeReport.class
 com\workgate\fdm\model\Task.class
 com\workgate\fdm\model\VISIBILITY.class
-com\workgate\fdm\controller\LoginController.class
 com\workgate\fdm\model\CURRENCY.class
 com\workgate\fdm\repository\RequestRepository.class
 com\workgate\fdm\model\TaskList.class
