@@ -142,7 +142,7 @@ export default function ITManagement() {
         </div>
 
         {/* ── Unlock panel ─────────────────────────────────────────────────── */}
-        <div className="card" style={{ alignSelf: 'start', width: 300, flexShrink: 0 }}>
+        <div className={`card ${styles.unlockPanel}`}>
           <div className="card-header"><span className="card-title">Unlock Account</span></div>
           <div className={styles.unlockBody}>
             <p className={styles.unlockHint}>Search by name or email to unlock a locked account.</p>

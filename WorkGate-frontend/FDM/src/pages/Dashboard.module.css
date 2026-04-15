@@ -1,15 +1,49 @@
-.twoCol {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+/* ── Greeting ── */
+.greeting {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 28px;
   margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
 }
-.twoCol > .card,
-.twoCol > div {
-  min-height: 320px;
+.greeting::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--lime), #a8d900);
 }
+.greetingHello {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+.greetingMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.greetingRole {
+  display: inline-block;
+  background: var(--green);
+  color: var(--black);
+  font-size: 9px;
+  font-family: var(--mono);
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.greetingDot { color: var(--border-bright); }
 
-/* Tasks */
+/* ── Tasks (unchanged) ── */
 .taskRow {
   display: flex;
   align-items: flex-start;
@@ -38,12 +72,114 @@
 .taskDone { text-decoration: line-through; color: var(--text-dim) !important; }
 .taskMeta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
 
-/* News */
-.postItem {
-  padding: 12px 0;
+/* ── Feed tiles row ── */
+.feedRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.feedTile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: var(--sans);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.feedTile:hover {
+  border-color: var(--lime-border);
+  background: var(--surface-2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(197,255,0,0.08);
+}
+.feedIcon {
+  font-size: 22px;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+.feedLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  font-family: var(--mono);
+}
+.feedSub {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.feedAction {
+  font-size: 11px;
+  color: var(--lime);
+  font-family: var(--mono);
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* ── Manager section ── */
+.managerSection {
+  margin-bottom: 16px;
+}
+.managerTitle {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-left: 2px;
+}
+.managerGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.managerTile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: var(--sans);
+  color: var(--text);
+}
+.managerTile:hover {
+  border-color: var(--role-manager-blue);
+  background: var(--role-manager-blue-dim);
+  transform: translateY(-2px);
+}
+.managerTileHighlight {
+  border-color: rgba(68,170,255,0.3);
+}
+.managerTileIcon { font-size: 20px; margin-bottom: 8px; }
+.managerTileLabel { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.managerTileSub { font-size: 11px; color: var(--text-dim); }
+.managerTileHighlight .managerTileSub { color: var(--role-manager-blue); font-weight: 600; }
+
+/* ── Modal content ── */
+.modalList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+/* News in modal */
+.newsItem {
+  padding: 14px 0;
   border-bottom: 1px solid var(--border);
 }
-.postItem:last-child { border-bottom: none; }
+.newsItem:last-child { border-bottom: none; }
 .pinBadge {
   display: inline-flex;
   align-items: center;
@@ -57,33 +193,51 @@
   border-radius: 4px;
   margin-bottom: 5px;
 }
-.postTitle { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-.postExcerpt { font-size: 12px; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.postFooter { display: flex; align-items: center; gap: 8px; margin-top: 7px; font-size: 11px; color: var(--text-dim); font-family: var(--mono); }
-.postTag { padding: 1px 6px; border-radius: 3px; background: var(--surface-3); border: 1px solid var(--border); font-size: 9px; }
+.newsTitle { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.newsExcerpt { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.newsFooter { display: flex; align-items: center; gap: 8px; margin-top: 7px; font-size: 11px; color: var(--text-dim); font-family: var(--mono); }
+.newsTag { padding: 1px 6px; border-radius: 3px; background: var(--surface-3); border: 1px solid var(--border); font-size: 9px; }
 
-/* Expenses */
-.expenseRow {
+/* Expenses in modal */
+.expenseItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 11px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--border);
 }
-.expenseRow:last-child { border-bottom: none; }
+.expenseItem:last-child { border-bottom: none; }
 .expenseInfo { flex: 1; min-width: 0; }
-.expenseTitle { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.expenseDate { font-size: 11px; color: var(--text-dim); font-family: var(--mono); margin-top: 2px; }
-.expenseAmount { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.expenseDesc { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.expenseMeta { font-size: 11px; color: var(--text-dim); font-family: var(--mono); margin-top: 2px; }
+.expenseAmount { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
 
-@media (max-width: 1100px) {
-  .statsGrid { grid-template-columns: repeat(2, 1fr); }
-  .twoCol { grid-template-columns: 1fr; }
+/* Leave in modal */
+.leaveItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.leaveItem:last-child { border-bottom: none; }
+.leavePeriod { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); }
+.leaveMeta { font-size: 12px; color: var(--text-dim); font-family: var(--mono); white-space: nowrap; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .managerGrid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .twoCol > .card,
-  .twoCol > div { min-height: unset; }
-  .expenseAmount { font-size: 13px; }
+  .greeting { padding: 16px 18px; }
+  .greetingHello { font-size: 18px; }
+  .feedRow { grid-template-columns: 1fr; gap: 10px; }
+  .managerGrid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .modalList { max-height: 45vh; }
+}
+
+@media (max-width: 480px) {
+  .managerGrid { grid-template-columns: repeat(2, 1fr); }
 }

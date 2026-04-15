@@ -104,3 +104,9 @@
   font-size: 13px;
   color: var(--text);
 }
+
+@media (max-width: 768px) {
+  .topBar { flex-wrap: wrap; gap: 10px; }
+  .filters { flex-wrap: wrap; }
+  .taskBody { padding: 6px 14px; }
+}

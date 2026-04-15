@@ -107,6 +107,7 @@
 .skillTag button:hover { color: var(--red); }
 
 /* ── Mobile: preferences + sign-out ── */
+/* Shown on all screens — on desktop users have sidebar sign-out; on mobile this is the only way */
 .mobileSignOut {
   display: none;
 }
@@ -160,6 +161,15 @@
 }
 
 /* ── Mobile ── */
+@media (max-width: 768px) {
+  .mobileSignOut {
+    display: block;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+}
+
 @media (max-width: 640px) {
   .profileHeader {
     padding: 16px;
@@ -176,11 +186,4 @@
   .detailValue { padding-right: 14px; }
 
   .skillsGrid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-
-  .mobileSignOut {
-    display: block;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-  }
 }
