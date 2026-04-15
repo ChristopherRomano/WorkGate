@@ -5,6 +5,17 @@ import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './IT.module.css';
 
+const MAX_SCREENSHOT_SIZE = 5 * 1024 * 1024;
+const ALLOWED_SCREENSHOT_TYPES = ['image/png', 'image/jpeg'];
+const ALLOWED_SCREENSHOT_EXTENSIONS = ['png', 'jpg', 'jpeg'];
+
+const isAllowedScreenshot = (file) => {
+  if (!file) return false;
+  if (ALLOWED_SCREENSHOT_TYPES.includes(file.type)) return true;
+  const extension = file.name.split('.').pop()?.toLowerCase();
+  return !!extension && ALLOWED_SCREENSHOT_EXTENSIONS.includes(extension);
+};
+
 const KB = [
   {
     q: 'How do I reset my password?',
@@ -46,6 +57,8 @@ export default function IT() {
   const [faqItem, setFaqItem]     = useState(null);
   const [search, setSearch]       = useState('');
   const [form, setForm]           = useState({ title: '', category: 'Software', priority: 'Medium', desc: '' });
+  const [screenshotFile, setScreenshotFile] = useState(null);
+  const [screenshotError, setScreenshotError] = useState('');
 
   const username = currentUser?.username ?? currentUser?.email ?? '';
 
@@ -69,11 +82,37 @@ export default function IT() {
       setTickets(prev => [created, ...prev]);
       setShowModal(false);
       setForm({ title: '', category: 'Software', priority: 'Medium', desc: '' });
+      setScreenshotFile(null);
+      setScreenshotError('');
     } catch (e) {
       setSubmitError(e.message);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const onScreenshotChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      setScreenshotFile(null);
+      setScreenshotError('');
+      return;
+    }
+
+    if (!isAllowedScreenshot(file)) {
+      setScreenshotFile(null);
+      setScreenshotError('Invalid screenshot type. Allowed: PNG, JPG, JPEG.');
+      return;
+    }
+
+    if (file.size > MAX_SCREENSHOT_SIZE) {
+      setScreenshotFile(null);
+      setScreenshotError('Screenshot is too large. Maximum size is 5MB.');
+      return;
+    }
+
+    setScreenshotFile(file);
+    setScreenshotError('');
   };
 
   const filteredKB = KB.filter(k => k.q.toLowerCase().includes(search.toLowerCase()));
@@ -173,9 +212,26 @@ export default function IT() {
           <div className="form-group">
             <label>Screenshot (optional)</label>
             <div className="upload-zone">
-              <div className="upload-zone-icon">🖼</div>
-              <div className="upload-zone-label">Attach screenshot</div>
-              <div className="upload-zone-sub">PNG, JPG — max 5MB</div>
+              <label htmlFor="it-screenshot" style={{ display: 'block', cursor: 'pointer' }}>
+                <div className="upload-zone-icon">🖼</div>
+                <div className="upload-zone-label">Attach screenshot</div>
+                <div className="upload-zone-sub">PNG, JPG, JPEG — max 5MB</div>
+                <input
+                  id="it-screenshot"
+                  type="file"
+                  accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+                  onChange={onScreenshotChange}
+                  style={{ display: 'none' }}
+                />
+              </label>
+              {screenshotFile && (
+                <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text)' }}>
+                  Selected: <strong>{screenshotFile.name}</strong>
+                </div>
+              )}
+              {screenshotError && (
+                <div style={{ marginTop: 8, fontSize: 12, color: 'var(--danger)' }}>{screenshotError}</div>
+              )}
             </div>
           </div>
           {submitError && (

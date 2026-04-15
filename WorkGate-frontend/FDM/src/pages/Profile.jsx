@@ -7,6 +7,9 @@ import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './Profile.module.css';
 
+const MAX_PROFILE_IMAGE_SIZE = 3 * 1024 * 1024;
+const ALLOWED_PROFILE_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+
 const SKILL_OPTIONS = [
   'Python', 'Java', 'JavaScript', 'TypeScript', 'C#', 'C++', 'R',
   'SQL', 'NoSQL', 'MongoDB', 'PostgreSQL',
@@ -92,6 +95,7 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
+  const [photoUploadError, setPhotoUploadError] = useState('');
 
   const isConsultant = currentUser?.role === 'consultant';
 
@@ -163,6 +167,35 @@ export default function Profile() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const onProfilePhotoSelected = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      setPhotoUploadError('');
+      return;
+    }
+
+    if (!ALLOWED_PROFILE_IMAGE_TYPES.includes(file.type)) {
+      setPhotoUploadError('Invalid image type. Allowed: PNG, JPG, JPEG, WEBP.');
+      return;
+    }
+
+    if (file.size > MAX_PROFILE_IMAGE_SIZE) {
+      setPhotoUploadError('Image is too large. Maximum size is 3MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = typeof reader.result === 'string' ? reader.result : '';
+      setFormData((previous) => ({ ...previous, profilePicture: dataUrl }));
+      setPhotoUploadError('');
+    };
+    reader.onerror = () => {
+      setPhotoUploadError('Could not read the selected image. Please try again.');
+    };
+    reader.readAsDataURL(file);
   };
 
   if (!currentUser) return null;
@@ -307,7 +340,11 @@ export default function Profile() {
       </div>
 
       {/* Edit Profile Modal */}
-      <Modal isOpen={showEdit} onClose={() => setShowEdit(false)} title="Edit Personal Details">
+      <Modal
+        isOpen={showEdit}
+        onClose={() => { setShowEdit(false); setPhotoUploadError(''); }}
+        title="Edit Personal Details"
+      >
         <div className="form-grid">
           <div className="form-grid form-grid-2">
             <div className="form-group">
@@ -368,6 +405,31 @@ export default function Profile() {
               onChange={(e) => setFormData({ ...formData, profilePicture: e.target.value })}
             />
           </div>
+          <div className="form-group">
+            <label>Upload Profile Photo</label>
+            <div className="upload-zone">
+              <label htmlFor="profile-photo-upload" style={{ display: 'block', cursor: 'pointer' }}>
+                <div className="upload-zone-icon">🧑‍💼</div>
+                <div className="upload-zone-label">Click to upload profile photo</div>
+                <div className="upload-zone-sub">PNG, JPG, JPEG, WEBP — max 3MB</div>
+                <input
+                  id="profile-photo-upload"
+                  type="file"
+                  accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                  onChange={onProfilePhotoSelected}
+                  style={{ display: 'none' }}
+                />
+              </label>
+            </div>
+            <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-dim)' }}>
+              Allowed: PNG, JPG, JPEG, WEBP. Max size: 3MB.
+            </div>
+          </div>
+          {photoUploadError && (
+            <div style={{ fontSize: 13, color: 'var(--danger)' }}>
+              {photoUploadError}
+            </div>
+          )}
           {saveError && (
             <div style={{
               fontSize: 13,
