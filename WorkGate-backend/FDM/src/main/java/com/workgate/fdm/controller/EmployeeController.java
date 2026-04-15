@@ -1,14 +1,14 @@
 package com.workgate.fdm.controller;
 
+import com.workgate.fdm.model.*;
+import org.springframework.web.bind.annotation.*;
 import com.workgate.fdm.DTO.NewEmployeeRequest;
-import com.workgate.fdm.DTO.UpdateInfoRequest;
 import com.workgate.fdm.model.Employee;
 import com.workgate.fdm.model.TAG;
 import com.workgate.fdm.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -107,6 +107,22 @@ public class EmployeeController {
         employee.setTag(request.getTag() == null ? TAG.EMPLOYEE : request.getTag());
 
         return employeeRepository.save(employee);
+    }
+
+    @DeleteMapping("/deleteEmployee")
+    public void deleteEmployee(@RequestParam String email) {
+
+        if (email == null || email.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required.");
+        }
+
+        Employee employee = employeeRepository.findByEmail(email);
+
+        if (employee == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found.");
+        }
+
+        employeeRepository.delete(employee);
     }
 
     private Employee findEmployeeByEmail(String email) {

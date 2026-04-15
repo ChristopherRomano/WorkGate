@@ -2,10 +2,6 @@ package com.workgate.fdm.controller;
 
 import java.util.List;
 
-import com.workgate.fdm.model.CURRENCY;
-import com.workgate.fdm.model.EmployeeReport;
-import com.workgate.fdm.model.STATUS;
-import com.workgate.fdm.repository.EmployeeReportRepository;
 import com.workgate.fdm.repository.ExpenseRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
