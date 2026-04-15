@@ -2,6 +2,9 @@ package com.workgate.fdm.controller;
 
 import java.util.List;
 
+import com.workgate.fdm.repository.EmployeeReportRepository;
+import com.workgate.fdm.repository.EmployeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.workgate.fdm.DTO.EmployeeReportRequest;
@@ -13,19 +16,30 @@ import com.workgate.fdm.model.EmployeeReport;
 
 public class EmployeeReportController{
 
+    @Autowired
+    private EmployeeReportRepository employeeReportRepository;
+
     @GetMapping("/employeeReports")
     public List<EmployeeReport> getEmployeeReports(@RequestParam String username) {
-        return List.of();
+        return employeeReportRepository.findByEmployeeEmail(username);
+
     }
 
     @PostMapping("/createEmployeeReport")
-    public void updateEmployeeInfo(@RequestBody EmployeeReportRequest info){
-        System.out.println("Created Employee report ticket");
+    public void createEmployeeReport(@RequestBody EmployeeReportRequest info){
+
+        EmployeeReport employeeReport = new EmployeeReport();
+        employeeReport.setContent(info.getContent());
+        employeeReport.setAnonymous(info.getIsAnonymous());
+        employeeReport.setTitle(info.getTitle());
+
+        employeeReportRepository.save(employeeReport);
     }
 
     @GetMapping("/claimEmployeeReport")
-    public void claimEmployeeReport(@RequestParam String username) {
-        System.out.println("Claimed Employee report");
+    public void claimEmployeeReport(@RequestParam String email, int id) {
+        EmployeeReport report = employeeReportRepository.findById(id);
+        report.setEmployeeEmail(email);
     }
 
 }

@@ -29,6 +29,9 @@ public abstract class Request {
 		this.status = status;
 	}
 
+	public void setEmployeeEmail(String employeeEmail) {
+		this.employeeEmail = employeeEmail;
+	}
 	public String getemployeeEmail() { return this.employeeEmail; }
 	public long getCreationTime()       { return this.creationTime; }
 	public STATUS getStatus()           { return this.status; }

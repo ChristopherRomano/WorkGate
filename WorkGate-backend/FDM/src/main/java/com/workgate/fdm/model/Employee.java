@@ -19,7 +19,7 @@ public class Employee extends User {
 	private String surname;
 	
 	
-	public Employee(String email, String password, TAG tag) {
+	public Employee(String email, String managerEmail, String password, TAG tag) {
 		super(email, password);
 		this.address = "";
 		this.phoneNumber = "";
@@ -35,7 +35,8 @@ public class Employee extends User {
 
 	}
 
-	public void setTag(TAG tag)                             { this.tag = tag; }
+	public void setTag(TAG tag) { this.tag = tag; }
+	public void setManagerEmail(String managerEmail) { this.managerEmail = managerEmail; }
 	public void setAddress(String address)                  { this.address = address; }
 	public void setPhoneNum(String phoneNum)                { this.phoneNumber = phoneNum; }
 	public void setEmergencyContact(String contact)         { this.emergencyContact = contact; }
