@@ -21,7 +21,7 @@ async function request(path, options = {}) {
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export function loginUser(username, password) {
-  return request('/auth/login', {
+  return request('/login', {
     method: 'POST',
     body: JSON.stringify({ username, password }),
   });
