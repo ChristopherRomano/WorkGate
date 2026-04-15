@@ -30,13 +30,17 @@ function roleFromTag(tag) {
 function toCurrentUser(profile, loginResponse) {
   const tag = profile?.tag ?? loginResponse?.tag;
   const email = profile?.email ?? loginResponse?.username ?? '';
-  const name = profile?.name ?? loginResponse?.username ?? email;
+  const firstName = profile?.name ?? '';
+  const surname = profile?.surname ?? '';
+  const name = [firstName, surname].filter(Boolean).join(' ').trim() || (loginResponse?.username ?? email);
   const initials = profile?.initials ?? (name.split(' ').filter(Boolean).map((part) => part[0]).slice(0, 2).join('').toUpperCase() || 'U');
 
   return {
     id: profile?.id ?? email,
     username: profile?.username ?? loginResponse?.username ?? email,
     email,
+    firstName,
+    surname,
     name,
     initials,
     role: roleFromTag(tag),
