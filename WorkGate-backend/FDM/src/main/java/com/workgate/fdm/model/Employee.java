@@ -31,9 +31,22 @@ public class Employee extends User {
 		this.tag = tag;
 	}
 
-	public Employee() {
-
+	public Employee(){
+		super();
 	}
+
+
+	public Employee(String email, String password) {
+		super(email, password);
+		this.address = "";
+		this.phoneNumber = "";
+		this.emergencyContact = "";
+		this.profilePicture = "";
+		this.managerEmail = "";
+		this.surname = "";
+		this.annualLeaveBalance = 10;
+	}
+
 
 	public void setTag(TAG tag) { this.tag = tag; }
 	public void setManagerEmail(String managerEmail) { this.managerEmail = managerEmail; }

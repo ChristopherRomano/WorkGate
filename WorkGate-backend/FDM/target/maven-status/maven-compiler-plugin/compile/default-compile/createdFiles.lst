@@ -30,10 +30,10 @@ com\workgate\fdm\DTO\EmployeeReportRequest.class
 com\workgate\fdm\model\Consultant.class
 com\workgate\fdm\model\ManagerRequest.class
 com\workgate\fdm\controller\AuthController.class
+com\workgate\fdm\repository\ExpenseRequestRepository.class
 com\workgate\fdm\FdmApplication.class
 com\workgate\fdm\repository\EmployeeRepository.class
 com\workgate\fdm\model\Day.class
-com\workgate\fdm\model\Poster.class
 com\workgate\fdm\model\Calendar.class
 com\workgate\fdm\DTO\ItTicketRequest.class
 com\workgate\fdm\model\EmployeeReport.class
