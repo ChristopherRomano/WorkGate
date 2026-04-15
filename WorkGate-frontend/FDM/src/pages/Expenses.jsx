@@ -23,6 +23,7 @@ const getIcon = (desc) => {
 
 
 export default function Expenses() {
+  const { currentUser } = useAuth();
   const [items, setItems] = useState(initial);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ description: '', amount: '', currency: 'GBP (£)', date: '', project: 'CLIENT-003' });
@@ -46,7 +47,7 @@ export default function Expenses() {
     }
 
     const request = {
-      username: "john",
+      username: currentUser?.username ,
       creationTime: (new Date()).getTime(),
       reason: description,
       amount : parseFloat(amount),

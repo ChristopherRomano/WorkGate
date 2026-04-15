@@ -62,26 +62,55 @@ export default function IT() {
 
   const username = currentUser?.username ?? currentUser?.email ?? '';
 
-  useEffect(() => {
-    fetchItTickets()
-      .then(all => setTickets(all.filter(t => t.username === username)))
-      .finally(() => setLoading(false));
-  }, [username]);
+  // useEffect(() => {
+  //   // fetchItTickets()
+  //   //   .then(all => setTickets(all.filter(t => t.username === username)))
+  //   //   .finally(() => setLoading(false));
+  // }, [username]);
+  
+  const createRequest = async (title,description,category) => {
+
+    const request = {
+      username: currentUser?.username ,
+      creationTime: new Date().getTime(),
+      title: title,
+      description: description,
+      category: category,
+      evidence: ["F","F"],
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/createItTicket", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create ticket");
+      }
+    } 
+    catch (error) {
+        console.error(error);
+    }
+  };
 
   const submit = async () => {
     if (!form.title.trim()) return;
     setSubmitError('');
     setSubmitting(true);
     try {
-      const created = await createItTicket({
-        username,
-        title:       form.title.trim(),
-        description: form.desc.trim(),
-        category:    form.category,
-      });
-      setTickets(prev => [created, ...prev]);
+      // const created = await createItTicket({
+      //   username,
+      //   title:       form.title.trim(),
+      //   description: form.desc.trim(),
+      //   category:    form.category,
+      // });
+      //setTickets(prev => [created, ...prev]);
       setShowModal(false);
       setForm({ title: '', category: 'Software', priority: 'Medium', desc: '' });
+      createRequest(form.title.trim(),form.desc.trim(),form.category)
       setScreenshotFile(null);
       setScreenshotError('');
     } catch (e) {

@@ -8,6 +8,7 @@ const initial = [
 ];
 
 export default function HR() {
+  const { currentUser } = useAuth();
   const [reports, setReports] = useState(initial);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ title: '', content: '', anon: false });
@@ -15,7 +16,8 @@ export default function HR() {
   const createRequest = async (content,title,anonymous) => {
 
     const request = {
-      username: "john",
+      username: currentUser?.username ,
+      creationTime: new Date().getTime(),
       content: content,
       title: title,
       anonymous: anonymous,

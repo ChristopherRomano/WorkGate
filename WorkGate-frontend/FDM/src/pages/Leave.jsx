@@ -5,6 +5,7 @@ import '../styles/components.css';
 import styles from './Leave.module.css';
 
 export default function Leave() {
+  const { currentUser } = useAuth();
   const [requests, setRequests] = useState(initial);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ start: '', end: '', notes: '' });
@@ -27,8 +28,8 @@ export default function Leave() {
   const createRequest = async (start,end,notes) => {
 
     const request = {
-      username: "john",
-      creationTime: (new Date()).getTime(),
+      username: currentUser?.username ,
+      creationTime: new Date().getTime(),
       startOfLeave:  new Date(start).getTime(),
       endOfLeave : new Date(end).getTime(),
       reason : notes,

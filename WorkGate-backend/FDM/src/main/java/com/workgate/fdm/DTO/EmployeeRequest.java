@@ -2,7 +2,6 @@ package com.workgate.fdm.DTO;
 public class EmployeeRequest {
 
     private String username;
-    private int id;
     private long creationTime;
 
     public EmployeeRequest(){}
