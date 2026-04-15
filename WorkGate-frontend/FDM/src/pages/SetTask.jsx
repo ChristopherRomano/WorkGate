@@ -43,7 +43,7 @@ export default function SetTask() {
           category: category.toUpperCase(),
       };
       try {
-          const response = await fetch("http://localhost:8080/api/newTask", {
+          const response = await fetch("http://localhost:8080/api/tasks/create", {
               method: "POST",
               headers: {
               "Content-Type": "application/json"

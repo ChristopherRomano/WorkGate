@@ -9,7 +9,6 @@ public class TaskRequest {
 	private String title;
 	private PRIORITY priority;
     private TASK_CATEGORY category;
-    private int taskId;
 
     public TaskRequest(){}
 
@@ -18,7 +17,6 @@ public class TaskRequest {
     public PRIORITY getPriority() { return priority; }
     public String getTitle() { return title; }
     public TASK_CATEGORY getCategory() { return category; }
-    public int getTaskId() { return taskId; }
 
     public void setDescription(String description) { this.description = description; }
     public void setPriority(PRIORITY priority) { this.priority = priority; }

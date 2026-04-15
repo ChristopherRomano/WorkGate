@@ -50,7 +50,6 @@ public class TaskController {
     public void createTask(@RequestBody TaskRequest request) {
         Task task = new Task();
 
-        task.setTaskId(request.getTaskId());
         task.setEmployeeEmail(request.getEmployeeName());
         task.setDescription(request.getDescription());
         task.setTitle(request.getTitle());
