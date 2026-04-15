@@ -1,13 +1,16 @@
 com\workgate\fdm\controller\TaskController.class
 com\workgate\fdm\DTO\TaskRequest.class
 com\workgate\fdm\DTO\LoginRequest.class
+com\workgate\fdm\repository\ClientCodeRepository.class
 com\workgate\fdm\model\TAG.class
 com\workgate\fdm\model\STATUS.class
 com\workgate\fdm\model\User.class
 com\workgate\fdm\model\Employee.class
+com\workgate\fdm\DTO\LoginResponse.class
 com\workgate\fdm\model\ItTicket.class
 com\workgate\fdm\model\Post.class
 com\workgate\fdm\model\PostList.class
+com\workgate\fdm\repository\LeaveRequestRepository.class
 com\workgate\fdm\model\TASK_CATEGORY.class
 com\workgate\fdm\model\AnnualLeaveRequest.class
 com\workgate\fdm\DTO\ManagerRequest.class
@@ -32,8 +35,10 @@ com\workgate\fdm\model\ManagerRequest.class
 com\workgate\fdm\controller\AuthController.class
 com\workgate\fdm\repository\ExpenseRequestRepository.class
 com\workgate\fdm\FdmApplication.class
+com\workgate\fdm\controller\ClientCodeController.class
 com\workgate\fdm\repository\EmployeeRepository.class
 com\workgate\fdm\model\Day.class
+com\workgate\fdm\model\Poster.class
 com\workgate\fdm\model\Calendar.class
 com\workgate\fdm\DTO\ItTicketRequest.class
 com\workgate\fdm\model\EmployeeReport.class
@@ -43,6 +48,7 @@ com\workgate\fdm\controller\LoginController.class
 com\workgate\fdm\model\CURRENCY.class
 com\workgate\fdm\repository\RequestRepository.class
 com\workgate\fdm\model\TaskList.class
+com\workgate\fdm\controller\EmployeeController.class
 com\workgate\fdm\controller\ExpenseRequestController.class
 com\workgate\fdm\model\ClientCode.class
 com\workgate\fdm\DTO\ExpenseRejectionRequest.class

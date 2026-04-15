@@ -29,7 +29,7 @@ public class AuthController {
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("username", username);
-        response.put("role", "admin");
+        response.put("role", "manager");
 
         return ResponseEntity.ok(response);
     }
