@@ -1,6 +1,5 @@
 package com.workgate.fdm.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -13,18 +12,18 @@ public class Task {
 	private String title;
 	private PRIORITY priority;
 	private TASK_CATEGORY category;
-	@Column(name = "employee_email")
-	private String username;
+	private String employeeEmail;
 
     @Id
     private Long id;
 
 
-	public Task(String description, String title, PRIORITY priority, String dueDate, TASK_CATEGORY category) {
+	public Task(String description, String title, PRIORITY priority, TASK_CATEGORY category, String employeeEmail) {
 		this.title = title;
 		this.description = description;
 		this.category = category;
 		this.priority = priority;
+		this.employeeEmail = employeeEmail;
 	}
 
 	public Task() {

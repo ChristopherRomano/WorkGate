@@ -9,8 +9,8 @@ public class Consultant extends Employee {
 	private List<String> keySkills;
 	private int endDate;
 
-	public Consultant(String email, String password) {
-		super(email, password);
+	public Consultant(String email, String password, TAG tag) {
+		super(email, password, tag);
 		this.keySkills = new ArrayList<>();
 	}
 

@@ -17,6 +17,10 @@ public class EmployeeReport extends Request {
 
 	}
 
+	public EmployeeReport(){
+		
+	}
+
 	public String getContent() { return this.content; }
 	public String getTitle() { return this.title; }
 	public boolean getAnonymous() { return this.anonymous; }

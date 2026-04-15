@@ -1,17 +1,15 @@
 package com.workgate.fdm.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
 
 @Entity
 public abstract class ManagerRequest extends Request {
 
-	//private Manager assignedManager;
-	private String manager;
+	private String managerEmail;
 
-	public ManagerRequest(String username, long creationTime, String manager) {
+	public ManagerRequest(String username, long creationTime, String managerEmail) {
 		super(username, creationTime);
-		this.manager = manager;
+		this.managerEmail = managerEmail;
 	}
 
 	public ManagerRequest (){
@@ -19,7 +17,7 @@ public abstract class ManagerRequest extends Request {
 	}
 
 	public String getAssignedManager() {
-		return this.manager;
+		return this.managerEmail;
 	}
 
 }

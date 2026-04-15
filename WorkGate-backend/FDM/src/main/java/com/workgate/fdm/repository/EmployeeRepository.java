@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.workgate.fdm.model.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-    Employee findByname(String name);
+    Employee findByEmail(String email);
 }

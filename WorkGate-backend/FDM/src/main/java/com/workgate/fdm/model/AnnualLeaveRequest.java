@@ -22,6 +22,10 @@ public class AnnualLeaveRequest extends ManagerRequest {
 		this.assignedManager = assignedManger;
 	}
 
+	public AnnualLeaveRequest(){
+		
+	}
+
 	public String getusername() {
 		return this.username;
 	}

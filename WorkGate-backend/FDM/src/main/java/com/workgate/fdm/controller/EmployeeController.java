@@ -33,7 +33,7 @@ public class EmployeeController {
     @GetMapping("/employeeInfo")
     public Employee getEmployeeInfo(@RequestParam String username) {
 
-        return new Employee("fdsfs", "fdsdfs");
+        return new Employee("fdsfs", "fdsdfs",TAG.ADMIN);
     }
 
     @PostMapping("/createEmployee")
@@ -41,7 +41,8 @@ public class EmployeeController {
         System.out.println("CHris sucks");
         Employee e = new Employee(
             request.getEmail(),
-            request.getManagerName()
+            request.getManagerName(),
+            request.getTag()
         );
 
         employeeRepository.save(e);

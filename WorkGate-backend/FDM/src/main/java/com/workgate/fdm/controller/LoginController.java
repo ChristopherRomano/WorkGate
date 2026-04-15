@@ -5,19 +5,33 @@ import java.io.Console;
 import org.springframework.web.bind.annotation.*;
 
 import com.workgate.fdm.DTO.LoginRequest;
+import com.workgate.fdm.model.Employee;
+import com.workgate.fdm.repository.EmployeeRepository;
 
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:5173")
 public class LoginController {
-    
-    @PostMapping("/login")
-    public String loginAuthenication(@RequestBody LoginRequest request){
-        final String[] TYPES_OF_USERS = {"employee", "consultant","admin","it","hr","manager"};
-        // validate here, return the type of employee
-        if (true){
 
-            return TYPES_OF_USERS[0];
+    private final EmployeeRepository employeeRepository;
+
+    public LoginController(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
+
+    @PostMapping("/login")
+    public String loginAuthenication(@RequestBody LoginRequest request) {
+
+        try {
+            Employee e = employeeRepository.findByEmail(request.getUsername());
+
+            if (e != null && e.checkPassword(request.getPassword())) {
+
+                return "employee"; // or whatever logic you want
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         throw new RuntimeException("Invalid credentials");

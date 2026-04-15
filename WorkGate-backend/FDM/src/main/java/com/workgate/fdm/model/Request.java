@@ -7,15 +7,15 @@ import jakarta.persistence.*;
 
 public abstract class Request {
 
-	private String username;
+	private String employeeEmail;
 	private long creationTime;
 	private STATUS status;
 	@Id
 	private Long id;
 
 	
-	public Request(String username, long creationTime) {
-		this.username = username;
+	public Request(String employeeEmail, long creationTime) {
+		this.employeeEmail = employeeEmail;
 		this.creationTime = creationTime;
 		this.status = STATUS.OPEN;
 		
@@ -29,7 +29,7 @@ public abstract class Request {
 		this.status = status;
 	}
 
-	public String getEmployeeUsername() { return this.username; }
+	public String getemployeeEmail() { return this.employeeEmail; }
 	public long getCreationTime()       { return this.creationTime; }
 	public STATUS getStatus()           { return this.status; }
 	public long getId()                  { return this.id; }
