@@ -14,7 +14,8 @@ public class Employee extends User {
 	private String emergencyContactNumber;
 	private String profilePicture;
 	private String managerEmail;
-	private int annualLeaveBalance;
+	@Column(columnDefinition = "INT DEFAULT 25")
+	private int annualLeaveBalance = 25;
 	private String surname;
 
 	public Employee(String email, String managerEmail, String password, TAG tag) {
@@ -32,6 +33,7 @@ public class Employee extends User {
 
 	public Employee() {
 		super();
+		this.annualLeaveBalance = 25;
 	}
 
 	public Employee(String email, String password) {
