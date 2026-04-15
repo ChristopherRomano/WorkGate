@@ -6,6 +6,7 @@ public class NewEmployeeRequest {
     private String email;
     private String managerEmail;
     private String name;
+    private String surname;
     private String password;
     private TAG tag;
 
@@ -17,6 +18,9 @@ public class NewEmployeeRequest {
     public String getManagerEmail() { return managerEmail; }
     public TAG getTag() { return tag; }
 
+    public String getSurname() {
+        return this.surname;
+    }
     public void setEmail(String email) { this.email = email; }
     public void setManagerEmail(String managerEmail) { this.managerEmail = managerEmail; }
     public void setName(String name) { this.name = name; }

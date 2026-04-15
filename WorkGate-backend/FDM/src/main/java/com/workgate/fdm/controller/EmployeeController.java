@@ -103,6 +103,7 @@ public class EmployeeController {
         Employee employee = new Employee(request.getEmail().trim(), request.getPassword() == null ? "pass" : request.getPassword());
         employee.setActive(true);
         employee.setName(request.getName());
+        employee.setSurname(request.getSurname());
         employee.setManagerEmail(managerEmail);
         employee.setTag(request.getTag() == null ? TAG.EMPLOYEE : request.getTag());
 
