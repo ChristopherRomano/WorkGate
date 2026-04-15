@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { clientCodes } from '../data/mockData';
-import { fetchEmployees, deactivateEmployee, reactivateEmployee, deleteEmployee } from '../api/api';
+import { fetchEmployees, fetchManagers, updateEmployeeManager, deactivateEmployee, reactivateEmployee, deleteEmployee } from '../api/api';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './ManageEmployees.module.css';
@@ -19,9 +18,97 @@ const TABS = [
   { key: 'support',    label: 'Support' },
 ];
 
+function mapTagToRole(tag) {
+  switch ((tag ?? '').toUpperCase()) {
+    case 'MANAGER':
+      return 'manager';
+    case 'HR':
+      return 'hr';
+    case 'IT':
+      return 'ittech';
+    case 'ADMIN':
+      return 'admin';
+    case 'BENCH':
+    case 'DEPLOYED':
+    case 'TRAINEE':
+      return 'consultant';
+    case 'EMPLOYEE':
+    default:
+      return 'employee';
+  }
+}
+
+function buildFullName(person) {
+  const baseName = person?.name?.trim() ?? '';
+  const surname = person?.surname?.trim() ?? '';
+
+  if (baseName && surname) {
+    if (baseName.toLowerCase().includes(surname.toLowerCase()) || baseName.includes(' ')) {
+      return baseName;
+    }
+    return `${baseName} ${surname}`;
+  }
+
+  if (baseName) {
+    return baseName;
+  }
+
+  if (surname) {
+    return surname;
+  }
+
+  const emailName = person?.email?.split('@')[0] ?? '';
+  if (!emailName) {
+    return 'Unknown Employee';
+  }
+
+  return emailName
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((chunk) => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+    .join(' ');
+}
+
+function buildInitials(name, fallbackInitials) {
+  if (fallbackInitials?.trim()) {
+    return fallbackInitials.trim().toUpperCase();
+  }
+
+  const letters = (name ?? '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+
+  return letters || 'WG';
+}
+
+function normaliseEmployee(person) {
+  const name = buildFullName(person);
+  const role = mapTagToRole(person?.tag);
+
+  return {
+    id: person?.id,
+    name,
+    initials: buildInitials(name, person?.initials),
+    email: person?.email ?? '',
+    role,
+    tag: person?.tag ?? 'EMPLOYEE',
+    manager: person?.managerEmail ?? '',
+    active: person?.active ?? true,
+    phone: person?.phoneNumber ?? '',
+    address: person?.address ?? '',
+    emergencyContact: person?.emergencyContact ?? '',
+    emergencyPhone: person?.emergencyContactNumber ?? '',
+  };
+}
+
 export default function ManageEmployees() {
   const [people, setPeople]             = useState([]);
+  const [managers, setManagers]         = useState([]);
   const [loading, setLoading]           = useState(true);
+  const [loadingManagers, setLoadingManagers] = useState(true);
   const [error, setError]               = useState('');
   const [roleTab, setRoleTab]           = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -34,13 +121,37 @@ export default function ManageEmployees() {
   const [deleteTarget, setDeleteTarget]         = useState(null);
   const [bulkAction, setBulkAction]             = useState(null);
   const [actionError, setActionError]           = useState('');
+  const [managerDraft, setManagerDraft]         = useState('');
+  const [savingManager, setSavingManager]       = useState(false);
 
   useEffect(() => {
     fetchEmployees()
-      .then(data => setPeople(data))
+      .then((data) => setPeople((data ?? []).map(normaliseEmployee)))
       .catch(() => setError('Could not load employees.'))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    fetchManagers()
+      .then((data) => setManagers((data ?? []).map(normaliseEmployee)))
+      .catch(() => setActionError('Could not load managers from the database.'))
+      .finally(() => setLoadingManagers(false));
+  }, []);
+
+  useEffect(() => {
+    setManagerDraft(viewTarget?.manager ?? '');
+  }, [viewTarget]);
+
+  const managerDirectory = useMemo(
+    () => new Map(managers.map((manager) => [manager.email, manager])),
+    [managers]
+  );
+
+  const formatManager = (managerEmail) => {
+    if (!managerEmail) return '—';
+    const manager = managerDirectory.get(managerEmail);
+    return manager ? `${manager.name} (${manager.email})` : managerEmail;
+  };
 
   // ── Counts ────────────────────────────────────────────────────────────────
   const counts = useMemo(() => ({
@@ -114,6 +225,24 @@ export default function ManageEmployees() {
       setDeleteTarget(null);
     } catch (e) {
       setActionError(e.message);
+    }
+  };
+
+  const saveManager = async () => {
+    if (!viewTarget) return;
+
+    setActionError('');
+    setSavingManager(true);
+    try {
+      const updated = await updateEmployeeManager(viewTarget.email, managerDraft);
+      const updatedEmployee = normaliseEmployee(updated);
+
+      setPeople((previous) => previous.map((person) => person.email === updatedEmployee.email ? updatedEmployee : person));
+      setViewTarget(updatedEmployee);
+    } catch (e) {
+      setActionError(e.message);
+    } finally {
+      setSavingManager(false);
     }
   };
 
@@ -231,7 +360,7 @@ export default function ManageEmployees() {
                     </span>
                   </td>
                   <td className={`${styles.colTag} ${styles.mono}`} style={{ fontSize: 11, color: 'var(--text-dim)' }}>{p.tag || '—'}</td>
-                  <td className={styles.colManager} style={{ fontSize: 13, color: 'var(--text-muted)' }}>{p.manager || '—'}</td>
+                  <td className={styles.colManager} style={{ fontSize: 13, color: 'var(--text-muted)' }}>{formatManager(p.manager)}</td>
                   <td className={styles.colStatus}>
                     <span className={`badge badge-${p.active ? 'approved' : 'rejected'}`}>
                       {p.active ? 'ACTIVE' : 'INACTIVE'}
@@ -275,7 +404,27 @@ export default function ManageEmployees() {
               </div>
               <div className={styles.viewSection}>
                 <div className="section-title">Assignment</div>
-                <div className={styles.viewRow}><span>Manager</span><span>{viewTarget.manager || '—'}</span></div>
+                <div className={styles.viewRow}><span>Manager</span><span>{formatManager(viewTarget.manager)}</span></div>
+                <div className="form-group" style={{ marginTop: 12 }}>
+                  <label>Change Line Manager</label>
+                  <select
+                    className="field"
+                    value={managerDraft}
+                    onChange={(e) => setManagerDraft(e.target.value)}
+                    disabled={loadingManagers || savingManager}
+                  >
+                    <option value="">
+                      {loadingManagers ? 'Loading managers…' : 'Select a manager'}
+                    </option>
+                    {managers
+                      .filter((manager) => manager.email !== viewTarget.email)
+                      .map((manager) => (
+                        <option key={manager.email} value={manager.email}>
+                          {manager.name} ({manager.email})
+                        </option>
+                      ))}
+                  </select>
+                </div>
               </div>
               <div className={styles.viewSection}>
                 <div className="section-title">Access</div>
@@ -284,6 +433,13 @@ export default function ManageEmployees() {
               </div>
             </div>
             <div className="modal-actions">
+              <button
+                className="btn btn-primary"
+                onClick={saveManager}
+                disabled={savingManager || loadingManagers || !managerDraft || managerDraft === viewTarget.manager}
+              >
+                {savingManager ? 'Saving…' : 'Save Manager'}
+              </button>
               {viewTarget.active
                 ? <button className={`btn btn-sm ${styles.deactivateBtn}`} onClick={() => { setViewTarget(null); setDeactivateTarget(viewTarget); }}>Deactivate</button>
                 : <button className={`btn btn-sm ${styles.reactivateBtn}`} onClick={() => { setViewTarget(null); handleReactivate(viewTarget); }}>Reactivate</button>

@@ -94,3 +94,143 @@
   background: var(--red, #f87171) !important;
   border-color: var(--red, #f87171) !important;
 }
+
+/* ── Calendar ── */
+.calHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.calTitle {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  flex: 1;
+  text-align: center;
+}
+
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  padding: 12px;
+}
+
+.calDayName {
+  text-align: center;
+  font-size: 9px;
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  padding: 4px 0 8px;
+}
+
+.calDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 4px;
+  border-radius: 6px;
+  min-height: 44px;
+  transition: background var(--transition);
+}
+
+.calDayHasItems { cursor: pointer; }
+.calDayHasItems:hover { background: var(--surface-2); }
+
+.calDaySelected {
+  background: var(--lime-dim) !important;
+  border: 1px solid var(--lime-border);
+}
+
+.calDayNum {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.calDayHasItems .calDayNum { color: var(--text); font-weight: 600; }
+.calDaySelected .calDayNum { color: var(--lime); }
+
+.calDots {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dotApproved {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lime);
+}
+
+/* ── Log section ── */
+.logSection {
+  margin-top: 24px;
+}
+
+.logList {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.logEntry {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.logEntry:last-child { border-bottom: none; }
+
+.logIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.logIconApproved { background: var(--lime-dim); color: var(--lime); }
+.logIconRejected { background: var(--red-dim); color: var(--red); }
+
+.logContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.logTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.logMeta {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+
+.logComment {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
+}

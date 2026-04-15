@@ -5,6 +5,17 @@ import '../styles/components.css';
 import styles from './Expenses.module.css';
 
 const ICONS = { Train: '🚂', Hotel: '🏨', Lunch: '🍽', Taxi: '🚕', Flight: '✈️', Other: '📎' };
+const MAX_RECEIPT_SIZE = 10 * 1024 * 1024;
+const ALLOWED_RECEIPT_TYPES = ['application/pdf', 'image/png', 'image/jpeg'];
+const ALLOWED_RECEIPT_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg'];
+
+const isAllowedReceipt = (file) => {
+  if (!file) return false;
+  if (ALLOWED_RECEIPT_TYPES.includes(file.type)) return true;
+  const extension = file.name.split('.').pop()?.toLowerCase();
+  return !!extension && ALLOWED_RECEIPT_EXTENSIONS.includes(extension);
+};
+
 const getIcon = (desc) => {
   const key = Object.keys(ICONS).find(k => desc.toLowerCase().includes(k.toLowerCase()));
   return ICONS[key] || '📎';
@@ -15,6 +26,8 @@ export default function Expenses() {
   const [items, setItems] = useState(initial);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ description: '', amount: '', currency: 'GBP (£)', date: '', project: 'CLIENT-003' });
+  const [receiptFile, setReceiptFile] = useState(null);
+  const [receiptError, setReceiptError] = useState('');
 
   const createRequest = async (amount,currency,date,description,evidence) => {
     let passedCurrency = "";
@@ -59,7 +72,13 @@ export default function Expenses() {
   };
 
   const submit = () => {
-    if (!form.description || !form.amount) return;
+    if (!form.description || !form.amount || !receiptFile) {
+      if (!receiptFile) {
+        setReceiptError('Please attach a receipt file.');
+      }
+      return;
+    }
+
     const sym = form.currency.match(/[£$€]/)?.[0] || '£';
     setItems(prev => [
       { id: `ex${Date.now()}`, description: form.description, date: form.date || 'Today', project: form.project, amount: `${sym}${parseFloat(form.amount).toFixed(2)}`, status: 'pending' },
@@ -68,6 +87,32 @@ export default function Expenses() {
     setShowModal(false);
     createRequest(form.amount,form.currency,form.date || new Date().getTime(),form.description,);
     setForm({ description: '', amount: '', currency: 'GBP (£)', date: '', project: 'CLIENT-003' });
+    setReceiptFile(null);
+    setReceiptError('');
+  };
+
+  const onReceiptChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      setReceiptFile(null);
+      setReceiptError('');
+      return;
+    }
+
+    if (!isAllowedReceipt(file)) {
+      setReceiptFile(null);
+      setReceiptError('Invalid file type. Allowed: PDF, PNG, JPG, JPEG.');
+      return;
+    }
+
+    if (file.size > MAX_RECEIPT_SIZE) {
+      setReceiptFile(null);
+      setReceiptError('File is too large. Maximum size is 10MB.');
+      return;
+    }
+
+    setReceiptFile(file);
+    setReceiptError('');
   };
 
   const pending = items.filter(e => e.status === 'pending');
@@ -156,9 +201,26 @@ export default function Expenses() {
           <div className="form-group">
             <label>Receipt</label>
             <div className="upload-zone">
-              <div className="upload-zone-icon">📎</div>
-              <div className="upload-zone-label">Click to upload or drag & drop</div>
-              <div className="upload-zone-sub">PDF, PNG, JPG — max 10MB</div>
+              <label htmlFor="expense-receipt" style={{ display: 'block', cursor: 'pointer' }}>
+                <div className="upload-zone-icon">📎</div>
+                <div className="upload-zone-label">Click to upload receipt</div>
+                <div className="upload-zone-sub">PDF, PNG, JPG, JPEG — max 10MB</div>
+                <input
+                  id="expense-receipt"
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+                  onChange={onReceiptChange}
+                  style={{ display: 'none' }}
+                />
+              </label>
+              {receiptFile && (
+                <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text)' }}>
+                  Selected: <strong>{receiptFile.name}</strong>
+                </div>
+              )}
+              {receiptError && (
+                <div style={{ marginTop: 8, fontSize: 12, color: 'var(--danger)' }}>{receiptError}</div>
+              )}
             </div>
           </div>
           <div className="modal-actions">

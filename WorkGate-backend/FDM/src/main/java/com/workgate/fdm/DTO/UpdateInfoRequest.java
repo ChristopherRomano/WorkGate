@@ -1,6 +1,8 @@
 package com.workgate.fdm.DTO;
 
 public class UpdateInfoRequest {
+	private String email;
+	private String role;
 	private String address;
 	private String phoneNumber;
 	private String emergencyContactNumber;
@@ -11,6 +13,8 @@ public class UpdateInfoRequest {
 
     public UpdateInfoRequest(){}
 
+    public String getEmail() { return email; }
+    public String getRole() { return role; }
     public String getAddress() { return address; }
     public String getEmergencyContactNumber() { return emergencyContactNumber; }
     public String getName() { return name; }
@@ -19,6 +23,8 @@ public class UpdateInfoRequest {
     public String getSurname() { return surname; }
     public String getEmergencyContactName() { return emergencyContactName; }
 
+    public void setEmail(String email) { this.email = email; }
+    public void setRole(String role) { this.role = role; }
     public void setAddress(String address) { this.address = address; }
     public void setEmergencyContactNumber(String emergencyContactNumber) { this.emergencyContactNumber = emergencyContactNumber; }
     public void setName(String name) { this.name = name; }

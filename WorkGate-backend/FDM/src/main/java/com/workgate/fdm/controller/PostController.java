@@ -1,6 +1,7 @@
 package com.workgate.fdm.controller;
 import com.workgate.fdm.DTO.PostRequest;
 import com.workgate.fdm.model.Post;
+import com.workgate.fdm.model.TAG;
 
 import java.util.List;
 
@@ -18,21 +19,28 @@ public class PostController {
     @Autowired
     private PostRepository postRepository;
 
-    @RequestMapping("/post")
+    @RequestMapping("/allPosts")
     public List<Post> getPosts(){
         return postRepository.findAll();
     }
+
+    @RequestMapping("/filterPosts")
+    public List<Post> getPosts(@RequestParam TAG tag){
+
+        return postRepository.findAll();
+    }
+
 
     @PostMapping("/createPost")
     public void createPost(@RequestBody PostRequest request){
 
         Post post = new Post(
-                request.getTitle(),
-                request.getContent(),
-                request.getPinned(),
-                request.getVisibility(),
-                request.getTimePosted(),
-                request.getAuthorUsername()
+            request.getTitle(),
+            request.getContent(),
+            request.getPinned(),
+            request.getVisibility(),
+            request.getTimePosted(),
+            request.getAuthorUsername()
 
         );
 

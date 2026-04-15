@@ -6,7 +6,6 @@ import Layout from './components/Layout';
 import Login          from './pages/Login';
 import Dashboard      from './pages/Dashboard';
 import Profile        from './pages/Profile';
-import Timesheet      from './pages/Timesheet';
 import Tasks          from './pages/Tasks';
 import Leave          from './pages/Leave';
 import Expenses       from './pages/Expenses';
@@ -23,6 +22,14 @@ import ClientCodes     from './pages/ClientCodes';
 import ITManagement    from './pages/ITManagement';
 import HRManagement    from './pages/HRManagement';
 import ExpenseApproval from './pages/ExpenseApproval';
+import Settings from './pages/Settings';
+
+function getDefaultAppRoute(role) {
+  if (role === 'admin') return '/app/admin';
+  if (role === 'ittech') return '/app/it-management';
+  if (role === 'hr') return '/app/hr-management';
+  return '/app';
+}
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -32,8 +39,24 @@ function ProtectedRoute({ children }) {
 function RoleRoute({ permission, children }) {
   const { currentUser } = useAuth();
   if (!currentUser) return <Navigate to="/login" replace />;
-  if (!hasPermission(currentUser.role, permission)) return <Navigate to="/app" replace />;
+  if (!hasPermission(currentUser.role, permission)) {
+    return <Navigate to={getDefaultAppRoute(currentUser.role)} replace />;
+  }
   return children;
+}
+
+function AppHome() {
+  const { currentUser } = useAuth();
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!hasPermission(currentUser.role, 'dashboard')) {
+    return <Navigate to={getDefaultAppRoute(currentUser.role)} replace />;
+  }
+
+  return <Dashboard />;
 }
 
 function AppRoutes() {
@@ -43,8 +66,9 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/app" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         {/* Universally accessible once logged in */}
-        <Route index           element={<Dashboard />} />
-        <Route path="profile"  element={<Profile />} />
+        <Route index           element={<AppHome />} />
+        <Route path="profile"  element={<RoleRoute permission="profile"><Profile /></RoleRoute>} />
+        <Route path="settings" element={<RoleRoute permission="settings"><Settings /></RoleRoute>} />
         <Route path="news"     element={<RoleRoute permission="news"><News /></RoleRoute>} />
 
         {/* Employee base permissions */}
@@ -53,9 +77,6 @@ function AppRoutes() {
         <Route path="expenses" element={<RoleRoute permission="expenses"><Expenses /></RoleRoute>} />
         <Route path="it"       element={<RoleRoute permission="it-support"><IT /></RoleRoute>} />
         <Route path="hr"       element={<RoleRoute permission="hr-support"><HR /></RoleRoute>} />
-
-        {/* Consultant + Manager (extends Employee) */}
-        <Route path="timesheet" element={<RoleRoute permission="timesheet"><Timesheet /></RoleRoute>} />
 
         {/* Manager only (extends Employee) */}
         <Route path="leave-approval"    element={<RoleRoute permission="leave-approval"><LeaveApproval /></RoleRoute>} />

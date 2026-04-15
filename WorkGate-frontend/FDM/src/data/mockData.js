@@ -156,16 +156,6 @@ export const leaderboard = [
   { rank: 5, initials: 'LW', name: 'Lucy Wang', score: 10, pct: 41 },
 ];
 
-export const timesheetData = {
-  weekLabel: 'Week of 31 Mar – 6 Apr 2026',
-  days: ['Mon 31', 'Tue 1', 'Wed 2', 'Thu 3', 'Fri 4', 'Sat 5', 'Sun 6'],
-  rows: [
-    { label: 'CLIENT-003', hours: [8, 8, 7.5, 8, 7, 0, 0] },
-    { label: 'Internal', hours: [0, 0, 0.5, 0, 1, 0, 0] },
-  ],
-  status: 'draft',
-};
-
 export const hrReports = [
   { id: 'hr1', employee: 'Alex Turner',  initials: 'AT', title: 'Workplace Feedback – Team Communication', content: 'General feedback about team communication processes on client site.', date: '20 Mar 2026', status: 'resolved', anon: true,  claimedBy: 'Maya Singh' },
   { id: 'hr2', employee: 'Aisha Patel',  initials: 'AP', title: 'Overtime Concern', content: 'Repeated requests to work beyond contracted hours without appropriate compensation or advance notice.', date: '2 Apr 2026', status: 'pending', anon: false, claimedBy: null },

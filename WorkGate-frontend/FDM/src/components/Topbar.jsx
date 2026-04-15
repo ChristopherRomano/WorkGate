@@ -7,6 +7,7 @@ import '../styles/components.css';
 const PAGE_META = {
   '/app':                      { title: 'Dashboard',          sub: (name) => `Welcome back, ${name}` },
   '/app/profile':              { title: 'My Profile',         sub: () => 'Manage your personal details and skills' },
+  '/app/settings':             { title: 'Settings',           sub: () => 'Manage password, theme, and app preferences' },
   '/app/timesheet':            { title: 'Timesheet',          sub: () => 'Log and submit your working hours' },
   '/app/tasks':                { title: 'Tasks',              sub: () => 'Your assigned and upskilling tasks' },
   '/app/leave':                { title: 'Annual Leave',       sub: () => 'Request and track your leave' },
