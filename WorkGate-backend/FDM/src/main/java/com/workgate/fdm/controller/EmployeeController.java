@@ -160,6 +160,9 @@ public class EmployeeController {
         if (request.getProfilePicture() != null) {
             employee.setProfilePicture(request.getProfilePicture().trim());
         }
+        if (request.getKeySkills() != null) {
+            employee.setKeySkills(request.getKeySkills());
+        }
     }
 
     private TAG defaultTagForRole(String role) {

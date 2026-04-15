@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchEmployeeProfile, updateEmployeeProfile } from '../api/api';
+import { fetchEmployeeProfile, updateEmployeeProfile, updateEmployeeSkills } from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Modal from '../components/Modal';
@@ -77,6 +77,7 @@ function mapBackendProfileToUser(profile, currentUser) {
     profilePicture: profile?.profilePicture ?? currentUser?.profilePicture ?? '',
     initials: deriveInitials(firstName, surname, currentUser?.initials),
     tag: profile?.tag ?? currentUser?.tag,
+    skills: profile?.keySkills ?? currentUser?.skills ?? [],
   };
 }
 
@@ -129,13 +130,29 @@ export default function Profile() {
     };
   }, [currentUser?.email]);
 
-  const addSkill = () => {
+  const addSkill = async () => {
     const skill = selectedSkill === 'Other' ? customSkill.trim() : selectedSkill;
-    if (skill) {
-      setSkills((existingSkills) => [...existingSkills, skill]);
-      setSelectedSkill('');
-      setCustomSkill('');
-      setShowSkill(false);
+    if (!skill) return;
+    const newSkills = [...skills, skill];
+    setSkills(newSkills);
+    setSelectedSkill('');
+    setCustomSkill('');
+    setShowSkill(false);
+    try {
+      await updateEmployeeSkills(currentUser.email, newSkills);
+    } catch {
+      // revert on failure
+      setSkills(skills);
+    }
+  };
+
+  const removeSkill = async (index) => {
+    const newSkills = skills.filter((_, i) => i !== index);
+    setSkills(newSkills);
+    try {
+      await updateEmployeeSkills(currentUser.email, newSkills);
+    } catch {
+      setSkills(skills);
     }
   };
 
@@ -296,7 +313,7 @@ export default function Profile() {
                 {skills.map((skill, index) => (
                   <div key={index} className={styles.skillTag}>
                     {skill}
-                    <button onClick={() => setSkills((existingSkills) => existingSkills.filter((_, skillIndex) => skillIndex !== index))}>×</button>
+                    <button onClick={() => removeSkill(index)}>×</button>
                   </div>
                 ))}
                 {skills.length === 0 && (

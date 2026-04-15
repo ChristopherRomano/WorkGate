@@ -1,5 +1,7 @@
 package com.workgate.fdm.DTO;
 
+import java.util.List;
+
 public class UpdateInfoRequest {
 	private String email;
 	private String role;
@@ -10,6 +12,7 @@ public class UpdateInfoRequest {
 	private String profilePicture;
 	private String name;
     private String surname;
+    private List<String> keySkills;
 
     public UpdateInfoRequest(){}
 
@@ -32,4 +35,6 @@ public class UpdateInfoRequest {
     public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
     public void setSurname(String surname) { this.surname = surname; }
     public void setEmergencyContactName(String emergencyContactName) { this.emergencyContactName = emergencyContactName; }
+    public List<String> getKeySkills() { return keySkills; }
+    public void setKeySkills(List<String> keySkills) { this.keySkills = keySkills; }
 }

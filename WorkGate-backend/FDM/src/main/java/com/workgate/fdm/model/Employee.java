@@ -1,6 +1,8 @@
 package com.workgate.fdm.model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("EMPLOYEE")
@@ -16,6 +18,11 @@ public class Employee extends User {
 	private String managerEmail;
 	private int annualLeaveBalance;
 	private String surname;
+
+	@ElementCollection
+	@CollectionTable(name = "employee_skills", joinColumns = @JoinColumn(name = "employee_id"))
+	@Column(name = "skill")
+	private List<String> keySkills = new ArrayList<>();
 	
 	
 	public Employee(String email, String managerEmail, String password, TAG tag) {
@@ -70,5 +77,7 @@ public class Employee extends User {
 	public String getProfilePicture()       { return this.profilePicture; }
 	public String getManagerEmail()         { return this.managerEmail; }
 	public String getSurname()              { return this.surname; }
+	public List<String> getKeySkills()      { return this.keySkills; }
+	public void setKeySkills(List<String> keySkills) { this.keySkills = keySkills != null ? keySkills : new ArrayList<>(); }
 
 }
