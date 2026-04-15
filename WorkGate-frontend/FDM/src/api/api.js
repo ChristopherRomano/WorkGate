@@ -159,12 +159,14 @@ export function removeClientCode(code) {
 
 export function mapTask(t) {
   return {
-    id: t.taskId,
+    id: t.id ?? t.taskId,
     title: t.title,
     description: t.description ?? '',
     done: t.completion,
     priority: t.priority?.toLowerCase() ?? 'medium',
     due: t.dueDate ?? '',
-    type: t.category ?? 'Operational',
+    type: t.category
+      ? (t.category.charAt(0).toUpperCase() + t.category.slice(1).toLowerCase())
+      : 'Operational',
   };
 }

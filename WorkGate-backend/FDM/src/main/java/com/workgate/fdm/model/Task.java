@@ -13,6 +13,7 @@ public class Task {
 	private PRIORITY priority;
 	private TASK_CATEGORY category;
 	private String employeeEmail;
+	private String dueDate;
 
     @Id
     private Long id;
@@ -73,4 +74,6 @@ public class Task {
 	public TASK_CATEGORY getCategory() {return category;}
 	public Long getId() { return id; }
 	public void setId(Long id) { this.id = id; }
+	public String getDueDate() { return dueDate; }
+	public void setDueDate(String dueDate) { this.dueDate = dueDate; }
 }

@@ -65,13 +65,14 @@ export default function SetTask() {
     onChange: (e) => setForm(f => ({ ...f, [key]: e.target.value })),
   });
 
-  const createRequest = async (title, priority, content, category, employee) => {
+  const createRequest = async (title, priority, content, category, due, employee) => {
     const request = {
       employeeName: employee?.email ?? getEmployeeName(employee),
       description: content,
       title,
       priority: priority.toUpperCase(),
       category: category.toUpperCase(),
+      dueDate: due,
     };
 
     const response = await fetch('http://localhost:8080/api/newTask', {
@@ -99,7 +100,7 @@ export default function SetTask() {
     setSubmitError(null);
 
     try {
-      await createRequest(form.title, form.priority, form.description, form.type, selected);
+      await createRequest(form.title, form.priority, form.description, form.type, form.due, selected);
     } catch (error) {
       setSubmitError(error.message);
       return;
