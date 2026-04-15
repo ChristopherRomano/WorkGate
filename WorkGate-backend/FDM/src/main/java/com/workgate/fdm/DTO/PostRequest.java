@@ -20,7 +20,7 @@ public class PostRequest {
     public VISIBILITY getVisibility() { return visibility; }
     public boolean getPinned(){ return pinned; }
 
-    public void setAuthorUsername(String authorUsername) { this.authorUsername = authorUsername; }
+    public void setAuthorUsername(String authorUsername) { this.authorUsername = PostRequest.this.authorUsername; }
     public void setTitle(String title) { this.title = title; }
     public void setContent(String content) { this.content = content; }
     public void setPinned(boolean pinned) { this.pinned = pinned; }
