@@ -3,6 +3,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 16px;
+  align-items: start;
 }
 
 .formBody {
@@ -151,7 +152,19 @@
 
 .assignBtn { width: 100%; }
 
-.recentBody { padding: 8px 24px; }
+.assignedCard {
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+}
+
+.recentBody {
+  padding: 8px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
 
 .recentEmpty {
   padding: 32px 0;
@@ -191,4 +204,33 @@
 .recentDesc {
   font-size: 12px;
   color: var(--text-muted);
+}
+
+.recentDone .recentTitle {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.completedBadge {
+  font-size: 10px;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--lime);
+  background: var(--lime-dim);
+  border: 1px solid var(--lime-border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.pendingBadge {
+  font-size: 10px;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--text-dim);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  white-space: nowrap;
 }

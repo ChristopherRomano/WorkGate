@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { fetchEmployees } from '../api/api';
+import { fetchEmployees, fetchMyTasks, mapTask } from '../api/api';
 import '../styles/components.css';
 import styles from './SetTask.module.css';
 
@@ -12,7 +12,8 @@ export default function SetTask() {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [assigned, setAssigned] = useState([]);
+  const [assignedTasks, setAssignedTasks] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState([]);
   const [submitError, setSubmitError] = useState(null);
@@ -21,6 +22,34 @@ export default function SetTask() {
     fetchEmployees().then(setEmployees).catch(() => {});
   }, []);
 
+  const visibleEmployees = employees.filter(e => e.managerEmail?.toLowerCase() === currentUser?.email?.toLowerCase());
+
+  const refreshTasks = useCallback(() => {
+    if (visibleEmployees.length === 0) return;
+    setTasksLoading(true);
+    Promise.all(visibleEmployees.map(emp => fetchMyTasks(emp.email).catch(() => [])))
+      .then(results => {
+        const emailToEmp = Object.fromEntries(visibleEmployees.map(e => [e.email?.toLowerCase(), e]));
+        const flat = results.flat().map(t => ({
+          ...mapTask(t),
+          employeeEmail: t.employeeEmail,
+          emp: emailToEmp[t.employeeEmail?.toLowerCase()],
+        }));
+        flat.sort((a, b) => {
+          if (!a.due && !b.due) return 0;
+          if (!a.due) return 1;
+          if (!b.due) return -1;
+          return new Date(a.due) - new Date(b.due);
+        });
+        setAssignedTasks(flat);
+      })
+      .finally(() => setTasksLoading(false));
+  }, [visibleEmployees.map(e => e.email).join(',')]);
+
+  useEffect(() => {
+    refreshTasks();
+  }, [refreshTasks]);
+
   const getEmployeeName = (emp) => {
     if (!emp) return '';
     const firstName = emp.firstName ?? emp.name ?? '';
@@ -28,8 +57,6 @@ export default function SetTask() {
     if (firstName || lastName) return [firstName, lastName].filter(Boolean).join(' ');
     return emp.name ?? '';
   };
-
-  const visibleEmployees = employees.filter(e => e.managerEmail?.toLowerCase() === currentUser?.email?.toLowerCase());
 
   const isPastDue = (dateString) => {
     if (!dateString) return false;
@@ -106,20 +133,11 @@ export default function SetTask() {
       return;
     }
 
-    setAssigned(prev => [{
-      id: `t-mgr-${Date.now()}`,
-      employee: selected,
-      title: form.title.trim(),
-      description: form.description.trim(),
-      priority: form.priority,
-      type: form.type,
-      due: form.due,
-    }, ...prev]);
-
     setForm(EMPTY_FORM);
     setSelected(null);
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 3000);
+    refreshTasks();
   };
 
   return (
@@ -212,19 +230,29 @@ export default function SetTask() {
           </div>
         </div>
 
-        {/* Right — recently assigned */}
-        <div className="card" style={{ alignSelf: 'start' }}>
-          <div className="card-header"><span className="card-title">Recently Assigned</span></div>
+        {/* Right — all assigned tasks */}
+        <div className={`card ${styles.assignedCard}`}>
+          <div className="card-header"><span className="card-title">Assigned Tasks</span></div>
           <div className={styles.recentBody}>
-            {assigned.length === 0 && <div className={styles.recentEmpty}>No tasks assigned yet this session.</div>}
-            {assigned.map(t => (
-              <div key={t.id} className={styles.recentItem}>
+            {tasksLoading && <div className={styles.recentEmpty}>Loading…</div>}
+            {!tasksLoading && assignedTasks.length === 0 && (
+              <div className={styles.recentEmpty}>No tasks assigned to your employees yet.</div>
+            )}
+            {!tasksLoading && assignedTasks.map(t => (
+              <div key={t.id} className={`${styles.recentItem} ${t.done ? styles.recentDone : ''}`}>
                 <div className={styles.recentHeader}>
                   <span className={styles.recentTitle}>{t.title}</span>
-                  <span className={`pill pill-${t.priority}`}>{t.priority.toUpperCase()}</span>
+                  <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                    <span className={`pill pill-${t.priority}`}>{t.priority.toUpperCase()}</span>
+                    {t.done
+                      ? <span className={styles.completedBadge}>✓ Done</span>
+                      : <span className={styles.pendingBadge}>Pending</span>}
+                  </div>
                 </div>
-                <div className={styles.recentMeta}>→ {getEmployeeName(t.employee)} · {t.type} · Due {t.due}</div>
-                <div className={styles.recentDesc}>{t.description}</div>
+                <div className={styles.recentMeta}>
+                  → {getEmployeeName(t.emp) || t.employeeEmail} · {t.type}{t.due ? ` · Due ${new Date(t.due + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}` : ''}
+                </div>
+                {t.description && <div className={styles.recentDesc}>{t.description}</div>}
               </div>
             ))}
           </div>
