@@ -1,104 +1,66 @@
 package com.workgate.fdm.controller;
 
-import com.workgate.fdm.model.*;
-import org.springframework.http.ResponseEntity;
+import com.workgate.fdm.DTO.ItTicketRequest;
+import com.workgate.fdm.DTO.ItTicketUpdateRequest;
+import com.workgate.fdm.model.ItTicket;
+import com.workgate.fdm.model.STATUS;
+import com.workgate.fdm.repository.ItTicketRequestRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/it-tickets")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ItTicketController {
 
-    private final Registry registry = Registry.getRegistry();
+    @Autowired
+    ItTicketRequestRepository itTicketRepository;
 
-    /**
-     * GET /api/it-tickets
-     * Returns all IT tickets (for IT management view).
-     */
-    @GetMapping
-    public ResponseEntity<List<Map<String, Object>>> getAll() {
-        List<Map<String, Object>> result = registry.getItTickets().stream()
-                .map(this::toMap)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(result);
+    // GET ALL TICKETS
+    @RequestMapping("/itTickets")
+    public List<ItTicket> getTickets() {
+        return itTicketRepository.findAll();
     }
 
-    /**
-     * POST /api/it-tickets
-     * Body: { username, title, description, category }
-     * Creates a new IT support ticket submitted by an employee.
-     */
-    @PostMapping
-    public ResponseEntity<?> create(@RequestBody Map<String, String> body) {
-        String username    = body.get("username");
-        String title       = body.get("title");
-        String description = body.get("description");
-        String category    = body.getOrDefault("category", "General");
+    // CLAIM TICKET
+    @RequestMapping("/claimItTicket")
+    public void claimTicket(@RequestBody ItTicketUpdateRequest request) {
 
-        if (username == null || username.isBlank()) return ResponseEntity.badRequest().body("Username is required.");
-        if (title == null || title.isBlank())       return ResponseEntity.badRequest().body("Title is required.");
+        ItTicket ticket = itTicketRepository.findById(request.getId())
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
 
-        ItTicket ticket = new ItTicket(username, System.currentTimeMillis(), title, description, category);
-        registry.addItTicket(ticket);
-        return ResponseEntity.ok(toMap(ticket));
+        ticket.setClaimedByEmail(request.getClaimByEmail());
+
+        itTicketRepository.save(ticket);
     }
 
-    /**
-     * PUT /api/it-tickets/{id}/claim
-     * Body: { techEmail }
-     * Claims an unclaimed ticket for an IT technician.
-     */
-    @PutMapping("/{id}/claim")
-    public ResponseEntity<?> claim(@PathVariable int id, @RequestBody Map<String, String> body) {
-        ItTicket ticket = findById(id);
-        if (ticket == null) return ResponseEntity.notFound().build();
-        if (ticket.getClaimedByEmail() != null)
-            return ResponseEntity.badRequest().body("Ticket is already claimed.");
+    // RESOLVE TICKET
+    @PostMapping("/resolveItTicket")
+    public void resolveTicket(@RequestParam long id) {
 
-        String techEmail = body.get("techEmail");
-        if (techEmail == null || techEmail.isBlank()) return ResponseEntity.badRequest().body("Tech email required.");
+        ItTicket ticket = itTicketRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
 
-        ticket.setClaimedByEmail(techEmail);
-        return ResponseEntity.ok(toMap(ticket));
+        ticket.updateStatus(STATUS.RESOLVED);
+
+        itTicketRepository.save(ticket);
     }
 
-    /**
-     * PUT /api/it-tickets/{id}/advance
-     * Advances ticket status: OPEN → IN_PROGRESS → RESOLVED.
-     */
-    @PutMapping("/{id}/advance")
-    public ResponseEntity<?> advance(@PathVariable int id) {
-        ItTicket ticket = findById(id);
-        if (ticket == null) return ResponseEntity.notFound().build();
-        if (!ticket.advance())
-            return ResponseEntity.badRequest().body("Ticket is already resolved.");
-        return ResponseEntity.ok(toMap(ticket));
-    }
+    // RESOLVE TICKET
+    @PostMapping("/createItTicket")
+    public void createTicket(@RequestBody ItTicketRequest request) {
+        ItTicket ticket = new ItTicket();
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+        ticket.setTitle(request.getTitle());
+        ticket.setDescription(request.getDescription());
+        ticket.setCategory(request.getCategory());
 
-    private ItTicket findById(int id) {
-        return registry.getItTickets().stream()
-                .filter(t -> t.getId() == id)
-                .findFirst()
-                .orElse(null);
-    }
-
-    private Map<String, Object> toMap(ItTicket t) {
-        Map<String, Object> m = new LinkedHashMap<>();
-        m.put("id",            t.getId());
-        m.put("username",      t.getEmployeeUsername());
-        m.put("title",         t.getTitle());
-        m.put("description",   t.getDescription());
-        m.put("category",      t.getCategory());
-        m.put("status",        t.getStatus().name());
-        m.put("claimedByEmail", t.getClaimedByEmail());
-        m.put("createdAt",     t.getCreationTime());
-        return m;
+        itTicketRepository.save(ticket);
     }
 }

@@ -5,17 +5,23 @@ async function request(path, options = {}) {
     headers: { 'Content-Type': 'application/json', ...options.headers },
     ...options,
   });
+  const text = await res.text();
   if (!res.ok) {
-    const text = await res.text();
     throw new Error(text || `Request failed: ${res.status}`);
   }
-  return res.json();
+  if (!text) return null;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export function loginUser(username, password) {
-  return request('/auth/login', {
+  return request('/login', {
     method: 'POST',
     body: JSON.stringify({ username, password }),
   });
@@ -25,6 +31,21 @@ export function loginUser(username, password) {
 
 export function fetchEmployees() {
   return request('/employees');
+}
+
+export function fetchManagers() {
+  return request('/employees/managers');
+}
+
+export function fetchEmployeeProfile(email) {
+  return request(`/employees/profile?email=${encodeURIComponent(email)}`);
+}
+
+export function updateEmployeeProfile(profile) {
+  return request('/employees/profile', {
+    method: 'PUT',
+    body: JSON.stringify(profile),
+  });
 }
 
 // ── Tasks ─────────────────────────────────────────────────────────────────────
@@ -63,10 +84,17 @@ export function deleteTask(taskId, employeeEmail) {
 
 // ── Admin ─────────────────────────────────────────────────────────────────────
 
-export function createEmployee({ email, username, name, initials, role, tag, managerEmail }) {
-  return request('/admin/employees', {
+export function createEmployee({ email, username, name, initials, role, tag, managerEmail, password }) {
+  return request('/employees/createEmployee', {
     method: 'POST',
-    body: JSON.stringify({ email, username, name, initials, role, tag, managerEmail }),
+    body: JSON.stringify({ email, username, name, initials, role, tag, managerEmail, password }),
+  });
+}
+
+export function updateEmployeeManager(email, managerEmail) {
+  return request(`/employees/${encodeURIComponent(email)}/manager`, {
+    method: 'PUT',
+    body: JSON.stringify({ managerEmail }),
   });
 }
 

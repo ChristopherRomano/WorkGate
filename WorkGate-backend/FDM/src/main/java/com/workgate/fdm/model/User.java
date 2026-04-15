@@ -1,10 +1,14 @@
 package com.workgate.fdm.model;
 
-import java.util.UUID;
+import jakarta.persistence.*;
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype")
 public abstract class User {
-
-	private String id;
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 	private String email;
 	private String password;
 	private String username;
@@ -15,7 +19,6 @@ public abstract class User {
 	private boolean active;
 
 	public User(String email, String password) {
-		this.id = UUID.randomUUID().toString();
 		this.email = email;
 		this.password = password;
 		this.failedAttempts = 0;
@@ -45,16 +48,18 @@ public abstract class User {
 		this.failedAttempts = 0;
 	}
 
-	public String getId()       { return this.id; }
+	public Long getId()       { return this.id; }
 	public String getEmail()    { return this.email; }
 	public String getUsername() { return this.username; }
 	public String getName()     { return this.name; }
+
 	public String getInitials() { return this.initials; }
 	public boolean isLocked()   { return this.isLocked; }
 	public boolean isActive()   { return this.active; }
 
-	public void setId(String id)             { this.id = id; }
 	public void setUsername(String username) { this.username = username; }
+	public void setEmail(String email) { this.email = email; }
+	public void setPassword(String password) { this.password = password; }
 	public void setName(String name)         { this.name = name; }
 	public void setInitials(String initials) { this.initials = initials; }
 	public void setActive(boolean active)    { this.active = active; }

@@ -2,8 +2,8 @@ package com.workgate.fdm.model;
 
 public abstract class Poster extends Employee {
 
-    public Poster(String email, String password) {
-        super(email, password);
+    public Poster(String email, String managerEmail, String password, TAG tag) {
+        super(email, managerEmail, password, tag);
     }
 
 	public Poster() {

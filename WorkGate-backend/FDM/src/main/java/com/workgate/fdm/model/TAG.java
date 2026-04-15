@@ -8,6 +8,6 @@ public enum TAG {
 	MANAGER,
 	EMPLOYEE,
 	HR,
-	OTHER,
+	ADMIN,
 	;
 }

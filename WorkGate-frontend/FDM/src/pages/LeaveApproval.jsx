@@ -1,5 +1,7 @@
 
-import { employeeLeaveRequests } from '../data/mockData';
+// leave approval
+
+import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
 import Modal from '../components/Modal';
 import '../styles/components.css';
@@ -9,16 +11,18 @@ import styles from './LeaveApproval.module.css';
 export default function LeaveApproval() {
 
   //const [requests, setRequests] = useState(employeeLeaveRequests);
+  const { currentUser } = useAuth();
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState('pending');
   const [rejectTarget, setRejectTarget] = useState(null);
   const [rejectComment, setRejectComment] = useState('');
 
 
+
   const fetchLeaveRequests = async () => {
   try {
     const response = await fetch(
-      "http://localhost:8080/api/annualLeave?Username=john"
+      `http://localhost:8080/api/annualLeave?Username=${currentUser.name}`
     );
 
     if (!response.ok) {
@@ -54,7 +58,7 @@ export default function LeaveApproval() {
 
   useEffect(() => {
   fetchLeaveRequests();
-}, []);
+}, [currentUser]);
 
   const approve = (id) =>
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved', comment: '' } : r));

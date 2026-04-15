@@ -1,159 +1,75 @@
 package com.workgate.fdm.controller;
 
+import com.workgate.fdm.DTO.TaskRequest;
 import com.workgate.fdm.model.*;
+import com.workgate.fdm.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
 
 
 @RestController
-@RequestMapping("/api/tasks")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:5173")
 public class TaskController {
 
-    private final Registry registry = Registry.getRegistry();
+    @Autowired
+    TaskRepository taskRepository;
 
-    /**
-     * POST /api/tasks/assign
-     * Body: { managerEmail, employeeEmail, title, description, priority, dueDate, category }
-     */
-    @PostMapping("/assign")
-    public ResponseEntity<?> assignTask(@RequestBody Map<String, String> body) {
-        String managerEmail = body.get("managerEmail");
-        String employeeEmail = body.get("employeeEmail");
-
-        Employee manager = registry.findEmployeeByEmail(managerEmail);
-        if (!(manager instanceof Manager)) {
-            return ResponseEntity.badRequest().body("Manager not found: " + managerEmail);
+    // New endpoint for creating tasks (called from SetTask)
+    @PostMapping("/newTask")
+    public ResponseEntity<?> newTask(@RequestBody TaskRequest request) {
+        // Validation
+        if (request.getEmployeeName() == null || request.getEmployeeName().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Employee name is required");
+        }
+        if (request.getTitle() == null || request.getTitle().trim().length() < 3) {
+            return ResponseEntity.badRequest().body("Task title must be at least 3 characters");
+        }
+        if (request.getDescription() == null || request.getDescription().trim().length() < 10) {
+            return ResponseEntity.badRequest().body("Task description must be at least 10 characters");
         }
 
-        Employee employee = registry.findEmployeeByEmail(employeeEmail);
-        if (employee == null) {
-            return ResponseEntity.badRequest().body("Employee not found: " + employeeEmail);
-        }
+        Task task = new Task();
+        task.setEmployeeEmail(request.getEmployeeName());
+        task.setDescription(request.getDescription());
+        task.setTitle(request.getTitle());
+        task.setPriority(request.getPriority());
+        task.setCategory(request.getCategory());
 
-        String title = body.get("title");
-        String description = body.get("description");
-        String dueDate = body.get("dueDate");
-        String category = body.get("category");
-
-        PRIORITY priority;
-        try {
-            priority = PRIORITY.valueOf(body.getOrDefault("priority", "MEDIUM").toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Invalid priority. Use LOW, MEDIUM, or HIGH.");
-        }
-
-        if (title == null || title.isBlank()) {
-            return ResponseEntity.badRequest().body("Title is required.");
-        }
-
-        int taskId = registry.nextTaskId();
-        ((Manager) manager).assignTask(employee, taskId, false, description, title, priority, dueDate, category);
-
-        return ResponseEntity.ok(Map.of(
-                "message", "Task assigned successfully.",
-                "taskId", taskId,
-                "assignedTo", employee.getName() != null ? employee.getName() : employeeEmail
-        ));
+        taskRepository.save(task);
+        return ResponseEntity.ok("Task created successfully");
     }
 
-    /**
-     * GET /api/tasks/employee/{email}
-     * Returns all tasks assigned to the employee with the given email.
-     */
-    @GetMapping("/employee/{email:.+}")
-    public ResponseEntity<?> getEmployeeTasks(@PathVariable String email) {
-        Employee employee = registry.findEmployeeByEmail(email);
-        if (employee == null) {
-            return ResponseEntity.notFound().build();
-        }
-        List<Task> tasks = employee.viewTasks();
-        return ResponseEntity.ok(tasks);
+    @PostMapping("/tasks/create")
+    public void createTask(@RequestBody TaskRequest request) {
+        Task task = new Task();
+
+        task.setTaskId(request.getTaskId());
+        task.setEmployeeEmail(request.getEmployeeName());
+        task.setDescription(request.getDescription());
+        task.setTitle(request.getTitle());
+        task.setPriority(request.getPriority());
+        task.setCategory(request.getCategory());
+
+        taskRepository.save(task);
     }
 
-    /**
-     * PUT /api/tasks/{taskId}/complete
-     * Body: { employeeEmail }
-     * Marks the task as complete for the given employee.
-     */
-    @PutMapping("/{taskId}/complete")
-    public ResponseEntity<?> completeTask(@PathVariable int taskId, @RequestBody Map<String, String> body) {
-        String employeeEmail = body.get("employeeEmail");
-        Employee employee = registry.findEmployeeByEmail(employeeEmail);
-        if (employee == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Task task = employee.getTaskList().getById(taskId);
-        if (task == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        employee.completeTask(task);
-        return ResponseEntity.ok(Map.of("message", "Task marked as complete.", "taskId", taskId));
+    @GetMapping("/tasks/view")
+    public List<Task> viewTask(@RequestParam String username) {
+        return taskRepository.findByEmployeeEmail(username);
     }
 
-    /**
-     * PUT /api/tasks/{taskId}
-     * Body: { employeeEmail, title, description, priority, dueDate, category }
-     * Updates an existing task's fields.
-     */
-    @PutMapping("/{taskId}")
-    public ResponseEntity<?> updateTask(@PathVariable int taskId, @RequestBody Map<String, String> body) {
-        String employeeEmail = body.get("employeeEmail");
-        Employee employee = registry.findEmployeeByEmail(employeeEmail);
-        if (employee == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Task task = employee.getTaskList().getById(taskId);
-        if (task == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (body.containsKey("title") && !body.get("title").isBlank()) {
-            task.setTitle(body.get("title"));
-        }
-        if (body.containsKey("description")) {
-            task.setDescription(body.get("description"));
-        }
-        if (body.containsKey("dueDate")) {
-            task.setDueDate(body.get("dueDate"));
-        }
-        if (body.containsKey("category")) {
-            task.setCategory(body.get("category"));
-        }
-        if (body.containsKey("priority")) {
-            try {
-                task.setPriority(PRIORITY.valueOf(body.get("priority").toUpperCase()));
-            } catch (IllegalArgumentException ignored) {}
-        }
-
-        return ResponseEntity.ok(Map.of("message", "Task updated.", "taskId", taskId));
-    }
-
-    /**
-     * DELETE /api/tasks/{taskId}
-     * Body: { employeeEmail }
-     * Removes the task from the employee's task list.
-     */
-    @DeleteMapping("/{taskId}")
-    public ResponseEntity<?> deleteTask(@PathVariable int taskId, @RequestBody Map<String, String> body) {
-        String employeeEmail = body.get("employeeEmail");
-        Employee employee = registry.findEmployeeByEmail(employeeEmail);
-        if (employee == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        boolean removed = employee.getTaskList().removeTask(taskId);
-        if (!removed) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(Map.of("message", "Task deleted.", "taskId", taskId));
+    @GetMapping("/tasks/complete")
+    public void completeTask(@RequestParam int id) {
+        Task task = taskRepository.findById(id);
+        task.setCompletion();
+        taskRepository.save(task);
     }
 
 }

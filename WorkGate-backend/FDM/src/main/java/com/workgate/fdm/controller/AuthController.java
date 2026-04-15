@@ -1,68 +1,38 @@
 package com.workgate.fdm.controller;
 
-import com.workgate.fdm.model.*;
-import org.springframework.http.ResponseEntity;
+import com.workgate.fdm.DTO.LoginResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.workgate.fdm.DTO.LoginRequest;
+import com.workgate.fdm.model.Employee;
+import com.workgate.fdm.repository.EmployeeRepository;
 
 @RestController
-@RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
-    private final Registry registry = Registry.getRegistry();
+    @Autowired
+    EmployeeRepository employeeRepository;
 
-    /**
-     * POST /api/auth/login
-     * Body: { username, password }
-     */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        String username = body.get("username");
-        String password = body.get("password");
+    public LoginResponse loginAuthenication(@RequestBody LoginRequest request) {
 
-        if (username == null || password == null) {
-            return ResponseEntity.badRequest().body("Username and password are required.");
+        try {
+            Employee e = employeeRepository.findByEmail(request.getUsername());
+
+            if (e != null && e.checkPassword(request.getPassword())) {
+                LoginResponse response = new LoginResponse();
+                response.setUsername(request.getUsername());
+                response.setTag(e.getTag());
+                return response;
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
-        User user = registry.findUserByUsername(username);
-        if (user == null || !user.checkPassword(password)) {
-            return ResponseEntity.status(401).body("Invalid username or password.");
-        }
-
-        return ResponseEntity.ok(buildUserResponse(user));
+        throw new RuntimeException("Invalid credentials");
     }
-
-    private Map<String, Object> buildUserResponse(User user) {
-        Map<String, Object> res = new LinkedHashMap<>();
-        res.put("id",       user.getId());
-        res.put("username", user.getUsername());
-        res.put("name",     user.getName());
-        res.put("initials", user.getInitials());
-        res.put("email",    user.getEmail());
-        res.put("role",     resolveRole(user));
-        res.put("tag",      resolveTag(user));
-        return res;
-    }
-
-    private String resolveRole(User user) {
-        if (user instanceof Manager)       return "manager";
-        if (user instanceof HrRep)         return "hr";
-        if (user instanceof ItTechnician)  return "ittech";
-        if (user instanceof Consultant)    return "consultant";
-        if (user instanceof Employee)      return "employee";
-        if (user instanceof Administrator) return "admin";
-        return "user";
-    }
-
-    private String resolveTag(User user) {
-        if (user instanceof Employee) {
-            TAG tag = ((Employee) user).getTag();
-            return tag != null ? tag.name() : null;
-        }
-        return null;
-    }
-
 }

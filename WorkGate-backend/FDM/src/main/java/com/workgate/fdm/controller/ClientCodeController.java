@@ -1,7 +1,8 @@
 package com.workgate.fdm.controller;
 
 import com.workgate.fdm.model.ClientCode;
-import com.workgate.fdm.model.Registry;
+import com.workgate.fdm.repository.ClientCodeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,14 +16,15 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*")
 public class ClientCodeController {
 
-    private final Registry registry = Registry.getRegistry();
+    @Autowired
+    private ClientCodeRepository clientCodeRepository;
 
     /**
      * GET /api/client-codes
      */
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getAll() {
-        List<Map<String, Object>> result = registry.getClientCodes().stream()
+        List<Map<String, Object>> result = clientCodeRepository.findAll().stream()
                 .map(this::toMap)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(result);
@@ -42,11 +44,11 @@ public class ClientCodeController {
         if (client == null || client.isBlank()) return ResponseEntity.badRequest().body("Client name is required.");
 
         String normalised = code.trim().toUpperCase();
-        if (registry.clientCodeExists(normalised))
+        if (clientCodeRepository.findByCode(normalised) != null)
             return ResponseEntity.badRequest().body("Code '" + normalised + "' already exists.");
 
         ClientCode cc = new ClientCode(normalised, client.trim(), sector.trim());
-        registry.addClientCode(cc);
+        clientCodeRepository.save(cc);
         return ResponseEntity.ok(toMap(cc));
     }
 
@@ -55,8 +57,10 @@ public class ClientCodeController {
      */
     @DeleteMapping("/{code}")
     public ResponseEntity<?> remove(@PathVariable String code) {
-        if (!registry.removeClientCode(code))
+        ClientCode cc = clientCodeRepository.findByCode(code);
+        if (cc == null)
             return ResponseEntity.notFound().build();
+        clientCodeRepository.delete(cc);
         return ResponseEntity.ok(Map.of("message", "Client code removed."));
     }
 

@@ -12,7 +12,7 @@ public class Post {
 	private String content;
 	private boolean pinned;
 	private VISIBILITY visibility;
-	private String authorUsername;
+	private String authorEmail;
 	private long timePosted;
     @Id
     private Long id;
@@ -27,13 +27,13 @@ public class Post {
 	 * @param authorUsername
 	 */
 
-	public Post(String title, String content, boolean pinned, VISIBILITY visibility, long timePosted, String authorUsername) {
+	public Post(String title, String content, boolean pinned, VISIBILITY visibility, long timePosted, String authorEmail) {
 		this.title = title;
 		this.content = content;
 		this.pinned = pinned;
 		this.visibility = visibility;
 		this.timePosted = timePosted;
-		this.authorUsername = authorUsername;
+		this.authorEmail = authorEmail;
 	}
 	public Post() {}
 
@@ -50,7 +50,7 @@ public class Post {
 	}
 
 	public String getAuthorUsername() {
-		return this.authorUsername;
+		return this.authorEmail;
 	}
 	public long getTimePosted() {
 		return this.timePosted;

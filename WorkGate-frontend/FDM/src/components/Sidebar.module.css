@@ -274,47 +274,34 @@
 }
 .leaveNums span:first-child { color: var(--lime); font-weight: 700; }
 
-.settingsWidget {
-  margin-top: 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 11px 13px;
-}
-.settingsLabel {
-  font-size: 9px;
-  color: var(--text-dim);
-  font-family: var(--mono);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.themeButtons {
+.settingsShortcut {
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px 10px;
   display: flex;
-  gap: 6px;
-}
-.themeBtn {
-  flex: 1;
-  padding: 6px 0;
-  font-size: 11px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 12px;
   font-family: var(--mono);
   font-weight: 700;
-  border-radius: var(--radius-xs);
-  background: var(--surface-2);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  cursor: pointer;
+  letter-spacing: 0.4px;
   transition: all var(--transition);
-  letter-spacing: 0.3px;
 }
-.themeBtn:hover {
-  background: var(--surface-3);
+
+.settingsShortcut:hover {
   color: var(--text);
+  border-color: var(--border-bright);
+  background: var(--surface-2);
 }
-.themeBtnActive {
-  background: var(--green);
-  color: var(--black);
-  border-color: var(--green);
+
+.settingsShortcutActive {
+  color: var(--lime);
+  border-color: var(--lime-border);
+  background: var(--lime-dim);
 }
 
 .logoutBtn {
