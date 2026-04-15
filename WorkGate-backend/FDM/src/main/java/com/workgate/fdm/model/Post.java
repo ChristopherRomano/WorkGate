@@ -1,6 +1,8 @@
 package com.workgate.fdm.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "posts")
@@ -28,6 +30,7 @@ public class Post {
 	 */
 
 	public Post(String title, String content, boolean pinned, VISIBILITY visibility, long timePosted, String authorEmail) {
+		this.id = System.currentTimeMillis();
 		this.title = title;
 		this.content = content;
 		this.pinned = pinned;

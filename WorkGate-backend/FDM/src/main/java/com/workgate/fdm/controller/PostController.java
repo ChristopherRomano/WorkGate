@@ -32,8 +32,7 @@ public class PostController {
 
 
     @PostMapping("/createPost")
-    public void createPost(@RequestBody PostRequest request){
-
+    public Post createPost(@RequestBody PostRequest request){
         Post post = new Post(
             request.getTitle(),
             request.getContent(),
@@ -41,12 +40,13 @@ public class PostController {
             request.getVisibility(),
             request.getTimePosted(),
             request.getAuthorUsername()
-
         );
+        return postRepository.save(post);
+    }
 
-        postRepository.save(post);
-
-        System.out.println("Post saved: " + request.getTitle());
+    @DeleteMapping("/posts/{id}")
+    public void deletePost(@PathVariable Long id) {
+        postRepository.deleteById(id);
     }
 
 }

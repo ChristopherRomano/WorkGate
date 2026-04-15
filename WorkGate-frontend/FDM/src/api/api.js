@@ -145,6 +145,30 @@ export function unlockAccount(email) {
   return request(`/admin/employees/${encodeURIComponent(email)}/unlock`, { method: 'PUT' });
 }
 
+// ── Posts ─────────────────────────────────────────────────────────────────────
+
+export function fetchPosts() {
+  return request('/allPosts');
+}
+
+export function createPost({ title, content, pinned, visibility, authorUsername }) {
+  return request('/createPost', {
+    method: 'POST',
+    body: JSON.stringify({
+      title,
+      content,
+      pinned,
+      visibility: visibility.toUpperCase(),
+      authorUsername,
+      timePosted: Date.now(),
+    }),
+  });
+}
+
+export function deletePost(id) {
+  return request(`/posts/${id}`, { method: 'DELETE' });
+}
+
 // ── Client Codes ──────────────────────────────────────────────────────────────
 
 export function fetchClientCodes() {
