@@ -11,10 +11,10 @@ import styles from './Sidebar.module.css';
 const NAV = [
   { section: 'Overview', items: [
     { to: '/app',         icon: '◈', label: 'Dashboard',  permission: 'dashboard',  mobile: true },
-    { to: '/app/profile', icon: '◉', label: 'My Profile', permission: 'profile',    mobile: true },
+    { to: '/app/profile', icon: '◉', label: 'My Profile', permission: 'profile' },
   ]},
   { section: 'Work', items: [
-{ to: '/app/tasks',     icon: '✓', label: 'Tasks',     permission: 'tasks',     mobile: true },
+    { to: '/app/tasks',     icon: '✓', label: 'Tasks',     permission: 'tasks',     mobile: true },
     { to: '/app/leave',     icon: '📅', label: 'Leave',    permission: 'leave' },
     { to: '/app/expenses',  icon: '£', label: 'Expenses',  permission: 'expenses' },
   ]},
@@ -31,10 +31,10 @@ const NAV = [
     { to: '/app/hr-management', icon: '📋', label: 'Report Management', permission: 'hr-management' },
   ]},
   { section: 'Admin', roleSection: 'admin', items: [
-    { to: '/app/admin',                icon: '⚙', label: 'Admin Dashboard',  permission: 'admin-dashboard',  mobile: true },
-    { to: '/app/admin/employees',      icon: '👥', label: 'Manage Employees', permission: 'manage-employees', mobile: true },
-    { to: '/app/admin/add-employee',   icon: '➕', label: 'Add Employee',     permission: 'add-employee',     mobile: true },
-    { to: '/app/admin/client-codes',   icon: '🏢', label: 'Client Codes',     permission: 'client-codes',     mobile: true },
+    { to: '/app/admin',              icon: '⚙', label: 'Admin Dashboard',  permission: 'admin-dashboard',  mobile: true },
+    { to: '/app/admin/employees',    icon: '👥', label: 'Manage Employees', permission: 'manage-employees', mobile: true },
+    { to: '/app/admin/add-employee', icon: '➕', label: 'Add Elements',     permission: 'add-employee',     mobile: true },
+    { to: '/app/admin/client-codes', icon: '🏢', label: 'Client Codes',     permission: 'client-codes' },
   ]},
   { section: 'Company', items: [
     { to: '/app/news', icon: '📢', label: 'News Feed', permission: 'news', badge: 2 },
@@ -67,6 +67,14 @@ export default function Sidebar() {
   const mobileItems = NAV
     .flatMap(s => s.items)
     .filter(item => item.mobile && can(item.permission));
+
+  const mobileLabelMap = {
+    'Dashboard': 'Home',
+    'Admin Dashboard': 'Admin',
+    'Manage Employees': 'Manage',
+    'Add Elements': 'Add',
+  };
+  const getMobileLabel = (label) => mobileLabelMap[label] ?? label;
 
   const showSettings = can('settings');
 
@@ -136,21 +144,26 @@ export default function Sidebar() {
         </div>
       </aside>
 
-      {mobileItems.length > 0 && (
-        <nav className={styles.mobileNav}>
-          {mobileItems.map(({ to, icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/app' || to === '/app/admin'}
-              className={({ isActive }) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`}
-            >
-              <span className={styles.mobileNavIcon}>{icon}</span>
-              <span className={styles.mobileNavLabel}>{label === 'My Profile' ? 'Profile' : label}</span>
-            </NavLink>
-          ))}
-        </nav>
-      )}
+      <nav className={styles.mobileNav}>
+        {mobileItems.map(({ to, icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === '/app' || to === '/app/admin'}
+            className={({ isActive }) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`}
+          >
+            <span className={styles.mobileNavIcon}>{icon}</span>
+            <span className={styles.mobileNavLabel}>{getMobileLabel(label)}</span>
+          </NavLink>
+        ))}
+        <NavLink
+          to="/app/profile"
+          className={({ isActive }) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`}
+        >
+          <span className={styles.mobileNavIcon}>◉</span>
+          <span className={styles.mobileNavLabel}>Profile</span>
+        </NavLink>
+      </nav>
     </>
   );
 }

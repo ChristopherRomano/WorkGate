@@ -119,7 +119,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Directory */}
-      <div className="card">
+      <div className={`card ${styles.mobileHidden}`}>
         <div className="card-header">
           <span className="card-title">People Directory</span>
         </div>

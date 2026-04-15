@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { fetchMyTasks, completeTask, deleteTask, updateTask, assignTask, mapTask } from '../api/api';
+import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './Tasks.module.css';
 
@@ -161,124 +162,104 @@ export default function Tasks() {
         </div>
       )}
 
-      {adding && (
-        <div className="modal-overlay" onClick={() => { setAdding(false); setAddErrors([]); }}>
-          <div className="modal" style={{ width: 520 }} onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <span className="modal-title">ADD TASK</span>
-              <button className="modal-close" onClick={() => { setAdding(false); setAddErrors([]); }}>×</button>
+      <Modal isOpen={adding} onClose={() => { setAdding(false); setAddErrors([]); }} title="ADD TASK">
+        {addErrors.length > 0 && (
+          <div className={styles.errorBar}>{addErrors.map((e, i) => <div key={i}>{e}</div>)}</div>
+        )}
+        <div className="form-grid">
+          <div className="form-group">
+            <label>Title</label>
+            <input className="field" value={newTask.title} onChange={e => setNewTask(n => ({ ...n, title: e.target.value }))} placeholder="Task title" />
+          </div>
+          <div className="form-group">
+            <label>Description</label>
+            <textarea className="field" style={{ minHeight: 80 }} value={newTask.description} onChange={e => setNewTask(n => ({ ...n, description: e.target.value }))} placeholder="Task description" />
+          </div>
+          <div className="form-grid form-grid-2">
+            <div className="form-group">
+              <label>Due Date</label>
+              <input className="field" type="date" value={newTask.dueDate} onChange={e => setNewTask(n => ({ ...n, dueDate: e.target.value }))} />
             </div>
-            {addErrors.length > 0 && (
-              <div className={styles.errorBar}>{addErrors.map((e, i) => <div key={i}>{e}</div>)}</div>
-            )}
-            <div className="modal-body">
-              <div className="form-grid">
-                <div className="form-group">
-                  <label>Title</label>
-                  <input className="field" value={newTask.title} onChange={e => setNewTask(n => ({ ...n, title: e.target.value }))} placeholder="Task title" />
-                </div>
-                <div className="form-group">
-                  <label>Description</label>
-                  <textarea className="field" style={{ minHeight: 80 }} value={newTask.description} onChange={e => setNewTask(n => ({ ...n, description: e.target.value }))} placeholder="Task description" />
-                </div>
-                <div className="form-grid form-grid-2">
-                  <div className="form-group">
-                    <label>Due Date</label>
-                    <input className="field" type="date" value={newTask.dueDate} onChange={e => setNewTask(n => ({ ...n, dueDate: e.target.value }))} />
-                  </div>
-                  <div className="form-group">
-                    <label>Priority</label>
-                    <select className="field" value={newTask.priority} onChange={e => setNewTask(n => ({ ...n, priority: e.target.value }))}>
-                      {PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
-                    </select>
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label>Category</label>
-                  <select className="field" value={newTask.type} onChange={e => setNewTask(n => ({ ...n, type: e.target.value }))}>
-                    {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                </div>
-                <div className="modal-actions">
-                  <button className="btn btn-primary" onClick={addTask}>Add Task</button>
-                  <button className="btn btn-ghost" onClick={() => { setAdding(false); setAddErrors([]); }}>Cancel</button>
-                </div>
+            <div className="form-group">
+              <label>Priority</label>
+              <select className="field" value={newTask.priority} onChange={e => setNewTask(n => ({ ...n, priority: e.target.value }))}>
+                {PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Category</label>
+            <select className="field" value={newTask.type} onChange={e => setNewTask(n => ({ ...n, type: e.target.value }))}>
+              {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+          <div className="modal-actions">
+            <button className="btn btn-primary" onClick={addTask}>Add Task</button>
+            <button className="btn btn-ghost" onClick={() => { setAdding(false); setAddErrors([]); }}>Cancel</button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={!!draft} onClose={closeOverlay} title={isManager ? 'EDIT TASK' : 'TASK DETAIL'}>
+        {draft && (isManager ? (
+          <div className="form-grid">
+            <div className="form-group">
+              <label>Title</label>
+              <input className="field" value={draft.title} onChange={e => setDraft(d => ({ ...d, title: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label>Description</label>
+              <textarea className="field" style={{ minHeight: 80 }} value={draft.description ?? ''} onChange={e => setDraft(d => ({ ...d, description: e.target.value }))} />
+            </div>
+            <div className="form-grid form-grid-2">
+              <div className="form-group">
+                <label>Due Date</label>
+                <input className="field" type="date" value={draft.due ?? ''} onChange={e => setDraft(d => ({ ...d, due: e.target.value }))} />
+              </div>
+              <div className="form-group">
+                <label>Priority</label>
+                <select className="field" value={draft.priority} onChange={e => setDraft(d => ({ ...d, priority: e.target.value }))}>
+                  {PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
+                </select>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {draft && (
-        <div className="modal-overlay" onClick={closeOverlay}>
-          <div className="modal" style={{ width: 520 }} onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <span className="modal-title">{isManager ? 'EDIT TASK' : 'TASK DETAIL'}</span>
-              <button className="modal-close" onClick={closeOverlay}>×</button>
+            <div className="form-group">
+              <label>Category</label>
+              <select className="field" value={draft.type} onChange={e => setDraft(d => ({ ...d, type: e.target.value }))}>
+                {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
             </div>
-            <div className="modal-body">
-              {isManager ? (
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label>Title</label>
-                    <input className="field" value={draft.title} onChange={e => setDraft(d => ({ ...d, title: e.target.value }))} />
-                  </div>
-                  <div className="form-group">
-                    <label>Description</label>
-                    <textarea className="field" style={{ minHeight: 80 }} value={draft.description ?? ''} onChange={e => setDraft(d => ({ ...d, description: e.target.value }))} />
-                  </div>
-                  <div className="form-grid form-grid-2">
-                    <div className="form-group">
-                      <label>Due Date</label>
-                      <input className="field" type="date" value={draft.due ?? ''} onChange={e => setDraft(d => ({ ...d, due: e.target.value }))} />
-                    </div>
-                    <div className="form-group">
-                      <label>Priority</label>
-                      <select className="field" value={draft.priority} onChange={e => setDraft(d => ({ ...d, priority: e.target.value }))}>
-                        {PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label>Category</label>
-                    <select className="field" value={draft.type} onChange={e => setDraft(d => ({ ...d, type: e.target.value }))}>
-                      {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                  </div>
-                  <div className="modal-actions">
-                    <button className="btn btn-primary" onClick={saveChanges}>Save Changes</button>
-                    <button className={`btn btn-ghost ${styles.deleteBtn}`} onClick={handleDelete}>Delete</button>
-                    <button className="btn btn-ghost" onClick={closeOverlay}>Cancel</button>
-                  </div>
-                </div>
-              ) : (
-                <div className={styles.detailView}>
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Title</span>
-                    <span className={styles.detailValue}>{draft.title}</span>
-                  </div>
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Description</span>
-                    <span className={styles.detailValue}>{draft.description || '—'}</span>
-                  </div>
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Due Date</span>
-                    <span className={styles.detailValue}>{draft.due}</span>
-                  </div>
-                  <div className={styles.detailRow}>
-                    <span className={styles.detailLabel}>Priority</span>
-                    <span className={`pill pill-${draft.priority}`}>{draft.priority.toUpperCase()}</span>
-                  </div>
-                  <div className="modal-actions" style={{ marginTop: 16 }}>
-                    {!draft.done && <button className="btn btn-primary" onClick={markComplete}>Mark as Complete</button>}
-                    <button className="btn btn-ghost" onClick={closeOverlay}>Close</button>
-                  </div>
-                </div>
-              )}
+            <div className="modal-actions">
+              <button className="btn btn-primary" onClick={saveChanges}>Save Changes</button>
+              <button className={`btn btn-ghost ${styles.deleteBtn}`} onClick={handleDelete}>Delete</button>
+              <button className="btn btn-ghost" onClick={closeOverlay}>Cancel</button>
             </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className={styles.detailView}>
+            <div className={styles.detailRow}>
+              <span className={styles.detailLabel}>Title</span>
+              <span className={styles.detailValue}>{draft.title}</span>
+            </div>
+            <div className={styles.detailRow}>
+              <span className={styles.detailLabel}>Description</span>
+              <span className={styles.detailValue}>{draft.description || '—'}</span>
+            </div>
+            <div className={styles.detailRow}>
+              <span className={styles.detailLabel}>Due Date</span>
+              <span className={styles.detailValue}>{draft.due}</span>
+            </div>
+            <div className={styles.detailRow}>
+              <span className={styles.detailLabel}>Priority</span>
+              <span className={`pill pill-${draft.priority}`}>{draft.priority.toUpperCase()}</span>
+            </div>
+            <div className="modal-actions" style={{ marginTop: 16 }}>
+              {!draft.done && <button className="btn btn-primary" onClick={markComplete}>Mark as Complete</button>}
+              <button className="btn btn-ghost" onClick={closeOverlay}>Close</button>
+            </div>
+          </div>
+        ))}
+      </Modal>
     </div>
   );
 }
