@@ -25,6 +25,11 @@ public class EmployeeController {
         return employeeRepository.findAll();
     }
 
+    @GetMapping("/managers")
+    public List<Employee> getManagers() {
+        return employeeRepository.findByTag(TAG.MANAGER);
+    }
+
     @PostMapping("/updateEmployee")
     public Employee updateEmployeeInfo(@RequestBody NewEmployeeRequest request){
         Employee employee = findEmployeeByEmail(request.getEmail());
@@ -77,6 +82,13 @@ public class EmployeeController {
         return employeeRepository.save(employee);
     }
 
+    @PutMapping("/{email}/manager")
+    public Employee updateEmployeeManager(@PathVariable String email, @RequestBody NewEmployeeRequest request) {
+        Employee employee = findEmployeeByEmail(email);
+        employee.setManagerEmail(validateManagerEmail(request.getManagerEmail(), employee.getEmail()));
+        return employeeRepository.save(employee);
+    }
+
     @PostMapping("/createEmployee")
     public Employee createEmployee (@RequestBody NewEmployeeRequest request){
         if (request.getEmail() == null || request.getEmail().isBlank()) {
@@ -87,10 +99,11 @@ public class EmployeeController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee already exists.");
         }
 
+        String managerEmail = validateManagerEmail(request.getManagerEmail(), request.getEmail());
         Employee employee = new Employee(request.getEmail().trim(), request.getPassword() == null ? "" : request.getPassword());
         employee.setActive(true);
         employee.setName(request.getName());
-        employee.setManagerEmail(request.getManagerEmail());
+        employee.setManagerEmail(managerEmail);
         employee.setTag(request.getTag() == null ? TAG.EMPLOYEE : request.getTag());
 
         return employeeRepository.save(employee);
@@ -145,5 +158,23 @@ public class EmployeeController {
             case "consultant" -> TAG.BENCH;
             default -> TAG.EMPLOYEE;
         };
+    }
+
+    private String validateManagerEmail(String managerEmail, String employeeEmail) {
+        if (managerEmail == null || managerEmail.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Line manager is required.");
+        }
+
+        String normalisedManagerEmail = managerEmail.trim();
+        if (employeeEmail != null && normalisedManagerEmail.equalsIgnoreCase(employeeEmail.trim())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An employee cannot be their own line manager.");
+        }
+
+        Employee manager = employeeRepository.findByEmail(normalisedManagerEmail);
+        if (manager == null || manager.getTag() != TAG.MANAGER) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selected line manager is invalid.");
+        }
+
+        return manager.getEmail();
     }
 }

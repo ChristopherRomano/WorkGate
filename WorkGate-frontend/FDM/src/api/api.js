@@ -33,6 +33,10 @@ export function fetchEmployees() {
   return request('/employees');
 }
 
+export function fetchManagers() {
+  return request('/employees/managers');
+}
+
 export function fetchEmployeeProfile(email) {
   return request(`/employees/profile?email=${encodeURIComponent(email)}`);
 }
@@ -80,10 +84,17 @@ export function deleteTask(taskId, employeeEmail) {
 
 // ── Admin ─────────────────────────────────────────────────────────────────────
 
-export function createEmployee({ email, username, name, initials, role, tag, managerEmail }) {
-  return request('/admin/employees', {
+export function createEmployee({ email, username, name, initials, role, tag, managerEmail, password }) {
+  return request('/employees/createEmployee', {
     method: 'POST',
-    body: JSON.stringify({ email, username, name, initials, role, tag, managerEmail }),
+    body: JSON.stringify({ email, username, name, initials, role, tag, managerEmail, password }),
+  });
+}
+
+export function updateEmployeeManager(email, managerEmail) {
+  return request(`/employees/${encodeURIComponent(email)}/manager`, {
+    method: 'PUT',
+    body: JSON.stringify({ managerEmail }),
   });
 }
 
