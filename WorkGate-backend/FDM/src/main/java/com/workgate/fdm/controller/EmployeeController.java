@@ -1,21 +1,16 @@
 package com.workgate.fdm.controller;
 
-import com.workgate.fdm.DTO.EmployeeReportRequest;
-import com.workgate.fdm.model.*;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import com.workgate.fdm.DTO.LoginRequest;
 import com.workgate.fdm.DTO.NewEmployeeRequest;
 import com.workgate.fdm.DTO.UpdateInfoRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.workgate.fdm.model.Employee;
+import com.workgate.fdm.model.TAG;
 import com.workgate.fdm.repository.EmployeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -25,43 +20,130 @@ public class EmployeeController {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    @GetMapping
+    public List<Employee> getEmployees() {
+        return employeeRepository.findAll();
+    }
+
     @PostMapping("/updateEmployee")
-    public void updateEmployeeInfo(@RequestBody NewEmployeeRequest request){
-        Employee e = employeeRepository.findByEmail(request.getEmail());
+    public Employee updateEmployeeInfo(@RequestBody NewEmployeeRequest request){
+        Employee employee = findEmployeeByEmail(request.getEmail());
 
-        e.setEmail(request.getEmail());
-        e.setName(request.getName());
-        e.setPassword(request.getPassword());
-        e.setManagerEmail(request.getManagerEmail());
-        e.setTag(request.getTag());
+        if (request.getName() != null) {
+            employee.setName(request.getName());
+        }
+        if (request.getPassword() != null) {
+            employee.setPassword(request.getPassword());
+        }
+        if (request.getManagerEmail() != null) {
+            employee.setManagerEmail(request.getManagerEmail());
+        }
+        if (request.getTag() != null) {
+            employee.setTag(request.getTag());
+        }
 
-        employeeRepository.save(e);
+        return employeeRepository.save(employee);
     }
 
 
     @GetMapping("/employeeInfo")
     public Employee getEmployeeInfo(@RequestParam String email) {
-        try {
-            Employee e = employeeRepository.findByEmail(email);
+        return findEmployeeByEmail(email);
+    }
 
-            if (e == null) {
-                throw new RuntimeException();
-            }
-            return e;
-        } catch (Exception ex) {
-            throw new RuntimeException();
+    @GetMapping("/profile")
+    public Employee getProfile(@RequestParam String email) {
+        return findEmployeeByEmail(email);
+    }
+
+    @PutMapping("/profile")
+    public Employee updateProfile(@RequestBody UpdateInfoRequest request) {
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required.");
         }
+
+        Employee employee = employeeRepository.findByEmail(request.getEmail());
+        if (employee == null) {
+            employee = new Employee(request.getEmail().trim(), "");
+            employee.setTag(defaultTagForRole(request.getRole()));
+            employee.setActive(true);
+        }
+
+        if (employee.getTag() == null) {
+            employee.setTag(defaultTagForRole(request.getRole()));
+        }
+
+        applyProfileUpdates(employee, request);
+        return employeeRepository.save(employee);
     }
 
     @PostMapping("/createEmployee")
-    public void createEmployee (@RequestBody NewEmployeeRequest request){
-        Employee e = new Employee(
-            request.getEmail(),
-            request.getPassword(),
-            request.getManagerEmail(),
-            request.getTag()
-        );
+    public Employee createEmployee (@RequestBody NewEmployeeRequest request){
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required.");
+        }
 
-        employeeRepository.save(e);
+        if (employeeRepository.findByEmail(request.getEmail()) != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee already exists.");
+        }
+
+        Employee employee = new Employee(request.getEmail().trim(), request.getPassword() == null ? "" : request.getPassword());
+        employee.setActive(true);
+        employee.setName(request.getName());
+        employee.setManagerEmail(request.getManagerEmail());
+        employee.setTag(request.getTag() == null ? TAG.EMPLOYEE : request.getTag());
+
+        return employeeRepository.save(employee);
+    }
+
+    private Employee findEmployeeByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required.");
+        }
+
+        Employee employee = employeeRepository.findByEmail(email);
+        if (employee == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found.");
+        }
+        return employee;
+    }
+
+    private void applyProfileUpdates(Employee employee, UpdateInfoRequest request) {
+        if (request.getName() != null) {
+            employee.setName(request.getName().trim());
+        }
+        if (request.getSurname() != null) {
+            employee.setSurname(request.getSurname().trim());
+        }
+        if (request.getAddress() != null) {
+            employee.setAddress(request.getAddress().trim());
+        }
+        if (request.getPhoneNumber() != null) {
+            employee.setPhoneNumber(request.getPhoneNumber().trim());
+        }
+        if (request.getEmergencyContactName() != null) {
+            employee.setEmergencyContact(request.getEmergencyContactName().trim());
+        }
+        if (request.getEmergencyContactNumber() != null) {
+            employee.setEmergencyContactNumber(request.getEmergencyContactNumber().trim());
+        }
+        if (request.getProfilePicture() != null) {
+            employee.setProfilePicture(request.getProfilePicture().trim());
+        }
+    }
+
+    private TAG defaultTagForRole(String role) {
+        if (role == null) {
+            return TAG.EMPLOYEE;
+        }
+
+        return switch (role.trim().toLowerCase()) {
+            case "manager" -> TAG.MANAGER;
+            case "ittech" -> TAG.IT;
+            case "hr" -> TAG.HR;
+            case "admin" -> TAG.ADMIN;
+            case "consultant" -> TAG.BENCH;
+            default -> TAG.EMPLOYEE;
+        };
     }
 }

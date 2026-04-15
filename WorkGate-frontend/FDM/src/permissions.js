@@ -15,6 +15,7 @@
 const EMPLOYEE_BASE = [
   'dashboard',
   'profile',
+  'settings',
   'tasks',
   'leave',
   'expenses',
@@ -49,9 +50,6 @@ export const ROLE_PERMISSIONS = {
     'unlock-accounts', // included in IT management page
   ],
   admin: [
-    'dashboard',
-    'profile',
-    'news',
     'admin-dashboard',
     'manage-employees',
     'add-employee',

@@ -5,11 +5,17 @@ async function request(path, options = {}) {
     headers: { 'Content-Type': 'application/json', ...options.headers },
     ...options,
   });
+  const text = await res.text();
   if (!res.ok) {
-    const text = await res.text();
     throw new Error(text || `Request failed: ${res.status}`);
   }
-  return res.json();
+  if (!text) return null;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -25,6 +31,17 @@ export function loginUser(username, password) {
 
 export function fetchEmployees() {
   return request('/employees');
+}
+
+export function fetchEmployeeProfile(email) {
+  return request(`/employees/profile?email=${encodeURIComponent(email)}`);
+}
+
+export function updateEmployeeProfile(profile) {
+  return request('/employees/profile', {
+    method: 'PUT',
+    body: JSON.stringify(profile),
+  });
 }
 
 // ── Tasks ─────────────────────────────────────────────────────────────────────

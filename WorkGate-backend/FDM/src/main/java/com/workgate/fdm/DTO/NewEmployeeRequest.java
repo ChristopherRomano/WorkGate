@@ -1,6 +1,6 @@
 package com.workgate.fdm.DTO;
 
-import com.workgate.fdm.model.TAG;;
+import com.workgate.fdm.model.TAG;
 
 public class NewEmployeeRequest {
     private String email;
@@ -9,7 +9,7 @@ public class NewEmployeeRequest {
     private String password;
     private TAG tag;
 
-    private NewEmployeeRequest(){}
+    public NewEmployeeRequest(){}
 
     public String getEmail() { return email;}
     public String getName() { return name;}
@@ -18,6 +18,8 @@ public class NewEmployeeRequest {
     public TAG getTag() { return tag; }
 
     public void setEmail(String email) { this.email = email; }
-    public void setManagerName(String managerEmail) { this.managerEmail = managerEmail; }
+    public void setManagerEmail(String managerEmail) { this.managerEmail = managerEmail; }
+    public void setName(String name) { this.name = name; }
+    public void setPassword(String password) { this.password = password; }
     public void setTag(TAG tag) { this.tag = tag; }
 }
