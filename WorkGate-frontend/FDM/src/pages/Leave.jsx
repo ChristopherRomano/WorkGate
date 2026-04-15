@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { leaveRequests as initial, currentUser } from '../data/mockData';
 import Modal from '../components/Modal';
 import '../styles/components.css';
+import { useAuth } from '../context/AuthContext';
 import styles from './Leave.module.css';
+
 
 export default function Leave() {
   const { currentUser } = useAuth();

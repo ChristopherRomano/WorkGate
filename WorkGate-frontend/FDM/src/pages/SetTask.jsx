@@ -4,6 +4,7 @@ import { fetchEmployees, assignTask } from '../api/api';
 import '../styles/components.css';
 import styles from './SetTask.module.css';
 
+
 const EMPTY_FORM = { title: '', priority: 'medium', type: 'Operational', due: '', description: '' };
 
 export default function SetTask() {
@@ -36,7 +37,7 @@ export default function SetTask() {
   const createRequest = async (title,priority,content,category) => {
   
       const request = {
-          employeeName: "john",
+          employeeName: currentUser?.username ,
           description : content,
           title: title,
           priority: priority.toUpperCase(),

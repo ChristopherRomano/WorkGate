@@ -3,6 +3,7 @@ import { expenses as initial } from '../data/mockData';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './Expenses.module.css';
+import { useAuth } from '../context/AuthContext';
 
 const ICONS = { Train: '🚂', Hotel: '🏨', Lunch: '🍽', Taxi: '🚕', Flight: '✈️', Other: '📎' };
 const MAX_RECEIPT_SIZE = 10 * 1024 * 1024;
