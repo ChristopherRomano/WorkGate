@@ -1,8 +1,6 @@
 package com.workgate.fdm.model;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @DiscriminatorValue("EMPLOYEE")
@@ -19,14 +17,6 @@ public class Employee extends User {
 	private int annualLeaveBalance;
 	private String surname;
 
-	@ElementCollection
-	@CollectionTable(name = "employee_skills", joinColumns = @JoinColumn(name = "employee_id"))
-	@Column(name = "skill")
-	private List<String> keySkills = new ArrayList<>();
-
-	private String activeClientCode;
-	
-	
 	public Employee(String email, String managerEmail, String password, TAG tag) {
 		super(email, password);
 		this.address = "";
@@ -40,10 +30,9 @@ public class Employee extends User {
 		this.tag = tag;
 	}
 
-	public Employee(){
+	public Employee() {
 		super();
 	}
-
 
 	public Employee(String email, String password) {
 		super(email, password);
@@ -57,31 +46,26 @@ public class Employee extends User {
 		this.annualLeaveBalance = 10;
 	}
 
+	public void setTag(TAG tag)                                  { this.tag = tag; }
+	public void setManagerEmail(String managerEmail)             { this.managerEmail = managerEmail; }
+	public void setAddress(String address)                       { this.address = address; }
+	public void setPhoneNum(String phoneNum)                     { this.phoneNumber = phoneNum; }
+	public void setPhoneNumber(String phoneNumber)               { this.phoneNumber = phoneNumber; }
+	public void setEmergencyContact(String contact)              { this.emergencyContact = contact; }
+	public void setEmergencyContactNumber(String contact)        { this.emergencyContactNumber = contact; }
+	public void setProfilePic(String image)                      { this.profilePicture = image; }
+	public void setProfilePicture(String profilePicture)         { this.profilePicture = profilePicture; }
+	public void setAnnualLeaveBalance(int balance)               { this.annualLeaveBalance = balance; }
+	public void setSurname(String surname)                       { this.surname = surname; }
 
-	public void setTag(TAG tag) { this.tag = tag; }
-	public void setManagerEmail(String managerEmail) { this.managerEmail = managerEmail; }
-	public void setAddress(String address)                  { this.address = address; }
-	public void setPhoneNum(String phoneNum)                { this.phoneNumber = phoneNum; }
-	public void setPhoneNumber(String phoneNumber)          { this.phoneNumber = phoneNumber; }
-	public void setEmergencyContact(String contact)         { this.emergencyContact = contact; }
-	public void setEmergencyContactNumber(String contact)   { this.emergencyContactNumber = contact; }
-	public void setProfilePic(String image)                 { this.profilePicture = image; }
-	public void setProfilePicture(String profilePicture)    { this.profilePicture = profilePicture; }
-	public void setAnnualLeaveBalance(int balance)          { this.annualLeaveBalance = balance; }
-	public void setSurname(String surname)                  { this.surname = surname; }
-
-	public TAG getTag()                     { return this.tag; }
-	public int getAnnualLeaveBalance()      { return this.annualLeaveBalance; }
-	public String getAddress()              { return this.address; }
-	public String getPhoneNumber()          { return this.phoneNumber; }
-	public String getEmergencyContact()     { return this.emergencyContact; }
+	public TAG getTag()                       { return this.tag; }
+	public int getAnnualLeaveBalance()        { return this.annualLeaveBalance; }
+	public String getAddress()                { return this.address; }
+	public String getPhoneNumber()            { return this.phoneNumber; }
+	public String getEmergencyContact()       { return this.emergencyContact; }
 	public String getEmergencyContactNumber() { return this.emergencyContactNumber; }
-	public String getProfilePicture()       { return this.profilePicture; }
-	public String getManagerEmail()         { return this.managerEmail; }
-	public String getSurname()              { return this.surname; }
-	public List<String> getKeySkills()      { return this.keySkills; }
-	public void setKeySkills(List<String> keySkills) { this.keySkills = keySkills != null ? keySkills : new ArrayList<>(); }
-	public String getActiveClientCode()     { return this.activeClientCode; }
-	public void setActiveClientCode(String code) { this.activeClientCode = code; }
+	public String getProfilePicture()         { return this.profilePicture; }
+	public String getManagerEmail()           { return this.managerEmail; }
+	public String getSurname()                { return this.surname; }
 
 }

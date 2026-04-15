@@ -42,6 +42,7 @@ function buildFormData(user) {
     emergencyContactName: user?.emergencyContact ?? '',
     emergencyContactNumber: user?.emergencyPhone ?? '',
     profilePicture: user?.profilePicture ?? '',
+    endDate: user?.projectEndDate ?? '',
   };
 }
 
@@ -80,6 +81,7 @@ function mapBackendProfileToUser(profile, currentUser, clientName) {
     skills: profile?.keySkills ?? currentUser?.skills ?? [],
     clientCode: profile?.activeClientCode ?? currentUser?.clientCode,
     clientName: clientName ?? currentUser?.clientName,
+    projectEndDate: profile?.endDate ?? currentUser?.projectEndDate,
   };
 }
 
@@ -181,6 +183,7 @@ export default function Profile() {
         emergencyContactName: formData.emergencyContactName.trim(),
         emergencyContactNumber: formData.emergencyContactNumber.trim(),
         profilePicture: formData.profilePicture.trim(),
+        endDate: isConsultant ? formData.endDate.trim() : undefined,
       });
 
       updateCurrentUser((previous) => mapBackendProfileToUser(savedProfile, previous));
@@ -420,6 +423,20 @@ export default function Profile() {
               onChange={(e) => setFormData({ ...formData, emergencyContactNumber: e.target.value })}
             />
           </div>
+          {isConsultant && (
+            <div className="form-group">
+              <label>Project End Date</label>
+              <input
+                className="field"
+                type="date"
+                value={formData.endDate}
+                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+              />
+              <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-dim)' }}>
+                Setting a future date marks you as Deployed. A past date moves you to Bench.
+              </div>
+            </div>
+          )}
           <div className="form-group">
             <label>Profile Photo URL</label>
             <input
