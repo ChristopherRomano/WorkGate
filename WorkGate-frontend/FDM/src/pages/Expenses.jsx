@@ -3,6 +3,7 @@ import { expenses as initial } from '../data/mockData';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './Expenses.module.css';
+import { useAuth } from '../context/AuthContext';
 
 const ICONS = { Train: '🚂', Hotel: '🏨', Lunch: '🍽', Taxi: '🚕', Flight: '✈️', Other: '📎' };
 const MAX_RECEIPT_SIZE = 10 * 1024 * 1024;
@@ -23,6 +24,7 @@ const getIcon = (desc) => {
 
 
 export default function Expenses() {
+  const { currentUser } = useAuth();
   const [items, setItems] = useState(initial);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ description: '', amount: '', currency: 'GBP (£)', date: '', project: 'CLIENT-003' });
@@ -46,7 +48,7 @@ export default function Expenses() {
     }
 
     const request = {
-      username: "john",
+      username: currentUser?.username ,
       creationTime: (new Date()).getTime(),
       reason: description,
       amount : parseFloat(amount),
