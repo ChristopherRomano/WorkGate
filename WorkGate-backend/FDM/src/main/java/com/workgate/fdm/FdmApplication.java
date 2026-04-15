@@ -7,12 +7,27 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @SpringBootApplication
 public class FdmApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FdmApplication.class, args);
+	}
+
+	@Bean
+	CommandLineRunner migrateConsultantDtype(JdbcTemplate jdbcTemplate) {
+		return args -> {
+			try {
+				jdbcTemplate.update(
+					"UPDATE user SET dtype = 'CONSULTANT' " +
+					"WHERE tag IN ('BENCH', 'DEPLOYED', 'TRAINEE') AND dtype = 'EMPLOYEE'"
+				);
+			} catch (Exception e) {
+				System.err.println("Consultant dtype migration skipped: " + e.getMessage());
+			}
+		};
 	}
 
 	@Bean

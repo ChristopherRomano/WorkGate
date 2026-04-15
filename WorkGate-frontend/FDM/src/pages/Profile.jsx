@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchEmployeeProfile, updateEmployeeProfile } from '../api/api';
+import { fetchEmployeeProfile, fetchClientCodes, updateEmployeeProfile, updateEmployeeSkills } from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Modal from '../components/Modal';
@@ -42,6 +42,7 @@ function buildFormData(user) {
     emergencyContactName: user?.emergencyContact ?? '',
     emergencyContactNumber: user?.emergencyPhone ?? '',
     profilePicture: user?.profilePicture ?? '',
+    endDate: user?.projectEndDate ?? '',
   };
 }
 
@@ -59,7 +60,7 @@ function deriveInitials(firstName, surname, fallback) {
   return letters || fallback || 'WG';
 }
 
-function mapBackendProfileToUser(profile, currentUser) {
+function mapBackendProfileToUser(profile, currentUser, clientName) {
   const existingName = splitDisplayName(currentUser);
   const firstName = profile?.name ?? existingName.firstName;
   const surname = profile?.surname ?? existingName.surname;
@@ -77,6 +78,10 @@ function mapBackendProfileToUser(profile, currentUser) {
     profilePicture: profile?.profilePicture ?? currentUser?.profilePicture ?? '',
     initials: deriveInitials(firstName, surname, currentUser?.initials),
     tag: profile?.tag ?? currentUser?.tag,
+    skills: profile?.keySkills ?? currentUser?.skills ?? [],
+    clientCode: profile?.activeClientCode ?? currentUser?.clientCode,
+    clientName: clientName ?? currentUser?.clientName,
+    projectEndDate: profile?.endDate ?? currentUser?.projectEndDate,
   };
 }
 
@@ -110,18 +115,23 @@ export default function Profile() {
     let cancelled = false;
     setProfileLoading(true);
 
-    fetchEmployeeProfile(currentUser.email)
-      .then((profile) => {
+    const isConsultantUser = currentUser?.role === 'consultant';
+
+    Promise.all([
+      fetchEmployeeProfile(currentUser.email),
+      isConsultantUser ? fetchClientCodes() : Promise.resolve([]),
+    ])
+      .then(([profile, codes]) => {
         if (cancelled || !profile) return;
-        updateCurrentUser((previous) => mapBackendProfileToUser(profile, previous));
+        const code = profile?.activeClientCode ?? currentUser?.clientCode;
+        const clientName = (codes ?? []).find((c) => c.code === code)?.client ?? currentUser?.clientName;
+        updateCurrentUser((previous) => mapBackendProfileToUser(profile, previous, clientName));
       })
       .catch(() => {
-        // Keep mock user data when the profile has not been persisted yet.
+        // Keep existing user data when the profile has not been persisted yet.
       })
       .finally(() => {
-        if (!cancelled) {
-          setProfileLoading(false);
-        }
+        if (!cancelled) setProfileLoading(false);
       });
 
     return () => {
@@ -129,13 +139,29 @@ export default function Profile() {
     };
   }, [currentUser?.email]);
 
-  const addSkill = () => {
+  const addSkill = async () => {
     const skill = selectedSkill === 'Other' ? customSkill.trim() : selectedSkill;
-    if (skill) {
-      setSkills((existingSkills) => [...existingSkills, skill]);
-      setSelectedSkill('');
-      setCustomSkill('');
-      setShowSkill(false);
+    if (!skill) return;
+    const newSkills = [...skills, skill];
+    setSkills(newSkills);
+    setSelectedSkill('');
+    setCustomSkill('');
+    setShowSkill(false);
+    try {
+      await updateEmployeeSkills(currentUser.email, newSkills);
+    } catch {
+      // revert on failure
+      setSkills(skills);
+    }
+  };
+
+  const removeSkill = async (index) => {
+    const newSkills = skills.filter((_, i) => i !== index);
+    setSkills(newSkills);
+    try {
+      await updateEmployeeSkills(currentUser.email, newSkills);
+    } catch {
+      setSkills(skills);
     }
   };
 
@@ -157,6 +183,7 @@ export default function Profile() {
         emergencyContactName: formData.emergencyContactName.trim(),
         emergencyContactNumber: formData.emergencyContactNumber.trim(),
         profilePicture: formData.profilePicture.trim(),
+        endDate: isConsultant ? formData.endDate.trim() : undefined,
       });
 
       updateCurrentUser((previous) => mapBackendProfileToUser(savedProfile, previous));
@@ -296,7 +323,7 @@ export default function Profile() {
                 {skills.map((skill, index) => (
                   <div key={index} className={styles.skillTag}>
                     {skill}
-                    <button onClick={() => setSkills((existingSkills) => existingSkills.filter((_, skillIndex) => skillIndex !== index))}>×</button>
+                    <button onClick={() => removeSkill(index)}>×</button>
                   </div>
                 ))}
                 {skills.length === 0 && (
@@ -396,6 +423,20 @@ export default function Profile() {
               onChange={(e) => setFormData({ ...formData, emergencyContactNumber: e.target.value })}
             />
           </div>
+          {isConsultant && (
+            <div className="form-group">
+              <label>Project End Date</label>
+              <input
+                className="field"
+                type="date"
+                value={formData.endDate}
+                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+              />
+              <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-dim)' }}>
+                Setting a future date marks you as Deployed. A past date moves you to Bench.
+              </div>
+            </div>
+          )}
           <div className="form-group">
             <label>Profile Photo URL</label>
             <input
