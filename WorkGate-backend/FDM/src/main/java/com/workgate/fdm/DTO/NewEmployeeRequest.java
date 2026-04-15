@@ -9,6 +9,7 @@ public class NewEmployeeRequest {
     private String surname;
     private String password;
     private TAG tag;
+    private String clientCode;
 
     public NewEmployeeRequest(){}
 
@@ -26,4 +27,6 @@ public class NewEmployeeRequest {
     public void setName(String name) { this.name = name; }
     public void setPassword(String password) { this.password = password; }
     public void setTag(TAG tag) { this.tag = tag; }
+    public String getClientCode() { return clientCode; }
+    public void setClientCode(String clientCode) { this.clientCode = clientCode; }
 }

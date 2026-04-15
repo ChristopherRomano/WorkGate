@@ -48,6 +48,13 @@ export function updateEmployeeProfile(profile) {
   });
 }
 
+export function updateEmployeeSkills(email, keySkills) {
+  return request('/employees/profile', {
+    method: 'PUT',
+    body: JSON.stringify({ email, keySkills }),
+  });
+}
+
 // ── Tasks ─────────────────────────────────────────────────────────────────────
 
 export function fetchMyTasks(email) {

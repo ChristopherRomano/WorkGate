@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { fetchEmployees, fetchManagers, updateEmployeeManager, deactivateEmployee, reactivateEmployee, deleteEmployee } from '../api/api';
+import { fetchEmployees, fetchManagers, fetchClientCodes, updateEmployeeProfile, updateEmployeeManager, deactivateEmployee, reactivateEmployee, deleteEmployee } from '../api/api';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './ManageEmployees.module.css';
@@ -101,6 +101,7 @@ function normaliseEmployee(person) {
     address: person?.address ?? '',
     emergencyContact: person?.emergencyContact ?? '',
     emergencyPhone: person?.emergencyContactNumber ?? '',
+    clientCode: person?.activeClientCode ?? '',
   };
 }
 
@@ -123,6 +124,9 @@ export default function ManageEmployees() {
   const [actionError, setActionError]           = useState('');
   const [managerDraft, setManagerDraft]         = useState('');
   const [savingManager, setSavingManager]       = useState(false);
+  const [clientCodes, setClientCodes]           = useState([]);
+  const [clientCodeDraft, setClientCodeDraft]   = useState('');
+  const [savingClientCode, setSavingClientCode] = useState(false);
 
   useEffect(() => {
     fetchEmployees()
@@ -139,7 +143,14 @@ export default function ManageEmployees() {
   }, []);
 
   useEffect(() => {
+    fetchClientCodes()
+      .then((data) => setClientCodes(data ?? []))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     setManagerDraft(viewTarget?.manager ?? '');
+    setClientCodeDraft(viewTarget?.clientCode ?? '');
   }, [viewTarget]);
 
   const managerDirectory = useMemo(
@@ -243,6 +254,22 @@ export default function ManageEmployees() {
       setActionError(e.message);
     } finally {
       setSavingManager(false);
+    }
+  };
+
+  const saveClientCode = async () => {
+    if (!viewTarget) return;
+    setActionError('');
+    setSavingClientCode(true);
+    try {
+      const updated = await updateEmployeeProfile({ email: viewTarget.email, clientCode: clientCodeDraft });
+      const updatedEmployee = { ...viewTarget, clientCode: updated?.activeClientCode ?? clientCodeDraft };
+      setPeople((prev) => prev.map((p) => p.email === updatedEmployee.email ? updatedEmployee : p));
+      setViewTarget(updatedEmployee);
+    } catch (e) {
+      setActionError(e.message);
+    } finally {
+      setSavingClientCode(false);
     }
   };
 
@@ -425,6 +452,24 @@ export default function ManageEmployees() {
                       ))}
                   </select>
                 </div>
+                {viewTarget.role === 'consultant' && (
+                  <div className="form-group" style={{ marginTop: 12 }}>
+                    <label>Client Code</label>
+                    <select
+                      className="field"
+                      value={clientCodeDraft}
+                      onChange={(e) => setClientCodeDraft(e.target.value)}
+                      disabled={savingClientCode}
+                    >
+                      <option value="">— None —</option>
+                      {clientCodes.map((cc) => (
+                        <option key={cc.code} value={cc.code}>
+                          {cc.code} — {cc.client}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
               <div className={styles.viewSection}>
                 <div className="section-title">Access</div>
@@ -432,7 +477,7 @@ export default function ManageEmployees() {
                 <div className={styles.viewRow}><span>Tag</span><span className={styles.mono}>{viewTarget.tag || '—'}</span></div>
               </div>
             </div>
-            <div className="modal-actions">
+            <div className={styles.viewActions}>
               <button
                 className="btn btn-primary"
                 onClick={saveManager}
@@ -440,6 +485,15 @@ export default function ManageEmployees() {
               >
                 {savingManager ? 'Saving…' : 'Save Manager'}
               </button>
+              {viewTarget.role === 'consultant' && (
+                <button
+                  className="btn btn-primary"
+                  onClick={saveClientCode}
+                  disabled={savingClientCode || clientCodeDraft === viewTarget.clientCode}
+                >
+                  {savingClientCode ? 'Saving…' : 'Save Client Code'}
+                </button>
+              )}
               {viewTarget.active
                 ? <button className={`btn btn-sm ${styles.deactivateBtn}`} onClick={() => { setViewTarget(null); setDeactivateTarget(viewTarget); }}>Deactivate</button>
                 : <button className={`btn btn-sm ${styles.reactivateBtn}`} onClick={() => { setViewTarget(null); handleReactivate(viewTarget); }}>Reactivate</button>
