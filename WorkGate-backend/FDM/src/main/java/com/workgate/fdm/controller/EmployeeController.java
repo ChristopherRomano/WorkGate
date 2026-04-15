@@ -1,6 +1,6 @@
 package com.workgate.fdm.controller;
 
-import com.workgate.fdm.model.*;
+import com.workgate.fdm.DTO.UpdateInfoRequest;
 import org.springframework.web.bind.annotation.*;
 import com.workgate.fdm.DTO.NewEmployeeRequest;
 import com.workgate.fdm.model.Employee;
@@ -8,7 +8,7 @@ import com.workgate.fdm.model.TAG;
 import com.workgate.fdm.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
