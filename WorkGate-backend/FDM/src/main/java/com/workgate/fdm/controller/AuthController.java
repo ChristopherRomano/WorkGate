@@ -1,7 +1,5 @@
 package com.workgate.fdm.controller;
 
-import java.io.Console;
-
 import com.workgate.fdm.DTO.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
