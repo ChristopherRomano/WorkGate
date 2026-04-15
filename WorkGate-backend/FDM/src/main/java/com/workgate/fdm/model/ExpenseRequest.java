@@ -20,6 +20,10 @@ public class ExpenseRequest extends ManagerRequest {
 		super();
 	}
 
+	public void setAmount(float amount) {
+		this.amount = amount;
+	}
+
 	public float getAmount() {
 		return this.amount;
 	}

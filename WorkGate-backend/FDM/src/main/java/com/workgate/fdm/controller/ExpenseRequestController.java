@@ -27,7 +27,7 @@ public class ExpenseRequestController {
     @PostMapping("/createExpense")
     public void createExpenseRequest(@RequestBody ExpenseRequestRequest request){
         ExpenseRequest expenseRequest = new ExpenseRequest();
-        expenseRequest.setAmmount(request.getAmount());
+        expenseRequest.setAmount(request.getAmount());
         request.getCurrency();
 
         return;
