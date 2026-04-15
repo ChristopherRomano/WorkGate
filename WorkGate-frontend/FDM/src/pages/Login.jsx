@@ -11,12 +11,12 @@ const QUICK_STATS = [
 ];
 
 const ACCOUNTS = [
-  { username: 'employee',   role: 'Employee' },
-  { username: 'consultant', role: 'Consultant' },
-  { username: 'manager',    role: 'Manager' },
-  { username: 'ittech',     role: 'IT Technician' },
-  { username: 'hr',         role: 'HR Rep' },
-  { username: 'admin',      role: 'Administrator' },
+  { username: 'employee',   role: 'Employee',      login: 'employee@workgate.com' },
+  { username: 'consultant', role: 'Consultant',    login: 'consultant@workgate.com' },
+  { username: 'manager',    role: 'Manager',       login: 'manager@workgate.com' },
+  { username: 'ittech',     role: 'IT Technician', login: 'ittech@workgate.com' },
+  { username: 'hr',         role: 'HR Rep',        login: 'hr@workgate.com' },
+  { username: 'admin',      role: 'Administrator', login: 'admin@workgate.com' },
 ];
 
 const ROLE_HOME = {
@@ -100,12 +100,13 @@ export default function Login() {
             </div>
 
             <div className={styles.demoBox}>
-              <div className={styles.demoLabel}>Demo accounts — password: <code className={styles.code}>pass</code></div>
+              <div className={styles.demoLabel}>Demo accounts (tap to auto-login)</div>
               <div className={styles.demoGrid}>
-                {ACCOUNTS.map(({ username: u, role }) => (
+                {ACCOUNTS.map(({ username: u, role, login }) => (
                   <button key={u} className={styles.demoBtn} onClick={() => quickLogin(u)}>
                     <span className={styles.demoRole}>{role}</span>
-                    <span className={styles.demoUser}>{u}</span>
+                    <span className={styles.demoUser}>{login}</span>
+                    <span className={styles.demoPass}>password: pass</span>
                   </button>
                 ))}
               </div>
