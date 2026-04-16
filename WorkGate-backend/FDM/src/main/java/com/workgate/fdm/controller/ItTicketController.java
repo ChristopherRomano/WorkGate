@@ -61,9 +61,6 @@ public class ItTicketController {
         ticket.setTitle(request.getTitle());
         ticket.setDescription(request.getDescription());
         ticket.setCategory(request.getCategory());
-        ticket.setCreationTime(request.getCreationTime());
-        ticket.setEmployeeEmail(request.getUsername());
-        ticket.updateStatus(STATUS.OPEN);
 
         itTicketRepository.save(ticket);
     }

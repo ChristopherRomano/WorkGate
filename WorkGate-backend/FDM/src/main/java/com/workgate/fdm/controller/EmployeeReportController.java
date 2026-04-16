@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import com.workgate.fdm.DTO.ClaimRequest;
 import com.workgate.fdm.DTO.EmployeeReportRequest;
 import com.workgate.fdm.model.EmployeeReport;
-import com.workgate.fdm.model.STATUS;
 
 @RestController
 @RequestMapping("/api")
@@ -34,9 +33,7 @@ public class EmployeeReportController{
         employeeReport.setContent(info.getContent());
         employeeReport.setAnonymous(info.getIsAnonymous());
         employeeReport.setTitle(info.getTitle());
-        employeeReport.setCreationTime(info.getCreationTime());
-        employeeReport.setEmployeeEmail(info.getUsername());
-        employeeReport.updateStatus(STATUS.OPEN);
+
         employeeReportRepository.save(employeeReport);
     }
 

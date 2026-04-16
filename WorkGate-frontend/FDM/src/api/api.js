@@ -145,6 +145,30 @@ export function unlockAccount(email) {
   return request(`/admin/employees/${encodeURIComponent(email)}/unlock`, { method: 'PUT' });
 }
 
+// ── Posts ─────────────────────────────────────────────────────────────────────
+
+export function fetchPosts() {
+  return request('/allPosts');
+}
+
+export function createPost({ title, content, pinned, visibility, authorUsername }) {
+  return request('/createPost', {
+    method: 'POST',
+    body: JSON.stringify({
+      title,
+      content,
+      pinned,
+      visibility: visibility.toUpperCase(),
+      authorUsername,
+      timePosted: Date.now(),
+    }),
+  });
+}
+
+export function deletePost(id) {
+  return request(`/posts/${id}`, { method: 'DELETE' });
+}
+
 // ── Client Codes ──────────────────────────────────────────────────────────────
 
 export function fetchClientCodes() {
@@ -162,16 +186,63 @@ export function removeClientCode(code) {
   return request(`/client-codes/${encodeURIComponent(code)}`, { method: 'DELETE' });
 }
 
+// ── Leave ────────────────────────────────────────────────────────────────────
+
+export function fetchLeaveRequests(username) {
+  return request(`/annualLeave?username=${encodeURIComponent(username)}`);
+}
+
+export function createLeaveRequest({ username, creationTime, startOfLeave, endOfLeave, reason }) {
+  const payload = JSON.stringify({ username, creationTime, startOfLeave, endOfLeave, reason });
+
+  return request('/annualLeave', {
+    method: 'POST',
+    body: payload,
+  }).catch((error) => {
+    if (String(error?.message ?? '').includes('404')) {
+      return request('/createAnnualLeave', {
+        method: 'POST',
+        body: payload,
+      });
+    }
+    throw error;
+  });
+}
+
+export function cancelLeaveRequest(requestId, username) {
+  return request(`/annualLeave/${requestId}?username=${encodeURIComponent(username)}`, {
+    method: 'DELETE',
+  });
+}
+
+export function fetchManagerLeaveRequests(managerEmail) {
+  return request(`/annualLeave/manager?managerEmail=${encodeURIComponent(managerEmail)}`);
+}
+
+export function approveLeaveRequest(requestId, managerEmail) {
+  return request(`/annualLeave/${requestId}/approve?managerEmail=${encodeURIComponent(managerEmail)}`, {
+    method: 'PUT',
+  });
+}
+
+export function rejectLeaveRequest(requestId, managerEmail) {
+  return request(`/annualLeave/${requestId}/reject?managerEmail=${encodeURIComponent(managerEmail)}`, {
+    method: 'PUT',
+  });
+}
+
 // ── Field mapping: backend Task → frontend task shape ─────────────────────────
 
 export function mapTask(t) {
   return {
-    id: t.taskId,
+    id: t.id ?? t.taskId,
     title: t.title,
     description: t.description ?? '',
     done: t.completion,
     priority: t.priority?.toLowerCase() ?? 'medium',
     due: t.dueDate ?? '',
-    type: t.category ?? 'Operational',
+    type: t.category
+      ? (t.category.charAt(0).toUpperCase() + t.category.slice(1).toLowerCase())
+      : 'Operational',
   };
 }

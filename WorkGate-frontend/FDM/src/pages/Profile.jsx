@@ -4,6 +4,7 @@ import { fetchEmployeeProfile, fetchClientCodes, updateEmployeeProfile, updateEm
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Modal from '../components/Modal';
+import jsPDF from 'jspdf';
 import '../styles/components.css';
 import styles from './Profile.module.css';
 
@@ -225,6 +226,113 @@ export default function Profile() {
     reader.readAsDataURL(file);
   };
 
+  // ── PDF Download ──────────────────────────────────────────────────────────
+  const downloadConsultantProfile = () => {
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 50;
+    const contentWidth = pageWidth - margin * 2;
+
+    // ── Header bar ──
+    doc.setFillColor(30, 64, 175); // FDM blue
+    doc.rect(0, 0, pageWidth, 80, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.text('FDM Group', margin, 35);
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Consultant Profile', margin, 55);
+
+    // ── Name ──
+    let y = 120;
+    doc.setTextColor(15, 23, 42);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.text(currentUser.name ?? '—', margin, y);
+
+    // ── Client code ──
+    y += 28;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 116, 139);
+    const clientLabel = `Client Code: ${currentUser.clientCode ?? '—'}${currentUser.clientName ? ` (${currentUser.clientName})` : ''}`;
+    doc.text(clientLabel, margin, y);
+
+    // ── Divider ──
+    y += 20;
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(1);
+    doc.line(margin, y, margin + contentWidth, y);
+
+    // ── Skills heading ──
+    y += 28;
+    doc.setTextColor(15, 23, 42);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.text('Key Skills', margin, y);
+
+    // ── Skills as pill-style tags ──
+    y += 18;
+    const skillsToRender = skills.length > 0 ? skills : [];
+
+    if (skillsToRender.length === 0) {
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(11);
+      doc.setTextColor(148, 163, 184);
+      doc.text('No skills added yet.', margin, y);
+    } else {
+      doc.setFontSize(10);
+      const pillPadX = 10;
+      const pillPadY = 6;
+      const pillHeight = 20;
+      const pillGapX = 8;
+      const pillGapY = 10;
+      let x = margin;
+
+      skillsToRender.forEach((skill) => {
+        const textWidth = doc.getTextWidth(skill);
+        const pillWidth = textWidth + pillPadX * 2;
+
+        // Wrap to next row if overflow
+        if (x + pillWidth > margin + contentWidth) {
+          x = margin;
+          y += pillHeight + pillGapY;
+        }
+
+        // Pill background
+        doc.setFillColor(239, 246, 255);
+        doc.setDrawColor(147, 197, 253);
+        doc.roundedRect(x, y - pillPadY - 2, pillWidth, pillHeight, 4, 4, 'FD');
+
+        // Pill text
+        doc.setTextColor(30, 64, 175);
+        doc.setFont('helvetica', 'normal');
+        doc.text(skill, x + pillPadX, y + 4);
+
+        x += pillWidth + pillGapX;
+      });
+    }
+
+    // ── Footer ──
+    const pageHeight = doc.internal.pageSize.getHeight();
+    doc.setDrawColor(226, 232, 240);
+    doc.line(margin, pageHeight - 40, margin + contentWidth, pageHeight - 40);
+    doc.setFontSize(9);
+    doc.setTextColor(148, 163, 184);
+    doc.setFont('helvetica', 'normal');
+    const generated = `Generated ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+    doc.text('FDM Group — Confidential', margin, pageHeight - 24);
+    doc.text(generated, margin + contentWidth, pageHeight - 24, { align: 'right' });
+
+    const safeName = (currentUser.name ?? 'consultant').replace(/\s+/g, '_');
+    doc.save(`${safeName}_FDM_Profile.pdf`);
+  };
+  // ─────────────────────────────────────────────────────────────────────────
+
   if (!currentUser) return null;
 
   const detailRows = [
@@ -285,7 +393,7 @@ export default function Profile() {
         </div>
         <div className={styles.profileActions}>
           {isConsultant && (
-            <button className="btn btn-primary">↓ Download FDM Profile</button>
+            <button className="btn btn-primary" onClick={downloadConsultantProfile}>↓ Download FDM Profile</button>
           )}
         </div>
       </div>

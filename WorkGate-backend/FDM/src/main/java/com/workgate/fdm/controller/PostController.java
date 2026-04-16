@@ -1,14 +1,20 @@
 package com.workgate.fdm.controller;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.workgate.fdm.DTO.PostRequest;
 import com.workgate.fdm.model.Post;
 import com.workgate.fdm.model.TAG;
-
-import java.util.List;
-
-import org.springframework.web.bind.annotation.*;
-
 import com.workgate.fdm.repository.PostRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api")
@@ -32,8 +38,7 @@ public class PostController {
 
 
     @PostMapping("/createPost")
-    public void createPost(@RequestBody PostRequest request){
-
+    public Post createPost(@RequestBody PostRequest request){
         Post post = new Post(
             request.getTitle(),
             request.getContent(),
@@ -41,12 +46,13 @@ public class PostController {
             request.getVisibility(),
             request.getTimePosted(),
             request.getAuthorUsername()
-
         );
+        return postRepository.save(post);
+    }
 
-        postRepository.save(post);
-
-        System.out.println("Post saved: " + request.getTitle());
+    @DeleteMapping("/posts/{id}")
+    public void deletePost(@PathVariable Long id) {
+        postRepository.deleteById(id);
     }
 
 }
