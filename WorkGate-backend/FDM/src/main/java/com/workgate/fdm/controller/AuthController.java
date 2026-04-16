@@ -19,11 +19,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public LoginResponse loginAuthenication(@RequestBody LoginRequest request) {
+
         LoginResponse response = new LoginResponse();
         response.setUsername(request.getUsername());
-        response.setTag(TAG.HR);
+        response.setTag(TAG.IT);
         return response;
-
 
         // try {
         //     Employee e = employeeRepository.findByEmail(request.getUsername());

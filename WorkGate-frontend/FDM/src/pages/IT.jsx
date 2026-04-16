@@ -96,6 +96,7 @@ export default function IT() {
     }
   };
 
+
   const submit = async () => {
     if (!form.title.trim()) return;
     setSubmitError('');

@@ -60,6 +60,8 @@ export default function LeaveApproval() {
   fetchLeaveRequests();
 }, [currentUser]);
 
+  
+
   const approve = (id) =>
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved', comment: '' } : r));
 

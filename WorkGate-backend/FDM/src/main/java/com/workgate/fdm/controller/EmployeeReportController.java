@@ -7,6 +7,7 @@ import com.workgate.fdm.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.workgate.fdm.DTO.ClaimRequest;
 import com.workgate.fdm.DTO.EmployeeReportRequest;
 import com.workgate.fdm.model.EmployeeReport;
 import com.workgate.fdm.model.STATUS;
@@ -39,10 +40,25 @@ public class EmployeeReportController{
         employeeReportRepository.save(employeeReport);
     }
 
-    @GetMapping("/claimEmployeeReport")
-    public void claimEmployeeReport(@RequestParam String email, int id) {
-        EmployeeReport report = employeeReportRepository.findById(id);
-        report.setEmployeeEmail(email);
+    @RequestMapping("/claimEmployeeReport")
+    public void claimEmployeeReport(@RequestBody ClaimRequest request) {
+        EmployeeReport report = employeeReportRepository.findById(request.getId())
+            .orElseThrow(() -> new RuntimeException("Report not found"));
+        report.setEmployeeEmail(request.getEmail());
+
+        report.updateStatus(STATUS.IN_PROGRESS);
+
+        employeeReportRepository.save(report);
+    }
+
+    @RequestMapping("/resolveEmployeeReport")
+    public void resolveEmployeeReport(@RequestBody Long id) {
+        EmployeeReport report = employeeReportRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        report.updateStatus(STATUS.RESOLVED);
+
+        employeeReportRepository.save(report);
     }
 
 }
