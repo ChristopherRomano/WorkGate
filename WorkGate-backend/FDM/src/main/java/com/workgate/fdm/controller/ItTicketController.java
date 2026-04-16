@@ -1,7 +1,7 @@
 package com.workgate.fdm.controller;
 
 import com.workgate.fdm.DTO.ItTicketRequest;
-import com.workgate.fdm.DTO.ClaimRequest;
+import com.workgate.fdm.DTO.ItTicketUpdateRequest;
 import com.workgate.fdm.model.ItTicket;
 import com.workgate.fdm.model.STATUS;
 import com.workgate.fdm.repository.ItTicketRequestRepository;
@@ -27,21 +27,20 @@ public class ItTicketController {
     }
 
     // CLAIM TICKET
-    @PostMapping("/claimItTicket")
-    public void claimTicket(@RequestBody ClaimRequest request) {
+    @RequestMapping("/claimItTicket")
+    public void claimTicket(@RequestBody ItTicketUpdateRequest request) {
 
         ItTicket ticket = itTicketRepository.findById(request.getId())
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
 
-        ticket.setClaimedByEmail(request.getEmail());
-        ticket.updateStatus(STATUS.IN_PROGRESS);
+        ticket.setClaimedByEmail(request.getClaimByEmail());
 
         itTicketRepository.save(ticket);
     }
 
     // RESOLVE TICKET
-    @RequestMapping("/resolveItTicket")
+    @PostMapping("/resolveItTicket")
     public void resolveTicket(@RequestParam long id) {
 
         ItTicket ticket = itTicketRepository.findById(id)

@@ -15,33 +15,8 @@ export default function HRManagement() {
   const filtered = filter === 'all' ? reports : reports.filter(r => r.status === filter);
   const pending = reports.filter(r => r.status === 'pending').length;
 
-  const claimRequest = async (id) => {
-
-    const request = {
-      id: id,
-      email: currentUser?.employee,
-    };
-
-    try {
-      const response = await fetch("http://localhost:8080/api//claimEmployeeReport", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(request)
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create ticket");
-      }
-    } 
-    catch (error) {
-        console.error(error);
-    }
-  };
-
-
   const claim = (id) =>
-    createRequest(id)
+    setReports(prev => prev.map(r => r.id === id ? { ...r, claimedBy: currentUser.name, status: 'inprogress' } : r));
 
   const openClose = (r) => { setSelected(r); setCloseComment(''); };
 

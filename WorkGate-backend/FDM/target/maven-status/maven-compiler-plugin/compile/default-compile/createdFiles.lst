@@ -5,6 +5,7 @@ com\workgate\fdm\repository\ClientCodeRepository.class
 com\workgate\fdm\model\TAG.class
 com\workgate\fdm\model\STATUS.class
 com\workgate\fdm\model\User.class
+com\workgate\fdm\DTO\ItTicketUpdateRequest.class
 com\workgate\fdm\model\Employee.class
 com\workgate\fdm\DTO\LoginResponse.class
 com\workgate\fdm\model\ItTicket.class
