@@ -64,8 +64,8 @@ public class AnnualLeaveRequest extends ManagerRequest {
 		this.reason = reason;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setAssignedManager(String assignedManager) {
+		this.assignedManager = assignedManager;
 	}
 
 }

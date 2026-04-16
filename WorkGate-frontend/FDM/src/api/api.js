@@ -186,6 +186,51 @@ export function removeClientCode(code) {
   return request(`/client-codes/${encodeURIComponent(code)}`, { method: 'DELETE' });
 }
 
+// ── Leave ────────────────────────────────────────────────────────────────────
+
+export function fetchLeaveRequests(username) {
+  return request(`/annualLeave?username=${encodeURIComponent(username)}`);
+}
+
+export function createLeaveRequest({ username, creationTime, startOfLeave, endOfLeave, reason }) {
+  const payload = JSON.stringify({ username, creationTime, startOfLeave, endOfLeave, reason });
+
+  return request('/annualLeave', {
+    method: 'POST',
+    body: payload,
+  }).catch((error) => {
+    if (String(error?.message ?? '').includes('404')) {
+      return request('/createAnnualLeave', {
+        method: 'POST',
+        body: payload,
+      });
+    }
+    throw error;
+  });
+}
+
+export function cancelLeaveRequest(requestId, username) {
+  return request(`/annualLeave/${requestId}?username=${encodeURIComponent(username)}`, {
+    method: 'DELETE',
+  });
+}
+
+export function fetchManagerLeaveRequests(managerEmail) {
+  return request(`/annualLeave/manager?managerEmail=${encodeURIComponent(managerEmail)}`);
+}
+
+export function approveLeaveRequest(requestId, managerEmail) {
+  return request(`/annualLeave/${requestId}/approve?managerEmail=${encodeURIComponent(managerEmail)}`, {
+    method: 'PUT',
+  });
+}
+
+export function rejectLeaveRequest(requestId, managerEmail) {
+  return request(`/annualLeave/${requestId}/reject?managerEmail=${encodeURIComponent(managerEmail)}`, {
+    method: 'PUT',
+  });
+}
+
 // ── Field mapping: backend Task → frontend task shape ─────────────────────────
 
 export function mapTask(t) {
