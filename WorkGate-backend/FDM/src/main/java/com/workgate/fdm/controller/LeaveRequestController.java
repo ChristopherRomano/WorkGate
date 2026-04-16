@@ -8,6 +8,7 @@ import java.time.ZoneId;
 
 import com.workgate.fdm.DTO.LeaveRequestRequest;
 import com.workgate.fdm.model.Employee;
+import com.workgate.fdm.model.STATUS;
 import com.workgate.fdm.repository.EmployeeRepository;
 import com.workgate.fdm.repository.LeaveRequestRepository;
 import org.springframework.http.HttpStatus;

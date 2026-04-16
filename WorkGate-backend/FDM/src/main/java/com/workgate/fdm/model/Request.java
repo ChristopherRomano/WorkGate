@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "dtype")
 
 public abstract class Request {
 

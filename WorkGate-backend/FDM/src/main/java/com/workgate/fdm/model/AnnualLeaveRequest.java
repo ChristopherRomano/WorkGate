@@ -1,8 +1,10 @@
 package com.workgate.fdm.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.DiscriminatorValue;
 
 @Entity
+@DiscriminatorValue("ANNUAL_LEAVE_REQUEST")
 public class AnnualLeaveRequest extends ManagerRequest {
 
 	private long startOfLeave;

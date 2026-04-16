@@ -1,8 +1,10 @@
 package com.workgate.fdm.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.DiscriminatorValue;
 
 @Entity
+@DiscriminatorValue("EXPENSE_REQUEST")
 public class ExpenseRequest extends ManagerRequest {
 
 	private float amount;
