@@ -1,106 +1,268 @@
-//Expense
-
-import { useState, useMemo, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { fetchEmployees, fetchManagerExpenseRequests, resolveExpenseRequest } from '../api/api';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './Expenses.module.css';
 import { useAuth } from '../context/AuthContext';
 
-const ICONS = { Train: '🚂', Hotel: '🏨', Lunch: '🍽', Taxi: '🚕', Flight: '✈️', Other: '📎' };
-const getIcon = (desc) => {
-  const key = Object.keys(ICONS).find(k => desc.toLowerCase().includes(k.toLowerCase()));
-  return ICONS[key] || '📎';
+const ICONS = {
+  Train: '\u{1F687}',
+  Hotel: '\u{1F3E8}',
+  Lunch: '\u{1F37D}',
+  Taxi: '\u{1F695}',
+  Flight: '\u2708\uFE0F',
+  Other: '\u{1F4CE}',
 };
 
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const CURRENCY_SYMBOLS = { USD: '$', GBP: '\u00A3', EUR: '\u20AC' };
+const DATE_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
 
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function getDaysInMonth(year, month) {
+  return new Date(year, month + 1, 0).getDate();
+}
 
-function getDaysInMonth(year, month) { return new Date(year, month + 1, 0).getDate(); }
-function getFirstDayOfWeek(year, month) { return (new Date(year, month, 1).getDay() + 6) % 7; }
+function getFirstDayOfWeek(year, month) {
+  return (new Date(year, month, 1).getDay() + 6) % 7;
+}
 
-const CURRENCY_SYMBOLS = { USD: '$', GBP: '£', EUR: '€' };
+function getIcon(description) {
+  const normalizedDescription = String(description ?? '');
+  const key = Object.keys(ICONS).find((label) => normalizedDescription.toLowerCase().includes(label.toLowerCase()));
+  return ICONS[key] || ICONS.Other;
+}
+
+function mapExpenseStatus(status) {
+  switch (String(status ?? '').toUpperCase()) {
+    case 'ACCEPTED':
+    case 'RESOLVED':
+      return 'approved';
+    case 'REJECTED':
+      return 'rejected';
+    case 'OPEN':
+    case 'IN_PROGRESS':
+    default:
+      return 'pending';
+  }
+}
+
+function formatCalendarDate(timestamp) {
+  const numericTimestamp = Number(timestamp);
+  if (!Number.isFinite(numericTimestamp)) {
+    return '';
+  }
+
+  const parsed = new Date(numericTimestamp);
+  if (Number.isNaN(parsed.getTime())) {
+    return '';
+  }
+
+  return DATE_FORMATTER.format(parsed);
+}
+
+function buildInitials(name, fallback = 'U') {
+  const parts = String(name ?? '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) {
+    return fallback;
+  }
+
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
+}
+
+function getEmployeeDisplay(employee) {
+  const name = employee?.name?.trim() ?? '';
+  const surname = employee?.surname?.trim() ?? '';
+  const fullName = [name, surname].filter(Boolean).join(' ').trim();
+
+  if (fullName) {
+    return fullName;
+  }
+
+  if (name) {
+    return name;
+  }
+
+  return employee?.email ?? 'Unknown';
+}
+
+function formatAmount(amount, currency) {
+  const symbol = CURRENCY_SYMBOLS[currency] ?? `${currency ?? ''} `;
+  return `${symbol}${(Number(amount) || 0).toFixed(2)}`;
+}
+
+function formatPendingTotal(expenses) {
+  const totalsByCurrency = expenses.reduce((totals, expense) => {
+    const currency = expense.currency || 'GBP';
+    totals[currency] = (totals[currency] ?? 0) + expense.amountValue;
+    return totals;
+  }, {});
+
+  const currencies = Object.keys(totalsByCurrency);
+  if (!currencies.length) {
+    return formatAmount(0, 'GBP');
+  }
+
+  return currencies
+    .sort((left, right) => left.localeCompare(right))
+    .map((currency) => formatAmount(totalsByCurrency[currency], currency))
+    .join(' / ');
+}
+
+function mapExpenseRequest(item, employeeDirectory) {
+  const employeeEmail = item?.employeeEmail ?? item?.employeeemail ?? item?.email ?? '';
+  const employee = employeeDirectory.get(employeeEmail.toLowerCase());
+  const employeeName = employee ? getEmployeeDisplay(employee) : (employeeEmail || 'Unknown');
+  const initials = employee?.initials ?? buildInitials(employeeName);
+  const amountValue = Number(item?.amount) || 0;
+  const currency = item?.currency ?? 'GBP';
+
+  return {
+    id: item?.id ?? `expense-${employeeEmail}-${item?.creationTime ?? Date.now()}`,
+    employee: employeeName,
+    employeeEmail,
+    initials,
+    description: item?.reason ?? 'Expense',
+    date: formatCalendarDate(item?.creationTime),
+    project: employee?.activeClientCode ?? employee?.clientCode ?? '\u2014',
+    amount: formatAmount(amountValue, currency),
+    amountValue,
+    currency,
+    status: mapExpenseStatus(item?.status),
+    comment: '',
+  };
+}
 
 export default function ExpenseApproval() {
   const { currentUser } = useAuth();
+  const managerEmail = currentUser?.email ?? '';
+
   const [teamItems, setTeamItems] = useState([]);
-  const [calDate, setCalDate]     = useState(new Date(2026, 3));
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [calDate, setCalDate] = useState(new Date(2026, 3));
   const [selectedDay, setSelectedDay] = useState(null);
   const [reviewTarget, setReviewTarget] = useState(null);
   const [rejectComment, setRejectComment] = useState('');
   const [teamFilter, setTeamFilter] = useState('pending');
-
-  const fetchExpenseRequests = async () => {
-  try {
-    const response = await fetch(
-      `http://localhost:8080/api/expenses?username=${currentUser.name}`
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch expense requests");
-    }
-
-    const data = await response.json();
-
-    console.log(data);
-
-    const formatted = data.map((item, index) => {
-      const dateObj = new Date(item.creationTime);
-      const dateStr = dateObj.toISOString().split('T')[0];
-
-      const name = item.username ?? item.name ?? "Unknown";
-
-      const initials = name
-        .split(" ")
-        .map(p => p[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2);
-
-      const symbol = CURRENCY_SYMBOLS[item.currency] ?? "";
-
-      return {
-        id: index,
-
-        employee: name,
-        initials,
-
-        description: item.reason ?? "Expense",
-        date: dateStr,
-
-        project: item.project ?? item.manager ?? "—",
-
-        amount: `${symbol}${parseFloat(item.amount || 0).toFixed(2)}`,
-
-        status: "pending",
-        comment: ""
-      };
-    });
-
-    setTeamItems(formatted);
-
-  } catch (error) {
-    console.error(error);
-  }
-  };
+  const [actionError, setActionError] = useState('');
+  const [resolvingId, setResolvingId] = useState(null);
+  const [actionType, setActionType] = useState('');
 
   useEffect(() => {
-    fetchExpenseRequests();
-  }, [currentUser]);
-  
+    let ignore = false;
 
-  const approveTeam = (id) => setTeamItems(prev => prev.map(e => e.id === id ? { ...e, status: 'approved' } : e));
+    async function loadManagerExpenses() {
+      if (!managerEmail) {
+        setTeamItems([]);
+        setLoadError('');
+        return;
+      }
 
-  const openReview = (expense) => { setReviewTarget(expense); setRejectComment(''); };
+      setLoading(true);
+      setLoadError('');
 
-  const confirmReject = () => {
-    if (!rejectComment.trim()) return;
-    setTeamItems(prev => prev.map(e => e.id === reviewTarget.id ? { ...e, status: 'rejected', comment: rejectComment.trim() } : e));
-    setReviewTarget(null);
+      try {
+        const [employees, expenseRequests] = await Promise.all([
+          fetchEmployees(),
+          fetchManagerExpenseRequests(managerEmail),
+        ]);
+
+        if (ignore) {
+          return;
+        }
+
+        const employeeDirectory = new Map(
+          (Array.isArray(employees) ? employees : []).map((employee) => [
+            String(employee?.email ?? '').toLowerCase(),
+            employee,
+          ]),
+        );
+
+        const formattedExpenses = Array.isArray(expenseRequests)
+          ? expenseRequests
+              .map((item) => mapExpenseRequest(item, employeeDirectory))
+              .sort((left, right) => right.date.localeCompare(left.date))
+          : [];
+
+        setTeamItems(formattedExpenses);
+      } catch (error) {
+        console.error(error);
+        if (!ignore) {
+          setTeamItems([]);
+          setLoadError('Unable to load expense requests for your team right now.');
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadManagerExpenses();
+
+    return () => {
+      ignore = true;
+    };
+  }, [managerEmail]);
+
+  const openReview = (expense) => {
+    setReviewTarget(expense);
     setRejectComment('');
   };
 
-  const teamPending = teamItems.filter(e => e.status === 'pending');
-  const teamPendingTotal = teamPending.reduce((sum, e) => sum + parseFloat(e.amount.replace(/[^0-9.]/g, '')), 0);
+  const confirmReject = () => {
+    if (!rejectComment.trim() || !reviewTarget) {
+      return;
+    }
+
+    resolveTeamExpense(reviewTarget, {
+      nextStatus: 'rejected',
+      payload: {
+        id: reviewTarget.id,
+        reason: rejectComment.trim(),
+      },
+      errorMessage: 'Unable to reject this expense request right now.',
+    });
+  };
+
+  const resolveTeamExpense = async (expense, { nextStatus, payload, errorMessage }) => {
+    setResolvingId(expense.id);
+    setActionType(nextStatus);
+    setActionError('');
+
+    try {
+      await resolveExpenseRequest(payload);
+
+      setTeamItems((previous) => previous.map((item) => (
+        item.id === expense.id
+          ? {
+              ...item,
+              status: nextStatus,
+              comment: nextStatus === 'rejected' ? rejectComment.trim() : item.comment,
+            }
+          : item
+      )));
+      setReviewTarget(null);
+      setRejectComment('');
+    } catch (error) {
+      console.error(error);
+      setActionError(errorMessage);
+    } finally {
+      setResolvingId(null);
+      setActionType('');
+    }
+  };
+
+  const teamPending = teamItems.filter((expense) => expense.status === 'pending');
+  const teamPendingTotal = formatPendingTotal(teamPending);
 
   const year = calDate.getFullYear();
   const month = calDate.getMonth();
@@ -109,28 +271,38 @@ export default function ExpenseApproval() {
 
   const expensesByDay = useMemo(() => {
     const map = {};
-    teamItems.forEach(e => {
-      if (!map[e.date]) map[e.date] = [];
-      map[e.date].push(e.status);
+    teamItems.forEach((expense) => {
+      if (!expense.date) {
+        return;
+      }
+
+      if (!map[expense.date]) {
+        map[expense.date] = [];
+      }
+
+      map[expense.date].push(expense.status);
     });
     return map;
   }, [teamItems]);
 
   const filteredTeam = useMemo(() => {
     let list = teamItems;
-    if (selectedDay) list = list.filter(e => e.date === selectedDay);
-    if (teamFilter !== 'all') list = list.filter(e => e.status === teamFilter);
+    if (selectedDay) {
+      list = list.filter((expense) => expense.date === selectedDay);
+    }
+    if (teamFilter !== 'all') {
+      list = list.filter((expense) => expense.status === teamFilter);
+    }
     return list;
   }, [teamItems, selectedDay, teamFilter]);
 
   return (
     <div className="animate-fade">
-      {/* Stats */}
       <div className={styles.statsGrid}>
         {[
-          { icon: '⏳', val: teamPending.length,                                    label: 'Awaiting approval' },
-          { icon: '💰', val: `£${teamPendingTotal.toFixed(2)}`,                     label: 'Pending total', highlight: true },
-          { icon: '✅', val: teamItems.filter(e => e.status === 'approved').length, label: 'Approved' },
+          { icon: '\u23F3', val: teamPending.length, label: 'Awaiting approval' },
+          { icon: '\u{1F4B0}', val: teamPendingTotal, label: 'Pending total', highlight: true },
+          { icon: '\u2705', val: teamItems.filter((expense) => expense.status === 'approved').length, label: 'Approved' },
         ].map(({ icon, val, label, highlight }) => (
           <div key={label} className={`${styles.statCard} ${highlight ? styles.highlight : ''}`}>
             <div className={styles.statIcon}>{icon}</div>
@@ -140,12 +312,11 @@ export default function ExpenseApproval() {
         ))}
       </div>
 
-      {/* Calendar */}
       <div className="card" style={{ marginBottom: 16 }}>
         <div className={styles.calHeader}>
-          <button className="btn btn-ghost btn-sm" onClick={() => setCalDate(new Date(year, month - 1))}>‹</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => setCalDate(new Date(year, month - 1))}>{'\u2039'}</button>
           <span className={styles.calTitle}>{MONTHS[month]} {year}</span>
-          <button className="btn btn-ghost btn-sm" onClick={() => setCalDate(new Date(year, month + 1))}>›</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => setCalDate(new Date(year, month + 1))}>{'\u203A'}</button>
           {selectedDay && (
             <button className={`btn btn-ghost btn-sm ${styles.calClearBtn}`} onClick={() => setSelectedDay(null)}>
               Clear filter
@@ -153,18 +324,19 @@ export default function ExpenseApproval() {
           )}
         </div>
         <div className={styles.calGrid}>
-          {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => (
-            <div key={d} className={styles.calDayName}>{d}</div>
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+            <div key={day} className={styles.calDayName}>{day}</div>
           ))}
-          {Array.from({ length: firstDayOffset }, (_, i) => <div key={`blank-${i}`} />)}
-          {Array.from({ length: daysInMonth }, (_, i) => {
-            const day = i + 1;
+          {Array.from({ length: firstDayOffset }, (_, index) => <div key={`blank-${index}`} />)}
+          {Array.from({ length: daysInMonth }, (_, index) => {
+            const day = index + 1;
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const statuses = expensesByDay[dateStr] || [];
             const isSelected = selectedDay === dateStr;
-            const hasPending  = statuses.includes('pending');
+            const hasPending = statuses.includes('pending');
             const hasApproved = statuses.includes('approved');
             const hasRejected = statuses.includes('rejected');
+
             return (
               <div
                 key={day}
@@ -178,7 +350,7 @@ export default function ExpenseApproval() {
                 <span className={styles.calDayNum}>{day}</span>
                 {statuses.length > 0 && (
                   <div className={styles.calDots}>
-                    {hasPending  && <span className={styles.dotPending}  />}
+                    {hasPending && <span className={styles.dotPending} />}
                     {hasApproved && <span className={styles.dotApproved} />}
                     {hasRejected && <span className={styles.dotRejected} />}
                   </div>
@@ -189,29 +361,29 @@ export default function ExpenseApproval() {
         </div>
       </div>
 
-      {/* Filter bar */}
       <div className={styles.teamFilters}>
         {[
-          ['pending',  `Pending${teamPending.length ? ` (${teamPending.length})` : ''}`],
+          ['pending', `Pending${teamPending.length ? ` (${teamPending.length})` : ''}`],
           ['approved', 'Approved'],
           ['rejected', 'Rejected'],
-          ['all',      'All'],
-        ].map(([val, label]) => (
+          ['all', 'All'],
+        ].map(([value, label]) => (
           <button
-            key={val}
-            className={`btn ${teamFilter === val ? 'btn-primary' : 'btn-ghost'} btn-sm`}
-            onClick={() => setTeamFilter(val)}
-          >{label}</button>
+            key={value}
+            className={`btn ${teamFilter === value ? 'btn-primary' : 'btn-ghost'} btn-sm`}
+            onClick={() => setTeamFilter(value)}
+          >
+            {label}
+          </button>
         ))}
         {selectedDay && (
           <span className={styles.dayFilterBadge}>
             Filtered: {selectedDay}
-            <button className={styles.dayFilterClear} onClick={() => setSelectedDay(null)}>×</button>
+            <button className={styles.dayFilterClear} onClick={() => setSelectedDay(null)}>{'\u00D7'}</button>
           </span>
         )}
       </div>
 
-      {/* Team expense list */}
       <div className="card">
         <div className="card-header">
           <span className="card-title">Team Claims</span>
@@ -219,40 +391,62 @@ export default function ExpenseApproval() {
             Click a pending row to review
           </span>
         </div>
+
+        {loadError && (
+          <div style={{ color: 'var(--danger)', padding: '0 16px 16px' }}>
+            {loadError}
+          </div>
+        )}
+
+        {actionError && (
+          <div style={{ color: 'var(--danger)', padding: '0 16px 16px' }}>
+            {actionError}
+          </div>
+        )}
+
         <div className="table-wrap">
           <table>
             <thead>
               <tr><th></th><th>Employee</th><th>Description</th><th>Date</th><th>Project</th><th>Amount</th><th>Status</th></tr>
             </thead>
             <tbody>
-              {filteredTeam.length === 0 && (
+              {loading && (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '24px 16px' }}>
+                    Loading claims...
+                  </td>
+                </tr>
+              )}
+
+              {!loading && filteredTeam.length === 0 && (
                 <tr>
                   <td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '24px 16px' }}>
                     No claims found.
                   </td>
                 </tr>
               )}
-              {filteredTeam.map(e => (
+
+              {!loading && filteredTeam.map((expense) => (
                 <tr
-                  key={e.id}
-                  className={e.status === 'pending' ? styles.clickableRow : ''}
-                  onClick={() => e.status === 'pending' && openReview(e)}
+                  key={expense.id}
+                  className={expense.status === 'pending' ? styles.clickableRow : ''}
+                  onClick={() => expense.status === 'pending' && openReview(expense)}
                 >
-                  <td className={styles.iconCell}>{getIcon(e.description)}</td>
+                  <td className={styles.iconCell}>{getIcon(expense.description)}</td>
                   <td>
                     <div className={styles.employeeCell}>
-                      <div className={styles.avatar}>{e.initials}</div>
-                      <strong>{e.employee}</strong>
+                      <div className={styles.avatar}>{expense.initials}</div>
+                      <strong>{expense.employee}</strong>
                     </div>
                   </td>
-                  <td>{e.description}</td>
-                  <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{e.date}</td>
-                  <td className={styles.projectCell}>{e.project}</td>
-                  <td><strong className={styles.amountCell}>{e.amount}</strong></td>
+                  <td>{expense.description}</td>
+                  <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{expense.date || '\u2014'}</td>
+                  <td className={styles.projectCell}>{expense.project}</td>
+                  <td><strong className={styles.amountCell}>{expense.amount}</strong></td>
                   <td>
                     <div className={styles.statusCell}>
-                      <span className={`badge badge-${e.status}`}>{e.status.toUpperCase()}</span>
-                      {e.status === 'pending' && <span className={styles.reviewHint}>Review →</span>}
+                      <span className={`badge badge-${expense.status}`}>{expense.status.toUpperCase()}</span>
+                      {expense.status === 'pending' && <span className={styles.reviewHint}>Review {'\u2192'}</span>}
                     </div>
                   </td>
                 </tr>
@@ -262,7 +456,6 @@ export default function ExpenseApproval() {
         </div>
       </div>
 
-      {/* Review Modal */}
       <Modal isOpen={!!reviewTarget} onClose={() => setReviewTarget(null)} title="Review Expense Claim">
         {reviewTarget && (
           <div className="form-grid">
@@ -271,7 +464,7 @@ export default function ExpenseApproval() {
                 <div className={styles.avatar}>{reviewTarget.initials}</div>
                 <div className={styles.reviewInfo}>
                   <div className={styles.reviewEmployee}>{reviewTarget.employee}</div>
-                  <div className={styles.reviewMeta}>{reviewTarget.project} · {reviewTarget.date}</div>
+                  <div className={styles.reviewMeta}>{reviewTarget.project} {'\u00B7'} {reviewTarget.date}</div>
                 </div>
                 <div className={styles.reviewAmount}>{reviewTarget.amount}</div>
               </div>
@@ -282,30 +475,38 @@ export default function ExpenseApproval() {
             </div>
 
             <div className="form-group">
-              <label>Comment — required to reject, optional to approve</label>
+              <label>Comment - required to reject, optional to approve</label>
               <textarea
                 className="field"
                 style={{ minHeight: 80 }}
                 placeholder="Add a note visible to the employee..."
                 value={rejectComment}
-                onChange={e => setRejectComment(e.target.value)}
+                onChange={(event) => setRejectComment(event.target.value)}
               />
             </div>
 
             <div className="modal-actions">
               <button
                 className="btn btn-primary"
-                onClick={() => { approveTeam(reviewTarget.id); setReviewTarget(null); }}
+                onClick={() => resolveTeamExpense(reviewTarget, {
+                  nextStatus: 'approved',
+                  payload: {
+                    id: reviewTarget.id,
+                    email: managerEmail,
+                  },
+                  errorMessage: 'Unable to approve this expense request right now.',
+                })}
+                disabled={resolvingId === reviewTarget.id}
               >
-                Approve
+                {resolvingId === reviewTarget.id && actionType === 'approved' ? 'Approving...' : 'Approve'}
               </button>
               <button
                 className="btn btn-danger"
                 style={{ flex: 1, justifyContent: 'center' }}
                 onClick={confirmReject}
-                disabled={!rejectComment.trim()}
+                disabled={!rejectComment.trim() || resolvingId === reviewTarget.id}
               >
-                Reject
+                {resolvingId === reviewTarget.id && actionType === 'rejected' ? 'Rejecting...' : 'Reject'}
               </button>
             </div>
           </div>

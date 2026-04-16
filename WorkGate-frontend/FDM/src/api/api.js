@@ -89,6 +89,28 @@ export function deleteTask(taskId, employeeEmail) {
   });
 }
 
+export function fetchExpenseRequests(email) {
+  return request(`/expenses?username=${encodeURIComponent(email)}`);
+}
+
+export function fetchManagerExpenseRequests(managerEmail) {
+  return request(`/expenses/manager?managerEmail=${encodeURIComponent(managerEmail)}`);
+}
+
+export function resolveExpenseRequest(payload) {
+  return request('/resolveExpenseRequest', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function createExpenseRequest({ username, amount, currency, evidence, purchaseDate, reason }) {
+  return request('/createExpense', {
+    method: 'POST',
+    body: JSON.stringify({ username, amount, currency, evidence, purchaseDate, reason }),
+  });
+}
+
 // ── Admin ─────────────────────────────────────────────────────────────────────
 
 export function createEmployee({ email, username, name, initials, role, tag, managerEmail, password }) {

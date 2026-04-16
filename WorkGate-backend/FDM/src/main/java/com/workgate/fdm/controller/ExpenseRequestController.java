@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.workgate.fdm.repository.EmployeeRepository;
 import com.workgate.fdm.repository.ExpenseRequestRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.workgate.fdm.DTO.ExpenseRequestRequest;
@@ -32,6 +31,11 @@ public class ExpenseRequestController {
         return expenseRequestRepository.findByEmployeeEmail(username);
     }
 
+    @GetMapping("/expenses/manager")
+    public List<ExpenseRequest> getManagerExpenseRequests(@RequestParam String managerEmail) {
+        return expenseRequestRepository.findByManagerEmail(managerEmail);
+    }
+
     @PostMapping("/createExpense")
     public void createExpenseRequest(@RequestBody ExpenseRequestRequest request) {
         ExpenseRequest expenseRequest = new ExpenseRequest();
@@ -44,6 +48,29 @@ public class ExpenseRequestController {
         expenseRequest.updateStatus(STATUS.OPEN);
         expenseRequest.setManagerEmail(employeeRepository.findByEmail(request.getUsername()).getManagerEmail());
 
+
+        expenseRequestRepository.save(expenseRequest);
+    }
+
+    @RequestMapping("/resolveExpenseRequest")
+    public void resolveExpenseRequest(@RequestBody java.util.Map<String, Object> request) {
+        Object idValue = request.get("id");
+        if (idValue == null) {
+            throw new RuntimeException("Expense request id is required");
+        }
+
+        Long expenseRequestId = Long.valueOf(String.valueOf(idValue));
+
+        ExpenseRequest expenseRequest = expenseRequestRepository.findById(expenseRequestId)
+                .orElseThrow(() -> new RuntimeException("Expense request not found"));
+
+        String rejectionReason = request.get("reason") == null ? "" : String.valueOf(request.get("reason")).trim();
+
+        if (!rejectionReason.isEmpty()) {
+            expenseRequest.updateStatus(STATUS.REJECTED);
+        } else {
+            expenseRequest.updateStatus(STATUS.ACCEPTED);
+        }
 
         expenseRequestRepository.save(expenseRequest);
     }

@@ -1,12 +1,13 @@
 package com.workgate.fdm.repository;
 
-import com.workgate.fdm.model.EmployeeReport;
-import com.workgate.fdm.model.ExpenseRequest;
-import com.workgate.fdm.model.Post;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import com.workgate.fdm.model.ExpenseRequest;
 
 public interface ExpenseRequestRepository extends JpaRepository<ExpenseRequest, Long> {
     List<ExpenseRequest> findByEmployeeEmail(String employeeEmail);
+    List<ExpenseRequest> findByManagerEmail(String managerEmail);
+    ExpenseRequest findById(long Id);
 }
