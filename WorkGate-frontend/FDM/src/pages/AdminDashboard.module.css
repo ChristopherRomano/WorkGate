@@ -187,3 +187,6 @@
   .directoryControls { flex-direction: column; align-items: stretch; }
   .searchWrap { min-width: unset; }
 }
+@media (max-width: 768px) {
+  .mobileHidden { display: none; }
+}

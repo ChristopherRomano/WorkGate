@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchEmployees, fetchManagers, fetchClientCodes, updateEmployeeProfile, updateEmployeeManager, deactivateEmployee, reactivateEmployee, deleteEmployee } from '../api/api';
 import Modal from '../components/Modal';
 import '../styles/components.css';
@@ -106,6 +107,7 @@ function normaliseEmployee(person) {
 }
 
 export default function ManageEmployees() {
+  const navigate = useNavigate();
   const [people, setPeople]             = useState([]);
   const [managers, setManagers]         = useState([]);
   const [loading, setLoading]           = useState(true);
@@ -301,14 +303,20 @@ export default function ManageEmployees() {
   return (
     <div className="animate-fade">
 
+      {/* Hub buttons */}
+      <div className={styles.hubRow}>
+        <button className={`btn btn-primary ${styles.hubBtn}`}>👥 Employees</button>
+        <button className={`btn btn-ghost ${styles.hubBtn}`} onClick={() => navigate('/app/admin/client-codes')}>🏢 Client Codes</button>
+      </div>
+
       {actionError && (
         <div style={{ marginBottom: 12, padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, fontSize: 13, color: 'var(--danger)' }}>
           {actionError}
         </div>
       )}
 
-      {/* Controls */}
-      <div className={styles.controlsBar}>
+      {/* Controls — desktop only */}
+      <div className={`${styles.controlsBar} ${styles.desktopOnly}`}>
         <div className={styles.tabsRow}>
           {TABS.map(({ key, label }) => (
             <button
@@ -335,7 +343,7 @@ export default function ManageEmployees() {
 
       {/* Bulk bar */}
       {someSelected && (
-        <div className={styles.bulkBar}>
+        <div className={`${styles.bulkBar} ${styles.desktopOnly}`}>
           <span className={styles.bulkCount}>{selected.size} selected</span>
           <button className="btn btn-ghost btn-sm" onClick={() => setBulkAction('reactivate')}>Reactivate</button>
           <button className="btn btn-ghost btn-sm" onClick={() => setBulkAction('deactivate')}>Deactivate</button>
@@ -344,8 +352,22 @@ export default function ManageEmployees() {
         </div>
       )}
 
-      {/* Table */}
-      <div className="card">
+      {/* Mobile name list */}
+      <div className={styles.mobileList}>
+        {filtered.length === 0 && <div className={styles.mobileEmpty}>No employees found.</div>}
+        {filtered.map(p => (
+          <button key={p.id} className={`${styles.mobileCard} ${!p.active ? styles.mobileCardInactive : ''}`} onClick={() => setViewTarget(p)}>
+            <div className={styles.mobileCardAvatar}>{p.initials}</div>
+            <span className={styles.mobileCardName}>{p.name}</span>
+            <span className={`badge badge-${p.active ? 'approved' : 'rejected'}`} style={{ fontSize: 9, marginLeft: 'auto' }}>
+              {p.active ? 'ACTIVE' : 'INACTIVE'}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Table — desktop only */}
+      <div className={`card ${styles.desktopOnly}`}>
         <div className="card-header">
           <span className="card-title">Employee Accounts</span>
           <span className={styles.resultCount}>{filtered.length} result{filtered.length !== 1 ? 's' : ''}</span>

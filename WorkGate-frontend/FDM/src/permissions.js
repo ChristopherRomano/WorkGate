@@ -53,6 +53,8 @@ export const ROLE_PERMISSIONS = {
     'manage-employees',
     'add-employee',
     'client-codes',
+    'profile',
+    'settings',
   ],
 };
 

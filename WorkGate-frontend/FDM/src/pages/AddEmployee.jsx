@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createEmployee, fetchManagers, fetchClientCodes } from '../api/api';
 import '../styles/components.css';
 import styles from './AddEmployee.module.css';
@@ -58,6 +59,7 @@ function buildManagerName(manager) {
 }
 
 export default function AddEmployee() {
+  const navigate = useNavigate();
   const [form, setForm] = useState(EMPTY);
   const [managers, setManagers] = useState([]);
   const [clientCodes, setClientCodes] = useState([]);
@@ -178,6 +180,12 @@ export default function AddEmployee() {
 
   return (
     <div className="animate-fade">
+      {/* Hub buttons */}
+      <div className={styles.hubRow}>
+        <button className={`btn btn-primary ${styles.hubBtn}`}>➕ Add Employee</button>
+        <button className={`btn btn-ghost ${styles.hubBtn}`} onClick={() => navigate('/app/admin/client-codes')}>🏢 Client Codes</button>
+      </div>
+
       <div className={styles.layout}>
         <div className="card">
           <div className="card-header"><span className="card-title">New Employee Account</span></div>

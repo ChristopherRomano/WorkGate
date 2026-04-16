@@ -160,6 +160,15 @@
 }
 
 /* ── Mobile ── */
+@media (max-width: 768px) {
+  .mobileSignOut {
+    display: block;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+}
+
 @media (max-width: 640px) {
   .profileHeader {
     padding: 16px;
@@ -176,11 +185,4 @@
   .detailValue { padding-right: 14px; }
 
   .skillsGrid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-
-  .mobileSignOut {
-    display: block;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-  }
 }

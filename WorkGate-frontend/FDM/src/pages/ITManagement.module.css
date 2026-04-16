@@ -4,6 +4,19 @@
   align-items: flex-start;
 }
 
+.unlockPanel {
+  align-self: flex-start;
+  width: 300px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .layout { flex-direction: column; }
+  .unlockPanel { width: 100%; }
+  .ticketRow { flex-direction: column; gap: 10px; }
+  .ticketActions { flex-direction: row; flex-wrap: wrap; }
+}
+
 .filters {
   display: flex;
   gap: 8px;

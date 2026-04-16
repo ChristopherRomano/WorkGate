@@ -14,9 +14,7 @@ const ACCOUNTS = [
 ];
 
 const ROLE_HOME = {
-  admin:  '/app/admin',
-  ittech: '/app/it-management',
-  hr:     '/app/hr-management',
+  admin: '/app/admin',
 };
 
 function getUserKey(user) {
