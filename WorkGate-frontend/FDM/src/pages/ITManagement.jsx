@@ -5,9 +5,6 @@ import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './ITManagement.module.css';
 
-const STATUS_LABEL = { OPEN: 'OPEN', IN_PROGRESS: 'IN PROGRESS', RESOLVED: 'RESOLVED' };
-const STATUS_BADGE = { OPEN: 'open', IN_PROGRESS: 'pending', RESOLVED: 'approved' };
-
 export default function ITManagement() {
   const { currentUser } = useAuth();
 
@@ -23,36 +20,81 @@ export default function ITManagement() {
   const [unlocking, setUnlocking]         = useState(false);
   const [allEmployees, setAllEmployees]   = useState([]);
 
+  const loadData = async () => {
+    const [ticketData, empData] = await Promise.all([
+      fetch("http://localhost:8080/api/itTickets").then(r => r.json()),
+      fetchEmployees()
+    ]);
+
+    setTickets(ticketData);
+    setAllEmployees(empData);
+  };
+
   useEffect(() => {
-    Promise.all([fetchItTickets(), fetchEmployees()])
-      .then(([ticketData, empData]) => {
-        setTickets(ticketData);
-        setAllEmployees(empData);
-      })
-      .finally(() => setLoading(false));
+    loadData().finally(() => setLoading(false));
   }, []);
+
+
+  const createRequest = async (id) => {
+
+    const request = {
+      id: id,
+      email: currentUser?.employee,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/claimItTicket", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create ticket");
+      }
+    } 
+    catch (error) {
+        console.error(error);
+    }
+  };
+
+  const resolveRequest = async (id) => {
+
+    const request = {
+      id: id,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/resolveItTicket", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(request)
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create ticket");
+      }
+    } 
+    catch (error) {
+        console.error(error);
+    }
+  };
+
 
   // ── Ticket actions ────────────────────────────────────────────────────────
 
   const handleClaim = async (id) => {
     setActionError('');
-    try {
-      const updated = await claimTicket(id, currentUser.email);
-      setTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
-    } catch (e) {
-      setActionError(e.message);
-    }
+    await createRequest(id)
+    await loadData();
   };
 
-  const handleAdvance = async (id) => {
+  const handleResolve = async (id) => {
     setActionError('');
-    try {
-      const updated = await advanceTicket(id);
-      setTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
-      if (selected?.id === id) setSelected(updated);
-    } catch (e) {
-      setActionError(e.message);
-    }
+    await resolveRequest(id);
+    await loadData();
   };
 
   // ── Unlock ────────────────────────────────────────────────────────────────
@@ -129,8 +171,11 @@ export default function ITManagement() {
                       <button className="btn btn-ghost btn-sm" onClick={() => handleClaim(t.id)}>Claim</button>
                     )}
                     {t.claimedByEmail && t.status !== 'RESOLVED' && (
-                      <button className="btn btn-primary btn-sm" onClick={() => handleAdvance(t.id)}>
-                        {t.status === 'OPEN' ? 'Start' : 'Resolve'}
+                      <button className="btn btn-primary btn-sm" onClick={() =>
+                              t.status === 'OPEN'
+                                ? handleStart(t.id)
+                                : handleResolve(t.id)
+                              }>                                  
                       </button>
                     )}
                     <button className="btn btn-ghost btn-sm" onClick={() => setSelected(t)}>Details</button>
@@ -217,7 +262,7 @@ export default function ITManagement() {
             </div>
             <div className="modal-actions">
               {selected.claimedByEmail && selected.status !== 'RESOLVED' && (
-                <button className="btn btn-primary" onClick={() => handleAdvance(selected.id)}>
+                <button className="btn btn-primary" onClick={() => handleResolve(selected.id)}>
                   {selected.status === 'OPEN' ? 'Start' : 'Resolve'}
                 </button>
               )}
