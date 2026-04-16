@@ -49,6 +49,8 @@ function toCurrentUser(profile, loginResponse) {
     clientCode: profile?.activeClientCode,
     clientName: profile?.clientName,
     projectEndDate: profile?.endDate ? String(profile.endDate) : undefined,
+    leaveBalance: Number(profile?.annualLeaveBalance ?? 0),
+    leaveTotal: 25,
   };
 }
 

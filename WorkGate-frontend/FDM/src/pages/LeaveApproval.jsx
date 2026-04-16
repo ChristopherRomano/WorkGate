@@ -4,7 +4,9 @@
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
 import Modal from '../components/Modal';
+import { approveLeaveRequest, fetchManagerLeaveRequests, rejectLeaveRequest } from '../api/api';
 import '../styles/components.css';
+import { countBusinessDays, formatLeaveDate } from '../utils/leaveDates';
 import styles from './LeaveApproval.module.css';
 
 
@@ -16,60 +18,75 @@ export default function LeaveApproval() {
   const [filter, setFilter] = useState('pending');
   const [rejectTarget, setRejectTarget] = useState(null);
   const [rejectComment, setRejectComment] = useState('');
+  const [loading, setLoading] = useState(false);
 
 
+  const mapStatus = (status) => {
+    const value = String(status ?? '').toUpperCase();
+    if (value === 'ACCEPTED') return 'approved';
+    if (value === 'REJECTED') return 'rejected';
+    return 'pending';
+  };
 
-  const fetchLeaveRequests = async () => {
-  try {
-    const response = await fetch(
-      `http://localhost:8080/api/annualLeave?Username=${currentUser.name}`
-    );
+  const loadRequests = async () => {
+    if (!currentUser?.username) return;
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch leave requests");
+    setLoading(true);
+    try {
+      const data = await fetchManagerLeaveRequests(currentUser.username);
+      const formatted = Array.isArray(data)
+        ? data.map((item) => ({
+            id: item.id,
+            employee: item.employeeEmail ?? item.employeeemail ?? item.employee ?? 'Unknown',
+            type: 'Annual Leave',
+            start: formatLeaveDate(item.startOfLeave),
+            end: formatLeaveDate(item.endOfLeave),
+            days: countBusinessDays(
+              new Date(item.startOfLeave).toISOString().split('T')[0],
+              new Date(item.endOfLeave).toISOString().split('T')[0],
+            ),
+            reason: item.reason ?? '',
+            status: mapStatus(item.status),
+            comment: '',
+          }))
+        : [];
+
+      setRequests(formatted);
+    } catch (error) {
+      console.error(error);
+      setRequests([]);
+    } finally {
+      setLoading(false);
     }
-
-    const data = await response.json();
-
-    console.log(data);
-    
-    const formatted = data.map((item, index) => ({
-      id: index,
-
-      employee: item.username ?? item.name ?? "Unknown",
-      type: "Annual Leave",
-
-      start: item.start ?? item.startDate ?? "",
-      end: item.end ?? item.endDate ?? "",
-
-      days: 1,
-      reason: item.reason ?? "",
-
-      status: "pending",
-      comment: ""
-    }));
-
-    setRequests(formatted);
-
-  } catch (error) {
-    console.error(error);
-  }
   };
 
   useEffect(() => {
-  fetchLeaveRequests();
-}, [currentUser]);
+    loadRequests();
+  }, [currentUser?.username]);
 
-  const approve = (id) =>
-    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved', comment: '' } : r));
+  const approve = async (id) => {
+    if (!currentUser?.username) return;
+    try {
+      await approveLeaveRequest(id, currentUser.username);
+      await loadRequests();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const openReject = (request) => { setRejectTarget(request); setRejectComment(''); };
 
-  const confirmReject = () => {
+  const confirmReject = async () => {
     if (!rejectComment.trim()) return;
-    setRequests(prev => prev.map(r => r.id === rejectTarget.id ? { ...r, status: 'rejected', comment: rejectComment.trim() } : r));
-    setRejectTarget(null);
-    setRejectComment('');
+    if (!currentUser?.username) return;
+    try {
+      await rejectLeaveRequest(rejectTarget.id, currentUser.username);
+      setRejectTarget(null);
+      setRejectComment('');
+      await loadRequests();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const filtered = filter === 'all' ? requests : requests.filter(r => r.status === filter);
@@ -88,7 +105,8 @@ export default function LeaveApproval() {
           <span className="card-title">Employee Leave Requests</span>
         </div>
         <div className={styles.listBody}>
-          {filtered.length === 0 && <div className={styles.empty}>No requests found.</div>}
+          {loading && <div className={styles.empty}>Loading requests...</div>}
+          {!loading && filtered.length === 0 && <div className={styles.empty}>No requests found.</div>}
           {filtered.map(req => (
             <div key={req.id} className={styles.requestRow}>
               <div className={styles.info}>

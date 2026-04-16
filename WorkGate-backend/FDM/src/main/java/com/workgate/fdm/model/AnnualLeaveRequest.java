@@ -1,8 +1,10 @@
 package com.workgate.fdm.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.DiscriminatorValue;
 
 @Entity
+@DiscriminatorValue("ANNUAL_LEAVE_REQUEST")
 public class AnnualLeaveRequest extends ManagerRequest {
 
 	private long startOfLeave;
@@ -64,8 +66,8 @@ public class AnnualLeaveRequest extends ManagerRequest {
 		this.reason = reason;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setAssignedManager(String assignedManager) {
+		this.assignedManager = assignedManager;
 	}
 
 }
