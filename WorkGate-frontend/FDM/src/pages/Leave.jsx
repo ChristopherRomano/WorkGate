@@ -48,10 +48,18 @@ const calculateDays = (startTimestamp, endTimestamp) => {
 
   const startUtc = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
   const endUtc = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
-  return Math.max(1, Math.round((endUtc - startUtc) / 86400000) + 1);
+
+  let count = 0;
+  let current = startUtc;
+  while (current <= endUtc) {
+    const dow = new Date(current).getUTCDay(); // 0=Sun, 6=Sat
+    if (dow !== 0 && dow !== 6) count++;
+    current += 86400000;
+  }
+  return Math.max(1, count);
 };
 
-const toBackendTimestamp = (isoDate) => new Date(`${isoDate}T00:00:00`).getTime();
+const toBackendTimestamp = (isoDate) => new Date(`${isoDate}T00:00:00Z`).getTime();
 
 const mapLeaveRequest = (item) => ({
   id: item?.id,
@@ -60,6 +68,7 @@ const mapLeaveRequest = (item) => ({
   days: calculateDays(item?.startOfLeave, item?.endOfLeave),
   status: mapLeaveStatus(item?.status),
   createdAt: Number(item?.creationTime) || 0,
+  rejectionNote: item?.rejectionReason ?? '',
 });
 
 export default function Leave() {
@@ -71,11 +80,12 @@ export default function Leave() {
   const [submitting, setSubmitting] = useState(false);
   const [cancellingId, setCancellingId] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [noteTarget, setNoteTarget] = useState(null);
   const [form, setForm] = useState({ start: '', end: '', notes: '' });
 
   const userEmail = currentUser?.email ?? currentUser?.username ?? '';
-  const leaveBalance = Number(currentUser?.annualLeaveBalance ?? 10);
-  const leaveTotal = Number(currentUser?.annualLeaveTotal ?? 25);
+  const leaveBalance = Number(currentUser?.annualLeaveBalance ?? 25);
+  const leaveTotal = Number(currentUser?.annualLeaveTotal) || 25;
   const usedDays = Math.max(0, leaveTotal - leaveBalance);
   const pct = leaveTotal > 0 ? (usedDays / leaveTotal) * 100 : 0;
 
@@ -250,7 +260,9 @@ export default function Leave() {
                   <td>
                     {r.status === 'pending'
                       ? <button className="btn btn-danger" onClick={() => cancel(r.id)} disabled={cancellingId === r.id}>{cancellingId === r.id ? 'Cancelling...' : 'Cancel'}</button>
-                      : <span className={styles.emptyCell}>—</span>
+                      : r.status === 'rejected' && r.rejectionNote
+                        ? <button className="btn btn-ghost btn-sm" onClick={() => setNoteTarget(r)}>View Note</button>
+                        : <span className={styles.emptyCell}>—</span>
                     }
                   </td>
                 </tr>
@@ -259,6 +271,21 @@ export default function Leave() {
           </table>
         </div>
       </div>
+
+      <Modal isOpen={!!noteTarget} onClose={() => setNoteTarget(null)} title="Rejection Note">
+        {noteTarget && (
+          <div className="form-grid">
+            <div className={styles.noteMetaRow}>
+              <span>{noteTarget.start}{noteTarget.start !== noteTarget.end ? ` – ${noteTarget.end}` : ''}</span>
+              <span className={styles.noteDays}>{noteTarget.days} working day{noteTarget.days !== 1 ? 's' : ''}</span>
+            </div>
+            <div className={styles.noteBody}>{noteTarget.rejectionNote}</div>
+            <div className="modal-actions">
+              <button className="btn btn-ghost" onClick={() => setNoteTarget(null)}>Close</button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Request Annual Leave">
         <div className="form-grid">
@@ -274,7 +301,7 @@ export default function Leave() {
           </div>
           {form.start && form.end && (
             <div className={styles.dateHint}>
-              📅 <strong className={styles.dateHintVal}>{Math.max(0, leaveBalance - calculateDays(toBackendTimestamp(form.start), toBackendTimestamp(form.end)))} days</strong> remaining after approval
+              📅 <strong className={styles.dateHintVal}>{calculateDays(toBackendTimestamp(form.start), toBackendTimestamp(form.end))} working day{calculateDays(toBackendTimestamp(form.start), toBackendTimestamp(form.end)) !== 1 ? 's' : ''}</strong> · <strong className={styles.dateHintVal}>{Math.max(0, leaveBalance - calculateDays(toBackendTimestamp(form.start), toBackendTimestamp(form.end)))}</strong> remaining after approval
             </div>
           )}
           <div className="form-group">

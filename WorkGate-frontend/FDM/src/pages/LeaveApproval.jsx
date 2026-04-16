@@ -34,7 +34,15 @@ const calculateDays = (startTimestamp, endTimestamp) => {
 
   const startUtc = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
   const endUtc = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
-  return Math.max(1, Math.round((endUtc - startUtc) / 86400000) + 1);
+
+  let count = 0;
+  let current = startUtc;
+  while (current <= endUtc) {
+    const dow = new Date(current).getUTCDay();
+    if (dow !== 0 && dow !== 6) count++;
+    current += 86400000;
+  }
+  return Math.max(1, count);
 };
 
 const formatDate = (timestamp) => {
@@ -180,7 +188,7 @@ export default function LeaveApproval() {
 
         <div className={styles.listBody}>
           {loading && <div className={styles.empty}>Loading requests...</div>}
-          {filtered.length === 0 && <div className={styles.empty}>No requests found.</div>}
+          {!loading && filtered.length === 0 && <div className={styles.empty}>No requests found.</div>}
           {!loading && filtered.map(req => (
             <div key={req.id} className={styles.requestRow}>
               <div className={styles.info}>

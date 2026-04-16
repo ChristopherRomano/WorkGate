@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.workgate.fdm.model.AnnualLeaveRequest;
 import com.workgate.fdm.model.STATUS;
 
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -92,6 +93,7 @@ public class LeaveRequestController {
 
         if (!rejectionReason.isEmpty()) {
             leaveRequest.updateStatus(STATUS.REJECTED);
+            leaveRequest.setRejectionReason(rejectionReason);
             leaveRequestRepository.save(leaveRequest);
             return;
         }
@@ -132,6 +134,15 @@ public class LeaveRequestController {
     private int calculateRequestedDays(long startMillis, long endMillis) {
         LocalDate startDate = Instant.ofEpochMilli(startMillis).atZone(ZoneOffset.UTC).toLocalDate();
         LocalDate endDate = Instant.ofEpochMilli(endMillis).atZone(ZoneOffset.UTC).toLocalDate();
-        return Math.max(1, (int) (endDate.toEpochDay() - startDate.toEpochDay()) + 1);
+        int count = 0;
+        LocalDate current = startDate;
+        while (!current.isAfter(endDate)) {
+            DayOfWeek dow = current.getDayOfWeek();
+            if (dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY) {
+                count++;
+            }
+            current = current.plusDays(1);
+        }
+        return Math.max(1, count);
     }
 }

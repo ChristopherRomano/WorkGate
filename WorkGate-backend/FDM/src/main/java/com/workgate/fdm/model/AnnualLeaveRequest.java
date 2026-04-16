@@ -10,6 +10,7 @@ public class AnnualLeaveRequest extends ManagerRequest {
 	private long startOfLeave;
 	private long endOfLeave;
 	private String reason;
+	private String rejectionReason;
 	private long creationTime;
 	private String assignedManager;
 
@@ -56,6 +57,14 @@ public class AnnualLeaveRequest extends ManagerRequest {
 
 	public void setReason(String reason) {
 		this.reason = reason;
+	}
+
+	public String getRejectionReason() {
+		return this.rejectionReason;
+	}
+
+	public void setRejectionReason(String rejectionReason) {
+		this.rejectionReason = rejectionReason;
 	}
 
 }

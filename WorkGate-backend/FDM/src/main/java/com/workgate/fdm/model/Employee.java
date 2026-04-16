@@ -15,6 +15,7 @@ public class Employee extends User {
 	private String profilePicture;
 	private String managerEmail;
 	private int annualLeaveBalance;
+	private int annualLeaveTotal;
 	private String surname;
 
 	public Employee(String email, String managerEmail, String password, TAG tag) {
@@ -26,7 +27,8 @@ public class Employee extends User {
 		this.profilePicture = "";
 		this.managerEmail = managerEmail;
 		this.surname = "";
-		this.annualLeaveBalance = 10;
+		this.annualLeaveTotal = 25;
+		this.annualLeaveBalance = 25;
 		this.tag = tag;
 	}
 
@@ -43,7 +45,8 @@ public class Employee extends User {
 		this.profilePicture = "";
 		this.managerEmail = "";
 		this.surname = "";
-		this.annualLeaveBalance = 10;
+		this.annualLeaveTotal = 25;
+		this.annualLeaveBalance = 25;
 	}
 
 	public void setTag(TAG tag)                                  { this.tag = tag; }
@@ -56,10 +59,12 @@ public class Employee extends User {
 	public void setProfilePic(String image)                      { this.profilePicture = image; }
 	public void setProfilePicture(String profilePicture)         { this.profilePicture = profilePicture; }
 	public void setAnnualLeaveBalance(int balance)               { this.annualLeaveBalance = balance; }
+	public void setAnnualLeaveTotal(int total)                   { this.annualLeaveTotal = total; }
 	public void setSurname(String surname)                       { this.surname = surname; }
 
 	public TAG getTag()                       { return this.tag; }
 	public int getAnnualLeaveBalance()        { return this.annualLeaveBalance; }
+	public int getAnnualLeaveTotal()          { return annualLeaveTotal > 0 ? annualLeaveTotal : 25; }
 	public String getAddress()                { return this.address; }
 	public String getPhoneNumber()            { return this.phoneNumber; }
 	public String getEmergencyContact()       { return this.emergencyContact; }
