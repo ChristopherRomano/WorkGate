@@ -46,6 +46,8 @@ function toCurrentUser(profile, loginResponse) {
     role: roleFromTag(tag),
     tag,
     managerEmail: profile?.managerEmail,
+    annualLeaveBalance: Number(profile?.annualLeaveBalance ?? 10),
+    annualLeaveTotal: Number(profile?.annualLeaveTotal ?? 25),
     clientCode: profile?.activeClientCode,
     clientName: profile?.clientName,
     projectEndDate: profile?.endDate ? String(profile.endDate) : undefined,

@@ -1,76 +1,182 @@
-import { useState } from 'react';
-import { leaveRequests as initial, currentUser } from '../data/mockData';
+import { useEffect, useMemo, useState } from 'react';
+import { cancelLeaveRequest, createLeaveRequest, fetchLeaveRequests } from '../api/api';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import { useAuth } from '../context/AuthContext';
 import styles from './Leave.module.css';
 
+const DATE_FORMATTER = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+
+const mapLeaveStatus = (status) => {
+  switch (String(status ?? '').toUpperCase()) {
+    case 'ACCEPTED':
+    case 'RESOLVED':
+      return 'approved';
+    case 'REJECTED':
+      return 'rejected';
+    case 'OPEN':
+    case 'IN_PROGRESS':
+    default:
+      return 'pending';
+  }
+};
+
+const formatTimestamp = (timestamp) => {
+  const numericTimestamp = Number(timestamp);
+  if (!Number.isFinite(numericTimestamp)) {
+    return '-';
+  }
+
+  const parsed = new Date(numericTimestamp);
+  if (Number.isNaN(parsed.getTime())) {
+    return '-';
+  }
+
+  return DATE_FORMATTER.format(parsed);
+};
+
+const calculateDays = (startTimestamp, endTimestamp) => {
+  const startDate = new Date(Number(startTimestamp));
+  const endDate = new Date(Number(endTimestamp));
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+    return 0;
+  }
+
+  const startUtc = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
+  const endUtc = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
+  return Math.max(1, Math.round((endUtc - startUtc) / 86400000) + 1);
+};
+
+const toBackendTimestamp = (isoDate) => new Date(`${isoDate}T00:00:00`).getTime();
+
+const mapLeaveRequest = (item) => ({
+  id: item?.id,
+  start: formatTimestamp(item?.startOfLeave),
+  end: formatTimestamp(item?.endOfLeave),
+  days: calculateDays(item?.startOfLeave, item?.endOfLeave),
+  status: mapLeaveStatus(item?.status),
+  createdAt: Number(item?.creationTime) || 0,
+});
 
 export default function Leave() {
   const { currentUser } = useAuth();
-  const [requests, setRequests] = useState(initial);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [cancellingId, setCancellingId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ start: '', end: '', notes: '' });
 
-  const usedDays = currentUser.leaveTotal - currentUser.leaveBalance;
-  const pct = (usedDays / currentUser.leaveTotal) * 100;
+  const userEmail = currentUser?.email ?? currentUser?.username ?? '';
+  const leaveBalance = Number(currentUser?.annualLeaveBalance ?? 10);
+  const leaveTotal = Number(currentUser?.annualLeaveTotal ?? 25);
+  const usedDays = Math.max(0, leaveTotal - leaveBalance);
+  const pct = leaveTotal > 0 ? (usedDays / leaveTotal) * 100 : 0;
 
   const getTodayDate = () => new Date().toISOString().split('T')[0];
 
-  const formatDate = (iso) =>
-    new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const loadLeaveRequests = async () => {
+    if (!userEmail) {
+      setRequests([]);
+      setLoadError('');
+      return;
+    }
 
-  const calcDays = (start, end) => {
-    const ms = new Date(end + 'T00:00:00') - new Date(start + 'T00:00:00');
-    return Math.max(1, Math.round(ms / 86400000) + 1);
-  };
-
-  const cancel = (id) => setRequests(prev => prev.filter(r => r.id !== id));
-
-  const createRequest = async (start,end,notes) => {
-
-    const request = {
-      username: currentUser?.username ,
-      creationTime: new Date().getTime(),
-      startOfLeave:  new Date(start).getTime(),
-      endOfLeave : new Date(end).getTime(),
-      reason : notes,
-    };
-
+    setLoading(true);
+    setLoadError('');
     try {
-      const response = await fetch("http://localhost:8080/api/createAnnualLeave", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(request)
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create ticket");
-      }
-    } 
+      const leaveRequests = await fetchLeaveRequests(userEmail);
+      const formatted = Array.isArray(leaveRequests)
+        ? leaveRequests
+            .map((item) => mapLeaveRequest(item))
+            .sort((left, right) => right.createdAt - left.createdAt)
+        : [];
+
+      setRequests(formatted);
+    }
     catch (error) {
       console.error(error);
+      setRequests([]);
+      setLoadError('Unable to load your leave requests right now.');
+    }
+    finally {
+      setLoading(false);
     }
   };
 
-  const submit = () => {
-    if (!form.start || !form.end) return;
-    setRequests(prev => [
-      {
-        id: `lr${Date.now()}`,
-        start: formatDate(form.start),
-        end: formatDate(form.end),
-        days: calcDays(form.start, form.end),
-        status: 'pending',
-      },
-      ...prev,
-    ]);
-    setShowModal(false);
+  useEffect(() => {
+    loadLeaveRequests();
+  }, [userEmail]);
 
-    createRequest(form.start,form.end,form.notes);
+  const pendingCount = useMemo(
+    () => requests.filter((request) => request.status === 'pending').length,
+    [requests],
+  );
 
-    setForm({ start: '', end: '', notes: '' });
+  const submit = async () => {
+    if (!form.start || !form.end || submitting) return;
+
+    if (form.end < form.start) {
+      setSubmitError('End date cannot be before start date.');
+      return;
+    }
+
+    if (!userEmail) {
+      setSubmitError('You must be signed in to create a leave request.');
+      return;
+    }
+
+    const requestedDays = calculateDays(toBackendTimestamp(form.start), toBackendTimestamp(form.end));
+    if (requestedDays > leaveBalance) {
+      setSubmitError('Requested leave exceeds your available leave balance.');
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError('');
+
+    try {
+      await createLeaveRequest({
+        username: userEmail,
+        creationTime: Date.now(),
+        startOfLeave: toBackendTimestamp(form.start),
+        endOfLeave: toBackendTimestamp(form.end),
+        reason: form.notes,
+      });
+
+      setShowModal(false);
+      setForm({ start: '', end: '', notes: '' });
+      await loadLeaveRequests();
+    } catch (error) {
+      console.error(error);
+      setSubmitError('Unable to submit your leave request right now.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const cancel = async (id) => {
+    if (!id || !userEmail || cancellingId) {
+      return;
+    }
+
+    setCancellingId(id);
+
+    try {
+      await cancelLeaveRequest(id, userEmail);
+      await loadLeaveRequests();
+    } catch (error) {
+      console.error(error);
+      setLoadError('Unable to cancel this leave request right now.');
+    } finally {
+      setCancellingId(null);
+    }
   };
 
   return (
@@ -78,8 +184,8 @@ export default function Leave() {
       <div className={styles.statsGrid}>
         {[
           { icon: '✅', val: usedDays, label: 'Days used' },
-          { icon: '📅', val: currentUser.leaveBalance, label: 'Days remaining', highlight: true },
-          { icon: '⏳', val: requests.filter(r => r.status === 'pending').length, label: 'Pending requests' },
+          { icon: '📅', val: leaveBalance, label: 'Days remaining', highlight: true },
+          { icon: '⏳', val: pendingCount, label: 'Pending requests' },
         ].map(({ icon, val, label, highlight }) => (
           <div key={label} className={`${styles.statCard} ${highlight ? styles.highlight : ''}`}>
             <div className={styles.statIcon}>{icon}</div>
@@ -93,7 +199,7 @@ export default function Leave() {
         <div className="card-body">
           <div className={styles.balanceRow}>
             <span>Leave used this year</span>
-            <span className={styles.balanceCount}>{usedDays} / {currentUser.leaveTotal} days</span>
+            <span className={styles.balanceCount}>{usedDays} / {leaveTotal} days</span>
           </div>
           <div className={styles.barTrack}>
             <div className={styles.barFill} style={{ width: `${pct}%` }} />
@@ -106,12 +212,35 @@ export default function Leave() {
           <span className="card-title">Leave History</span>
           <button className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}>+ Request Leave</button>
         </div>
+
+        {loadError && (
+          <div style={{ color: 'var(--danger)', padding: '0 16px 16px' }}>
+            {loadError}
+          </div>
+        )}
+
         <div className="table-wrap">
           <table>
             <thead>
               <tr><th>Start</th><th>End</th><th>Days</th><th>Status</th><th>Action</th></tr>
             </thead>
             <tbody>
+              {loading && (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '24px 16px' }}>
+                    Loading leave requests...
+                  </td>
+                </tr>
+              )}
+
+              {!loading && requests.length === 0 && (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '24px 16px' }}>
+                    No leave requests found.
+                  </td>
+                </tr>
+              )}
+
               {requests.map(r => (
                 <tr key={r.id}>
                   <td><strong>{r.start}</strong></td>
@@ -120,7 +249,7 @@ export default function Leave() {
                   <td><span className={`badge badge-${r.status}`}>{r.status.toUpperCase()}</span></td>
                   <td>
                     {r.status === 'pending'
-                      ? <button className="btn btn-danger" onClick={() => cancel(r.id)}>Cancel</button>
+                      ? <button className="btn btn-danger" onClick={() => cancel(r.id)} disabled={cancellingId === r.id}>{cancellingId === r.id ? 'Cancelling...' : 'Cancel'}</button>
                       : <span className={styles.emptyCell}>—</span>
                     }
                   </td>
@@ -145,15 +274,22 @@ export default function Leave() {
           </div>
           {form.start && form.end && (
             <div className={styles.dateHint}>
-              📅 <strong className={styles.dateHintVal}>{currentUser.leaveBalance} days</strong> remaining after approval
+              📅 <strong className={styles.dateHintVal}>{Math.max(0, leaveBalance - calculateDays(toBackendTimestamp(form.start), toBackendTimestamp(form.end)))} days</strong> remaining after approval
             </div>
           )}
           <div className="form-group">
             <label>Notes (optional)</label>
             <textarea className="field" placeholder="Any additional notes for your manager..." value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
           </div>
+
+          {submitError && (
+            <div style={{ color: 'var(--danger)', fontSize: 12 }}>
+              {submitError}
+            </div>
+          )}
+
           <div className="modal-actions">
-            <button className="btn btn-primary" onClick={submit}>Submit Request</button>
+            <button className="btn btn-primary" onClick={submit} disabled={submitting}>{submitting ? 'Submitting...' : 'Submit Request'}</button>
             <button className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
           </div>
         </div>

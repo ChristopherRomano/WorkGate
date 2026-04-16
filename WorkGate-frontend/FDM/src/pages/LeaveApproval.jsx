@@ -1,77 +1,153 @@
-
-// leave approval
-
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
+import { fetchManagerLeaveRequests, resolveLeaveRequest } from '../api/api';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './LeaveApproval.module.css';
 
+const DATE_FORMATTER = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+
+const mapLeaveStatus = (status) => {
+  switch (String(status ?? '').toUpperCase()) {
+    case 'ACCEPTED':
+    case 'RESOLVED':
+      return 'approved';
+    case 'REJECTED':
+      return 'rejected';
+    case 'OPEN':
+    case 'IN_PROGRESS':
+    default:
+      return 'pending';
+  }
+};
+
+const calculateDays = (startTimestamp, endTimestamp) => {
+  const startDate = new Date(Number(startTimestamp));
+  const endDate = new Date(Number(endTimestamp));
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+    return 0;
+  }
+
+  const startUtc = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
+  const endUtc = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
+  return Math.max(1, Math.round((endUtc - startUtc) / 86400000) + 1);
+};
+
+const formatDate = (timestamp) => {
+  const numericTimestamp = Number(timestamp);
+  if (!Number.isFinite(numericTimestamp)) {
+    return '-';
+  }
+
+  const parsed = new Date(numericTimestamp);
+  if (Number.isNaN(parsed.getTime())) {
+    return '-';
+  }
+
+  return DATE_FORMATTER.format(parsed);
+};
+
+const mapLeaveRequest = (item) => ({
+  id: item?.id,
+  employee: item?.employeeEmail ?? 'Unknown',
+  type: 'Annual Leave',
+  start: formatDate(item?.startOfLeave),
+  end: formatDate(item?.endOfLeave),
+  days: calculateDays(item?.startOfLeave, item?.endOfLeave),
+  reason: item?.reason ?? '',
+  status: mapLeaveStatus(item?.status),
+  comment: '',
+});
 
 export default function LeaveApproval() {
-
-  //const [requests, setRequests] = useState(employeeLeaveRequests);
   const { currentUser } = useAuth();
   const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [actionError, setActionError] = useState('');
+  const [resolvingId, setResolvingId] = useState(null);
   const [filter, setFilter] = useState('pending');
   const [rejectTarget, setRejectTarget] = useState(null);
   const [rejectComment, setRejectComment] = useState('');
 
-
-
   const fetchLeaveRequests = async () => {
-  try {
-    const response = await fetch(
-      `http://localhost:8080/api/annualLeave?Username=${currentUser.name}`
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch leave requests");
+    const managerEmail = currentUser?.email ?? '';
+    if (!managerEmail) {
+      setRequests([]);
+      setLoadError('');
+      return;
     }
 
-    const data = await response.json();
+    setLoading(true);
+    setLoadError('');
+    try {
+      const data = await fetchManagerLeaveRequests(managerEmail);
+      const formatted = Array.isArray(data)
+        ? data.map((item) => mapLeaveRequest(item))
+        : [];
 
-    console.log(data);
-    
-    const formatted = data.map((item, index) => ({
-      id: index,
-
-      employee: item.username ?? item.name ?? "Unknown",
-      type: "Annual Leave",
-
-      start: item.start ?? item.startDate ?? "",
-      end: item.end ?? item.endDate ?? "",
-
-      days: 1,
-      reason: item.reason ?? "",
-
-      status: "pending",
-      comment: ""
-    }));
-
-    setRequests(formatted);
-
-  } catch (error) {
-    console.error(error);
-  }
+      setRequests(formatted);
+    } catch (error) {
+      console.error(error);
+      setRequests([]);
+      setLoadError('Unable to load leave requests for your team right now.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-  fetchLeaveRequests();
-}, [currentUser]);
+    fetchLeaveRequests();
+  }, [currentUser]);
 
-  
+  const approve = async (request) => {
+    if (!request?.id || resolvingId) {
+      return;
+    }
 
-  const approve = (id) =>
-    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved', comment: '' } : r));
+    setResolvingId(request.id);
+    setActionError('');
+
+    try {
+      await resolveLeaveRequest({ id: request.id, reason: '' });
+      setRequests((prev) => prev.map((item) => (
+        item.id === request.id ? { ...item, status: 'approved', comment: '' } : item
+      )));
+    } catch (error) {
+      console.error(error);
+      setActionError('Unable to approve this leave request right now.');
+    } finally {
+      setResolvingId(null);
+    }
+  };
 
   const openReject = (request) => { setRejectTarget(request); setRejectComment(''); };
 
-  const confirmReject = () => {
-    if (!rejectComment.trim()) return;
-    setRequests(prev => prev.map(r => r.id === rejectTarget.id ? { ...r, status: 'rejected', comment: rejectComment.trim() } : r));
-    setRejectTarget(null);
-    setRejectComment('');
+  const confirmReject = async () => {
+    if (!rejectComment.trim() || !rejectTarget?.id || resolvingId) return;
+
+    setResolvingId(rejectTarget.id);
+    setActionError('');
+
+    try {
+      await resolveLeaveRequest({ id: rejectTarget.id, reason: rejectComment.trim() });
+      setRequests((prev) => prev.map((item) => (
+        item.id === rejectTarget.id
+          ? { ...item, status: 'rejected', comment: rejectComment.trim() }
+          : item
+      )));
+      setRejectTarget(null);
+      setRejectComment('');
+    } catch (error) {
+      console.error(error);
+      setActionError('Unable to reject this leave request right now.');
+    } finally {
+      setResolvingId(null);
+    }
   };
 
   const filtered = filter === 'all' ? requests : requests.filter(r => r.status === filter);
@@ -89,9 +165,23 @@ export default function LeaveApproval() {
         <div className="card-header">
           <span className="card-title">Employee Leave Requests</span>
         </div>
+
+        {loadError && (
+          <div style={{ color: 'var(--danger)', padding: '0 16px 16px' }}>
+            {loadError}
+          </div>
+        )}
+
+        {actionError && (
+          <div style={{ color: 'var(--danger)', padding: '0 16px 16px' }}>
+            {actionError}
+          </div>
+        )}
+
         <div className={styles.listBody}>
+          {loading && <div className={styles.empty}>Loading requests...</div>}
           {filtered.length === 0 && <div className={styles.empty}>No requests found.</div>}
-          {filtered.map(req => (
+          {!loading && filtered.map(req => (
             <div key={req.id} className={styles.requestRow}>
               <div className={styles.info}>
                 <div className={styles.employeeName}>{req.employee}</div>
@@ -105,8 +195,8 @@ export default function LeaveApproval() {
               </div>
               {req.status === 'pending' ? (
                 <div className={styles.actions}>
-                  <button className="btn btn-primary btn-sm" onClick={() => approve(req.id)}>Approve</button>
-                  <button className={`btn btn-ghost btn-sm ${styles.rejectBtn}`} onClick={() => openReject(req)}>Reject</button>
+                  <button className="btn btn-primary btn-sm" onClick={() => approve(req)} disabled={resolvingId === req.id}>{resolvingId === req.id ? 'Working...' : 'Approve'}</button>
+                  <button className={`btn btn-ghost btn-sm ${styles.rejectBtn}`} onClick={() => openReject(req)} disabled={resolvingId === req.id}>Reject</button>
                 </div>
               ) : (
                 <span className={`badge badge-${req.status === 'approved' ? 'approved' : 'rejected'}`}>
@@ -139,7 +229,7 @@ export default function LeaveApproval() {
             />
           </div>
           <div className="modal-actions">
-            <button className={`btn btn-primary ${styles.confirmRejectBtn}`} onClick={confirmReject} disabled={!rejectComment.trim()}>Confirm Rejection</button>
+            <button className={`btn btn-primary ${styles.confirmRejectBtn}`} onClick={confirmReject} disabled={!rejectComment.trim() || resolvingId === rejectTarget?.id}>{resolvingId === rejectTarget?.id ? 'Rejecting...' : 'Confirm Rejection'}</button>
             <button className="btn btn-ghost" onClick={() => setRejectTarget(null)}>Cancel</button>
           </div>
         </div>

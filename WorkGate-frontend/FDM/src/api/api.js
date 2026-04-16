@@ -111,6 +111,34 @@ export function createExpenseRequest({ username, amount, currency, evidence, pur
   });
 }
 
+export function fetchLeaveRequests(username) {
+  return request(`/annualLeave?username=${encodeURIComponent(username)}`);
+}
+
+export function fetchManagerLeaveRequests(managerEmail) {
+  return request(`/annualLeave/manager?managerEmail=${encodeURIComponent(managerEmail)}`);
+}
+
+export function createLeaveRequest({ username, creationTime, startOfLeave, endOfLeave, reason }) {
+  return request('/createAnnualLeave', {
+    method: 'POST',
+    body: JSON.stringify({ username, creationTime, startOfLeave, endOfLeave, reason }),
+  });
+}
+
+export function resolveLeaveRequest(payload) {
+  return request('/resolveAnnualLeaveRequest', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function cancelLeaveRequest(id, username) {
+  return request(`/annualLeave/${encodeURIComponent(id)}?username=${encodeURIComponent(username)}`, {
+    method: 'DELETE',
+  });
+}
+
 // ── Admin ─────────────────────────────────────────────────────────────────────
 
 export function createEmployee({ email, username, name, initials, role, tag, managerEmail, password }) {
