@@ -13,6 +13,7 @@ public class Task {
 	private PRIORITY priority;
 	private TASK_CATEGORY category;
 	private String employeeEmail;
+	private String dueDate;
 
     @Id
     private Long id;
@@ -29,9 +30,9 @@ public class Task {
 	public Task() {
 
 	}
-	
+
 	public void setCompletion(boolean completion) { this.completion = completion; }
-	public void setTitle(String title) {  }
+	public void setTitle(String title) { this.title = title; }
 
 	public boolean isCompletion() {
 		return completion;
@@ -41,12 +42,9 @@ public class Task {
 		this.taskId = taskId;
 	}
 
-
-
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
 
 	public void setPriority(PRIORITY priority) {
 		this.priority = priority;
@@ -60,16 +58,16 @@ public class Task {
 		this.employeeEmail = employeeEmail;
 	}
 
-
-	public String getEmployeeEmail() {
-		return employeeEmail;
-	}
+	public String getEmployeeEmail() { return employeeEmail; }
 	public int getTaskId() { return this.taskId; }
-	public String getDescription() {return this.description;}
+	public String getDescription() { return this.description; }
 	public String getTitle() { return this.title; }
 	public PRIORITY getPriority() { return this.priority; }
 	public boolean getCompletion() { return this.completion; }
-	public void setCompletion(){ this.completion = true; }
-	public TASK_CATEGORY getCategory() {return category;}
+	public void setCompletion() { this.completion = true; }
+	public TASK_CATEGORY getCategory() { return category; }
 	public Long getId() { return id; }
+	public void setId(Long id) { this.id = id; }
+	public String getDueDate() { return dueDate; }
+	public void setDueDate(String dueDate) { this.dueDate = dueDate; }
 }
