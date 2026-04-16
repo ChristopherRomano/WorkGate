@@ -1,103 +1,83 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { fetchItTickets, claimTicket, advanceTicket, unlockAccount, fetchEmployees } from '../api/api';
+import { fetchAllItTickets, claimItTicket, resolveItTicket, fetchEmployees, unlockAccount } from '../api/api';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './ITManagement.module.css';
 
+const STATUS_BADGE = { OPEN: 'open', IN_PROGRESS: 'pending', RESOLVED: 'approved' };
+const STATUS_LABEL = { OPEN: 'OPEN', IN_PROGRESS: 'IN PROGRESS', RESOLVED: 'RESOLVED' };
+
 export default function ITManagement() {
   const { currentUser } = useAuth();
 
-  const [tickets, setTickets]         = useState([]);
-  const [loading, setLoading]         = useState(true);
-  const [filter, setFilter]           = useState('all');
-  const [selected, setSelected]       = useState(null);
-  const [actionError, setActionError] = useState('');
+  const [tickets, setTickets]           = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [loadError, setLoadError]       = useState('');
+  const [filter, setFilter]             = useState('all');
+  const [selected, setSelected]         = useState(null);
+  const [resolveTarget, setResolveTarget] = useState(null);
+  const [resolveMessage, setResolveMessage] = useState('');
+  const [resolveError, setResolveError] = useState('');
+  const [resolving, setResolving]       = useState(false);
+  const [actionError, setActionError]   = useState('');
 
-  // Unlock panel
-  const [unlockSearch, setUnlockSearch]   = useState('');
-  const [unlockResult, setUnlockResult]   = useState(null);
-  const [unlocking, setUnlocking]         = useState(false);
-  const [allEmployees, setAllEmployees]   = useState([]);
+  const [unlockSearch, setUnlockSearch] = useState('');
+  const [unlockResult, setUnlockResult] = useState(null);
+  const [unlocking, setUnlocking]       = useState(false);
+  const [allEmployees, setAllEmployees] = useState([]);
 
-  const loadData = async () => {
-    const [ticketData, empData] = await Promise.all([
-      fetch("http://localhost:8080/api/itTickets").then(r => r.json()),
-      fetchEmployees()
-    ]);
-
-    setTickets(ticketData);
-    setAllEmployees(empData);
-  };
-
-  useEffect(() => {
-    loadData().finally(() => setLoading(false));
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setLoadError('');
+    try {
+      const [ticketData, empData] = await Promise.all([
+        fetchAllItTickets(),
+        fetchEmployees(),
+      ]);
+      setTickets(Array.isArray(ticketData) ? ticketData : []);
+      setAllEmployees(Array.isArray(empData) ? empData : []);
+    } catch {
+      setLoadError('Unable to load tickets right now.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-
-  const createRequest = async (id) => {
-
-    const request = {
-      id: id,
-      email: currentUser?.employee,
-    };
-
-    try {
-      const response = await fetch("http://localhost:8080/api/claimItTicket", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(request)
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create ticket");
-      }
-    } 
-    catch (error) {
-        console.error(error);
-    }
-  };
-
-  const resolveRequest = async (id) => {
-
-    const request = {
-      id: id,
-    };
-
-    try {
-      const response = await fetch("http://localhost:8080/api/resolveItTicket", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(request)
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create ticket");
-      }
-    } 
-    catch (error) {
-        console.error(error);
-    }
-  };
-
-
-  // ── Ticket actions ────────────────────────────────────────────────────────
+  useEffect(() => { loadData(); }, [loadData]);
 
   const handleClaim = async (id) => {
     setActionError('');
-    await createRequest(id)
-    await loadData();
+    try {
+      await claimItTicket(id, currentUser?.email ?? '');
+      await loadData();
+    } catch (e) {
+      setActionError(e.message || 'Unable to claim ticket.');
+    }
   };
 
-  const handleResolve = async (id) => {
-    setActionError('');
-    await resolveRequest(id);
-    await loadData();
+  const openResolve = (ticket) => {
+    setResolveTarget(ticket);
+    setResolveMessage('');
+    setResolveError('');
   };
 
-  // ── Unlock ────────────────────────────────────────────────────────────────
+  const confirmResolve = async () => {
+    if (!resolveMessage.trim()) { setResolveError('Please provide a resolution message.'); return; }
+    if (resolving || !resolveTarget) return;
+    setResolving(true);
+    setResolveError('');
+    try {
+      await resolveItTicket(resolveTarget.id, resolveMessage.trim());
+      setResolveTarget(null);
+      if (selected?.id === resolveTarget.id) setSelected(null);
+      await loadData();
+    } catch (e) {
+      setResolveError(e.message || 'Unable to resolve ticket.');
+    } finally {
+      setResolving(false);
+    }
+  };
 
   const searchUnlock = () => {
     const q = unlockSearch.trim().toLowerCase();
@@ -114,7 +94,7 @@ export default function ITManagement() {
       await unlockAccount(unlockResult.email);
       setUnlockResult(r => ({ ...r, done: true }));
     } catch (e) {
-      setActionError(e.message);
+      setActionError(e.message || 'Unable to unlock account.');
     } finally {
       setUnlocking(false);
     }
@@ -124,8 +104,6 @@ export default function ITManagement() {
     ? tickets
     : tickets.filter(t => t.status === filter.toUpperCase());
 
-  if (loading) return <div className="animate-fade" style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading…</div>;
-
   return (
     <div className="animate-fade">
       {actionError && (
@@ -133,9 +111,14 @@ export default function ITManagement() {
           {actionError}
         </div>
       )}
+      {loadError && (
+        <div style={{ marginBottom: 12, padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, fontSize: 13, color: 'var(--danger)' }}>
+          {loadError}
+        </div>
+      )}
 
       <div className={styles.layout}>
-        {/* ── Ticket list ───────────────────────────────────────────────────── */}
+        {/* Ticket list */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className={styles.filters}>
             {[['all', 'All'], ['open', 'Open'], ['in_progress', 'In Progress'], ['resolved', 'Resolved']].map(([val, label]) => (
@@ -149,8 +132,9 @@ export default function ITManagement() {
               <span className={styles.count}>{filtered.length} ticket{filtered.length !== 1 ? 's' : ''}</span>
             </div>
             <div className={styles.listBody}>
-              {filtered.length === 0 && <div className={styles.empty}>No tickets found.</div>}
-              {filtered.map(t => (
+              {loading && <div className={styles.empty}>Loading…</div>}
+              {!loading && filtered.length === 0 && <div className={styles.empty}>No tickets found.</div>}
+              {!loading && filtered.map(t => (
                 <div key={t.id} className={styles.ticketRow}>
                   <div className={styles.ticketMain}>
                     <div className={styles.ticketHeader}>
@@ -163,20 +147,15 @@ export default function ITManagement() {
                     <div className={styles.ticketTitle}>{t.title}</div>
                     <div className={styles.ticketDesc}>{t.description}</div>
                     <div className={styles.ticketMeta}>
-                      Submitted by: {t.username} · {t.claimedByEmail ? `Claimed by ${t.claimedByEmail}` : 'Unclaimed'}
+                      Submitted by: {t.employeeEmail} · {t.claimedByEmail ? `Claimed by ${t.claimedByEmail}` : 'Unclaimed'}
                     </div>
                   </div>
                   <div className={styles.ticketActions}>
                     {!t.claimedByEmail && (
                       <button className="btn btn-ghost btn-sm" onClick={() => handleClaim(t.id)}>Claim</button>
                     )}
-                    {t.claimedByEmail && t.status !== 'RESOLVED' && (
-                      <button className="btn btn-primary btn-sm" onClick={() =>
-                              t.status === 'OPEN'
-                                ? handleStart(t.id)
-                                : handleResolve(t.id)
-                              }>                                  
-                      </button>
+                    {t.claimedByEmail && t.status === 'IN_PROGRESS' && (
+                      <button className="btn btn-primary btn-sm" onClick={() => openResolve(t)}>Resolve</button>
                     )}
                     <button className="btn btn-ghost btn-sm" onClick={() => setSelected(t)}>Details</button>
                   </div>
@@ -186,7 +165,7 @@ export default function ITManagement() {
           </div>
         </div>
 
-        {/* ── Unlock panel ─────────────────────────────────────────────────── */}
+        {/* Unlock panel */}
         <div className="card" style={{ alignSelf: 'start', width: 300, flexShrink: 0 }}>
           <div className="card-header"><span className="card-title">Unlock Account</span></div>
           <div className={styles.unlockBody}>
@@ -200,51 +179,69 @@ export default function ITManagement() {
                 onKeyDown={e => e.key === 'Enter' && searchUnlock()}
               />
             </div>
-            <button
-              className="btn btn-ghost btn-sm"
-              style={{ width: '100%', justifyContent: 'center' }}
-              onClick={searchUnlock}
-            >
+            <button className="btn btn-ghost btn-sm" style={{ width: '100%', justifyContent: 'center' }} onClick={searchUnlock}>
               Search
             </button>
-
             {unlockResult && !unlockResult.notFound && (
               <div className={styles.unlockCard}>
-                <div className={styles.unlockAvatar}>{unlockResult.initials}</div>
+                <div className={styles.unlockAvatar}>{unlockResult.initials ?? unlockResult.email?.[0]?.toUpperCase()}</div>
                 <div>
-                  <div className={styles.unlockName}>{unlockResult.name}</div>
+                  <div className={styles.unlockName}>{unlockResult.name ?? unlockResult.email}</div>
                   <div className={styles.unlockEmail}>{unlockResult.email}</div>
                   {unlockResult.done
                     ? <div className={styles.unlockSuccess}>Account unlocked.</div>
-                    : (
-                      <button
-                        className="btn btn-primary btn-sm"
-                        style={{ marginTop: 8 }}
-                        onClick={handleUnlock}
-                        disabled={unlocking}
-                      >
-                        {unlocking ? 'Unlocking…' : 'Unlock Account'}
-                      </button>
-                    )
+                    : <button className="btn btn-primary btn-sm" style={{ marginTop: 8 }} onClick={handleUnlock} disabled={unlocking}>{unlocking ? 'Unlocking…' : 'Unlock Account'}</button>
                   }
                 </div>
               </div>
             )}
-            {unlockResult?.notFound && (
-              <div className={styles.unlockNotFound}>No employee found.</div>
-            )}
+            {unlockResult?.notFound && <div className={styles.unlockNotFound}>No employee found.</div>}
           </div>
         </div>
       </div>
 
-      {/* ── Ticket detail modal ───────────────────────────────────────────── */}
+      {/* Resolve Modal */}
+      <Modal isOpen={!!resolveTarget} onClose={() => setResolveTarget(null)} title="Resolve Ticket">
+        {resolveTarget && (
+          <div className="form-grid">
+            <div className={styles.detailBox}>
+              <div className={styles.detailRow}><span>Ticket</span><strong>#{resolveTarget.id}</strong></div>
+              <div className={styles.detailRow}><span>Submitted by</span><strong>{resolveTarget.employeeEmail}</strong></div>
+              <div className={styles.detailRow}><span>Category</span><strong>{resolveTarget.category}</strong></div>
+            </div>
+            <div className="form-group">
+              <label>Issue</label>
+              <div className={styles.detailText}>{resolveTarget.title}</div>
+            </div>
+            <div className="form-group">
+              <label>Resolution / Response <span style={{ color: 'var(--danger)' }}>*</span></label>
+              <textarea
+                className="field"
+                style={{ minHeight: 100 }}
+                placeholder="Describe what was done to resolve this issue — this will be visible to the employee..."
+                value={resolveMessage}
+                onChange={e => { setResolveMessage(e.target.value); if (resolveError) setResolveError(''); }}
+              />
+              {resolveError && <div style={{ fontSize: 11, color: 'var(--danger)', marginTop: 4 }}>{resolveError}</div>}
+            </div>
+            <div className="modal-actions">
+              <button className="btn btn-primary" onClick={confirmResolve} disabled={resolving || !resolveMessage.trim()}>
+                {resolving ? 'Resolving…' : 'Mark Resolved'}
+              </button>
+              <button className="btn btn-ghost" onClick={() => setResolveTarget(null)}>Cancel</button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Details Modal */}
       <Modal isOpen={!!selected} onClose={() => setSelected(null)} title="Ticket Details">
         {selected && (
           <div className="form-grid">
             <div className={styles.detailBox}>
               <div className={styles.detailRow}><span>ID</span><strong>#{selected.id}</strong></div>
               <div className={styles.detailRow}><span>Category</span><strong>{selected.category}</strong></div>
-              <div className={styles.detailRow}><span>Submitted by</span><strong>{selected.username}</strong></div>
+              <div className={styles.detailRow}><span>Submitted by</span><strong>{selected.employeeEmail}</strong></div>
               <div className={styles.detailRow}><span>Status</span>
                 <span className={`badge badge-${STATUS_BADGE[selected.status] ?? 'open'}`}>
                   {STATUS_LABEL[selected.status] ?? selected.status}
@@ -260,11 +257,18 @@ export default function ITManagement() {
               <label>Description</label>
               <div className={styles.detailText}>{selected.description}</div>
             </div>
+            {selected.resolutionMessage && (
+              <div className="form-group">
+                <label>Resolution</label>
+                <div className={styles.detailText}>{selected.resolutionMessage}</div>
+              </div>
+            )}
             <div className="modal-actions">
-              {selected.claimedByEmail && selected.status !== 'RESOLVED' && (
-                <button className="btn btn-primary" onClick={() => handleResolve(selected.id)}>
-                  {selected.status === 'OPEN' ? 'Start' : 'Resolve'}
-                </button>
+              {!selected.claimedByEmail && (
+                <button className="btn btn-ghost" onClick={async () => { await handleClaim(selected.id); setSelected(null); }}>Claim</button>
+              )}
+              {selected.claimedByEmail && selected.status === 'IN_PROGRESS' && (
+                <button className="btn btn-primary" onClick={() => { setSelected(null); openResolve(selected); }}>Resolve</button>
               )}
               <button className="btn btn-ghost" onClick={() => setSelected(null)}>Close</button>
             </div>

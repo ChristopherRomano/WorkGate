@@ -169,30 +169,68 @@ export function deleteEmployee(email) {
 
 // ── IT Tickets ────────────────────────────────────────────────────────────────
 
-export function fetchItTickets() {
-  return request('/it-tickets');
+export function fetchAllItTickets() {
+  return request('/itTickets');
+}
+
+export function fetchMyItTickets(username) {
+  return request(`/itTickets/employee?username=${encodeURIComponent(username)}`);
 }
 
 export function createItTicket({ username, title, description, category }) {
-  return request('/it-tickets', {
+  return request('/createItTicket', {
     method: 'POST',
-    body: JSON.stringify({ username, title, description, category }),
+    body: JSON.stringify({ username, creationTime: Date.now(), title, description, category, evidence: [] }),
   });
 }
 
-export function claimTicket(id, techEmail) {
-  return request(`/it-tickets/${id}/claim`, {
-    method: 'PUT',
-    body: JSON.stringify({ techEmail }),
+export function claimItTicket(id, email) {
+  return request('/claimItTicket', {
+    method: 'POST',
+    body: JSON.stringify({ id, email }),
   });
 }
 
-export function advanceTicket(id) {
-  return request(`/it-tickets/${id}/advance`, { method: 'PUT' });
+export function resolveItTicket(id, message) {
+  return request('/resolveItTicket', {
+    method: 'POST',
+    body: JSON.stringify({ id, message }),
+  });
 }
 
 export function unlockAccount(email) {
   return request(`/admin/employees/${encodeURIComponent(email)}/unlock`, { method: 'PUT' });
+}
+
+// ── HR Reports ────────────────────────────────────────────────────────────────
+
+export function fetchMyHrReports(username) {
+  return request(`/employeeReports?username=${encodeURIComponent(username)}`);
+}
+
+export function fetchAllHrReports() {
+  return request('/employeeReports/all');
+}
+
+export function createHrReport({ username, title, content, anonymous, creationTime }) {
+  return request('/createEmployeeReport', {
+    method: 'POST',
+    body: JSON.stringify({ username, creationTime, title, content, anonymous }),
+  });
+}
+
+export function claimHrReport(id, email) {
+  return request('/claimEmployeeReport', {
+    method: 'POST',
+    body: JSON.stringify({ id, email }),
+  });
+}
+
+export function resolveHrReport(id, resolution) {
+  return request('/resolveEmployeeReport', {
+    method: 'POST',
+    body: JSON.stringify({ id, resolution }),
+  });
 }
 
 // ── Posts ─────────────────────────────────────────────────────────────────────
