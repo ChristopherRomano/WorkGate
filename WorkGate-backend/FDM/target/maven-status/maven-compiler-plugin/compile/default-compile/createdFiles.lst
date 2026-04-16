@@ -25,7 +25,6 @@ com\workgate\fdm\DTO\UpdateInfoRequest.class
 com\workgate\fdm\controller\PostController.class
 com\workgate\fdm\controller\AdminController.class
 com\workgate\fdm\model\ExpenseRequest.class
-com\workgate\fdm\controller\EmployeeReportController.class
 com\workgate\fdm\DTO\ExpenseRequestRequest.class
 com\workgate\fdm\repository\PostRepository.class
 com\workgate\fdm\DTO\LeaveRequestRequest.class
@@ -39,7 +38,6 @@ com\workgate\fdm\controller\ClientCodeController.class
 com\workgate\fdm\repository\EmployeeRepository.class
 com\workgate\fdm\model\Day.class
 com\workgate\fdm\model\Poster.class
-com\workgate\fdm\controller\ItTicketController.class
 com\workgate\fdm\model\Calendar.class
 com\workgate\fdm\DTO\ItTicketRequest.class
 com\workgate\fdm\model\EmployeeReport.class

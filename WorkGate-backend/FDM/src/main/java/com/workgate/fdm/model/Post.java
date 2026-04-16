@@ -15,7 +15,6 @@ public class Post {
 	private String authorEmail;
 	private long timePosted;
     @Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 	/**
@@ -29,6 +28,7 @@ public class Post {
 	 */
 
 	public Post(String title, String content, boolean pinned, VISIBILITY visibility, long timePosted, String authorEmail) {
+		this.id = System.currentTimeMillis();
 		this.title = title;
 		this.content = content;
 		this.pinned = pinned;

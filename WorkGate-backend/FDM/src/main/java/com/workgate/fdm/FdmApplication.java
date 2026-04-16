@@ -47,4 +47,22 @@ public class FdmApplication {
 			employeeRepository.save(manager);
 		};
 	}
+
+	@Bean
+	CommandLineRunner seedTestAdmin(EmployeeRepository employeeRepository) {
+		return args -> {
+			if (employeeRepository.findByEmail("admin@workgate.com") != null) {
+				return;
+			}
+
+			Employee admin = new Employee("admin@workgate.com", "", "pass", TAG.ADMIN);
+			admin.setName("Test");
+			admin.setSurname("Admin");
+			admin.setInitials("TA");
+			admin.setUsername("admin");
+			admin.setActive(true);
+
+			employeeRepository.save(admin);
+		};
+	}
 }
