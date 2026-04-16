@@ -20,7 +20,7 @@ public abstract class ManagerRequest extends Request {
 		return this.managerEmail;
 	}
 
-	public void setManagerEmail(String managerEmail) {
+	public void setManagerEmail(String managerEmail){
 		this.managerEmail = managerEmail;
 	}
 

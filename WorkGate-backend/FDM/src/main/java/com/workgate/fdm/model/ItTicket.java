@@ -1,7 +1,7 @@
 package com.workgate.fdm.model;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 
 @Entity
