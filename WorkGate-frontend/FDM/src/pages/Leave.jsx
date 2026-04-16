@@ -7,7 +7,6 @@ import { useAuth } from '../context/AuthContext';
 import { countBusinessDays, formatLeaveDate, getTodayDateString, isPastDate } from '../utils/leaveDates';
 import styles from './Leave.module.css';
 
-
 export default function Leave() {
   const { currentUser, updateCurrentUser } = useAuth();
   const [requests, setRequests] = useState([]);

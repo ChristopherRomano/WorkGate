@@ -2,13 +2,12 @@ import { useState } from 'react';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './HR.module.css';
-import { useAuth } from '../context/AuthContext';
+
 const initial = [
   { id: 'hr1', title: 'Workplace Feedback – Team Communication', excerpt: 'General feedback about team communication processes on client site. Submitted anonymously.', date: '20 Mar 2026', status: 'resolved', anon: true },
 ];
 
 export default function HR() {
-  const { currentUser } = useAuth();
   const [reports, setReports] = useState(initial);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ title: '', content: '', anon: false });
@@ -16,8 +15,7 @@ export default function HR() {
   const createRequest = async (content,title,anonymous) => {
 
     const request = {
-      username: currentUser?.username ,
-      creationTime: new Date().getTime(),
+      username: "john",
       content: content,
       title: title,
       anonymous: anonymous,

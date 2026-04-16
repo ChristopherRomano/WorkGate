@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "dtype")
+@Inheritance(strategy = InheritanceType.JOINED)
+
 public abstract class Request {
 
 	private String employeeEmail;

@@ -145,6 +145,30 @@ export function unlockAccount(email) {
   return request(`/admin/employees/${encodeURIComponent(email)}/unlock`, { method: 'PUT' });
 }
 
+// ── Posts ─────────────────────────────────────────────────────────────────────
+
+export function fetchPosts() {
+  return request('/allPosts');
+}
+
+export function createPost({ title, content, pinned, visibility, authorUsername }) {
+  return request('/createPost', {
+    method: 'POST',
+    body: JSON.stringify({
+      title,
+      content,
+      pinned,
+      visibility: visibility.toUpperCase(),
+      authorUsername,
+      timePosted: Date.now(),
+    }),
+  });
+}
+
+export function deletePost(id) {
+  return request(`/posts/${id}`, { method: 'DELETE' });
+}
+
 // ── Client Codes ──────────────────────────────────────────────────────────────
 
 export function fetchClientCodes() {
@@ -211,12 +235,14 @@ export function rejectLeaveRequest(requestId, managerEmail) {
 
 export function mapTask(t) {
   return {
-    id: t.taskId,
+    id: t.id ?? t.taskId,
     title: t.title,
     description: t.description ?? '',
     done: t.completion,
     priority: t.priority?.toLowerCase() ?? 'medium',
     due: t.dueDate ?? '',
-    type: t.category ?? 'Operational',
+    type: t.category
+      ? (t.category.charAt(0).toUpperCase() + t.category.slice(1).toLowerCase())
+      : 'Operational',
   };
 }

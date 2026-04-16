@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.workgate.fdm.model.AnnualLeaveRequest;
-import com.workgate.fdm.model.STATUS;
 
 @RestController
 @RequestMapping("/api")
@@ -78,7 +77,6 @@ public class LeaveRequestController {
         String managerEmail = employee.getManagerEmail().trim();
 
         AnnualLeaveRequest annualLeaveRequest = new AnnualLeaveRequest();
-        annualLeaveRequest.setCreationTime(request.getCreationTime());
         annualLeaveRequest.setStartOfLeave(request.getStartOfLeave());
         annualLeaveRequest.setEndOfLeave(request.getEndOfLeave());
         annualLeaveRequest.setReason(request.getReason());

@@ -4,6 +4,12 @@
   align-items: flex-start;
 }
 
+.unlockPanel {
+  align-self: flex-start;
+  width: 300px;
+  flex-shrink: 0;
+}
+
 .filters {
   display: flex;
   gap: 8px;
@@ -97,6 +103,24 @@
 .unlockEmail   { font-size: 11px; color: var(--text-dim); }
 .unlockSuccess { font-size: 12px; color: var(--green); margin-top: 6px; font-weight: 600; }
 .unlockNotFound { font-size: 12px; color: var(--red, #f87171); text-align: center; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+  .unlockPanel {
+    width: 100%;
+  }
+  .ticketRow {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ticketActions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
 
 /* Detail modal */
 .detailBox {
