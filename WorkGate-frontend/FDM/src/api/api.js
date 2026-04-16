@@ -89,12 +89,62 @@ export function deleteTask(taskId, employeeEmail) {
   });
 }
 
+export function fetchExpenseRequests(email) {
+  return request(`/expenses?username=${encodeURIComponent(email)}`);
+}
+
+export function fetchManagerExpenseRequests(managerEmail) {
+  return request(`/expenses/manager?managerEmail=${encodeURIComponent(managerEmail)}`);
+}
+
+export function resolveExpenseRequest(payload) {
+  return request('/resolveExpenseRequest', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function createExpenseRequest({ username, amount, currency, evidence, purchaseDate, reason }) {
+  return request('/createExpense', {
+    method: 'POST',
+    body: JSON.stringify({ username, amount, currency, evidence, purchaseDate, reason }),
+  });
+}
+
+export function fetchLeaveRequests(username) {
+  return request(`/annualLeave?username=${encodeURIComponent(username)}`);
+}
+
+export function fetchManagerLeaveRequests(managerEmail) {
+  return request(`/annualLeave/manager?managerEmail=${encodeURIComponent(managerEmail)}`);
+}
+
+export function createLeaveRequest({ username, creationTime, startOfLeave, endOfLeave, reason }) {
+  return request('/createAnnualLeave', {
+    method: 'POST',
+    body: JSON.stringify({ username, creationTime, startOfLeave, endOfLeave, reason }),
+  });
+}
+
+export function resolveLeaveRequest(payload) {
+  return request('/resolveAnnualLeaveRequest', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function cancelLeaveRequest(id, username) {
+  return request(`/annualLeave/${encodeURIComponent(id)}?username=${encodeURIComponent(username)}`, {
+    method: 'DELETE',
+  });
+}
+
 // ── Admin ─────────────────────────────────────────────────────────────────────
 
-export function createEmployee({ email, username, name, initials, role, tag, managerEmail, password, clientCode }) {
+export function createEmployee({ email, username, name, initials, role, tag, managerEmail, password }) {
   return request('/employees/createEmployee', {
     method: 'POST',
-    body: JSON.stringify({ email, username, name, initials, role, tag, managerEmail, password, clientCode }),
+    body: JSON.stringify({ email, username, name, initials, role, tag, managerEmail, password }),
   });
 }
 
@@ -119,30 +169,68 @@ export function deleteEmployee(email) {
 
 // ── IT Tickets ────────────────────────────────────────────────────────────────
 
-export function fetchItTickets() {
-  return request('/it-tickets');
+export function fetchAllItTickets() {
+  return request('/itTickets');
+}
+
+export function fetchMyItTickets(username) {
+  return request(`/itTickets/employee?username=${encodeURIComponent(username)}`);
 }
 
 export function createItTicket({ username, title, description, category }) {
-  return request('/it-tickets', {
+  return request('/createItTicket', {
     method: 'POST',
-    body: JSON.stringify({ username, title, description, category }),
+    body: JSON.stringify({ username, creationTime: Date.now(), title, description, category, evidence: [] }),
   });
 }
 
-export function claimTicket(id, techEmail) {
-  return request(`/it-tickets/${id}/claim`, {
-    method: 'PUT',
-    body: JSON.stringify({ techEmail }),
+export function claimItTicket(id, email) {
+  return request('/claimItTicket', {
+    method: 'POST',
+    body: JSON.stringify({ id, email }),
   });
 }
 
-export function advanceTicket(id) {
-  return request(`/it-tickets/${id}/advance`, { method: 'PUT' });
+export function resolveItTicket(id, message) {
+  return request('/resolveItTicket', {
+    method: 'POST',
+    body: JSON.stringify({ id, message }),
+  });
 }
 
 export function unlockAccount(email) {
   return request(`/admin/employees/${encodeURIComponent(email)}/unlock`, { method: 'PUT' });
+}
+
+// ── HR Reports ────────────────────────────────────────────────────────────────
+
+export function fetchMyHrReports(username) {
+  return request(`/employeeReports?username=${encodeURIComponent(username)}`);
+}
+
+export function fetchAllHrReports() {
+  return request('/employeeReports/all');
+}
+
+export function createHrReport({ username, title, content, anonymous, creationTime }) {
+  return request('/createEmployeeReport', {
+    method: 'POST',
+    body: JSON.stringify({ username, creationTime, title, content, anonymous }),
+  });
+}
+
+export function claimHrReport(id, email) {
+  return request('/claimEmployeeReport', {
+    method: 'POST',
+    body: JSON.stringify({ id, email }),
+  });
+}
+
+export function resolveHrReport(id, resolution) {
+  return request('/resolveEmployeeReport', {
+    method: 'POST',
+    body: JSON.stringify({ id, resolution }),
+  });
 }
 
 // ── Posts ─────────────────────────────────────────────────────────────────────
@@ -169,6 +257,7 @@ export function deletePost(id) {
   return request(`/posts/${id}`, { method: 'DELETE' });
 }
 
+
 // ── Client Codes ──────────────────────────────────────────────────────────────
 
 export function fetchClientCodes() {
@@ -184,51 +273,6 @@ export function addClientCode({ code, client, sector }) {
 
 export function removeClientCode(code) {
   return request(`/client-codes/${encodeURIComponent(code)}`, { method: 'DELETE' });
-}
-
-// ── Leave ────────────────────────────────────────────────────────────────────
-
-export function fetchLeaveRequests(username) {
-  return request(`/annualLeave?username=${encodeURIComponent(username)}`);
-}
-
-export function createLeaveRequest({ username, creationTime, startOfLeave, endOfLeave, reason }) {
-  const payload = JSON.stringify({ username, creationTime, startOfLeave, endOfLeave, reason });
-
-  return request('/annualLeave', {
-    method: 'POST',
-    body: payload,
-  }).catch((error) => {
-    if (String(error?.message ?? '').includes('404')) {
-      return request('/createAnnualLeave', {
-        method: 'POST',
-        body: payload,
-      });
-    }
-    throw error;
-  });
-}
-
-export function cancelLeaveRequest(requestId, username) {
-  return request(`/annualLeave/${requestId}?username=${encodeURIComponent(username)}`, {
-    method: 'DELETE',
-  });
-}
-
-export function fetchManagerLeaveRequests(managerEmail) {
-  return request(`/annualLeave/manager?managerEmail=${encodeURIComponent(managerEmail)}`);
-}
-
-export function approveLeaveRequest(requestId, managerEmail) {
-  return request(`/annualLeave/${requestId}/approve?managerEmail=${encodeURIComponent(managerEmail)}`, {
-    method: 'PUT',
-  });
-}
-
-export function rejectLeaveRequest(requestId, managerEmail) {
-  return request(`/annualLeave/${requestId}/reject?managerEmail=${encodeURIComponent(managerEmail)}`, {
-    method: 'PUT',
-  });
 }
 
 // ── Field mapping: backend Task → frontend task shape ─────────────────────────

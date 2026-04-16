@@ -14,9 +14,9 @@ const NAV = [
     { to: '/app/profile', icon: '◉', label: 'My Profile', permission: 'profile' },
   ]},
   { section: 'Work', items: [
-    { to: '/app/tasks',     icon: '✓', label: 'Tasks',     permission: 'tasks',     mobile: true },
-    { to: '/app/leave',     icon: '📅', label: 'Leave',    permission: 'leave' },
-    { to: '/app/expenses',  icon: '£', label: 'Expenses',  permission: 'expenses' },
+    { to: '/app/tasks',    icon: '✓',  label: 'Tasks',    permission: 'tasks',    mobile: true },
+    { to: '/app/leave',    icon: '📅', label: 'Leave',    permission: 'leave' },
+    { to: '/app/expenses', icon: '£',  label: 'Expenses', permission: 'expenses' },
   ]},
   { section: 'Management', roleSection: 'manager', items: [
     { to: '/app/leave-approval',   icon: '📋', label: 'Leave Approvals',  permission: 'leave-approval' },
@@ -31,7 +31,7 @@ const NAV = [
     { to: '/app/hr-management', icon: '📋', label: 'Report Management', permission: 'hr-management' },
   ]},
   { section: 'Admin', roleSection: 'admin', items: [
-    { to: '/app/admin',              icon: '⚙', label: 'Admin Dashboard',  permission: 'admin-dashboard',  mobile: true },
+    { to: '/app/admin',              icon: '⚙',  label: 'Admin Dashboard',  permission: 'admin-dashboard',  mobile: true },
     { to: '/app/admin/employees',    icon: '👥', label: 'Manage Employees', permission: 'manage-employees', mobile: true },
     { to: '/app/admin/add-employee', icon: '➕', label: 'Add Elements',     permission: 'add-employee',     mobile: true },
     { to: '/app/admin/client-codes', icon: '🏢', label: 'Client Codes',     permission: 'client-codes' },
@@ -68,13 +68,7 @@ export default function Sidebar() {
     .flatMap(s => s.items)
     .filter(item => item.mobile && can(item.permission));
 
-  const mobileLabelMap = {
-    'Dashboard': 'Home',
-    'Admin Dashboard': 'Admin',
-    'Manage Employees': 'Manage',
-    'Add Elements': 'Add',
-  };
-  const getMobileLabel = (label) => mobileLabelMap[label] ?? label;
+  const MOBILE_LABEL = { 'Dashboard':'Home', 'Admin Dashboard':'Admin', 'Manage Employees':'Manage', 'Add Elements':'Add' };
 
   const showSettings = can('settings');
 
@@ -153,7 +147,7 @@ export default function Sidebar() {
             className={({ isActive }) => `${styles.mobileNavItem} ${isActive ? styles.mobileNavActive : ''}`}
           >
             <span className={styles.mobileNavIcon}>{icon}</span>
-            <span className={styles.mobileNavLabel}>{getMobileLabel(label)}</span>
+            <span className={styles.mobileNavLabel}>{MOBILE_LABEL[label] ?? label}</span>
           </NavLink>
         ))}
         <NavLink

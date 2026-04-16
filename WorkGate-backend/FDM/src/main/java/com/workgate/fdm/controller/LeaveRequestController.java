@@ -1,22 +1,23 @@
 package com.workgate.fdm.controller;
+
 import java.util.List;
-import java.util.Optional;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 
 
 import com.workgate.fdm.DTO.LeaveRequestRequest;
 import com.workgate.fdm.model.Employee;
-import com.workgate.fdm.model.STATUS;
 import com.workgate.fdm.repository.EmployeeRepository;
 import com.workgate.fdm.repository.LeaveRequestRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.workgate.fdm.model.AnnualLeaveRequest;
+import com.workgate.fdm.model.STATUS;
+
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 
 @RestController
 @RequestMapping("/api")
@@ -35,171 +36,113 @@ public class LeaveRequestController {
     }
 
     @GetMapping("/annualLeave")
-    public List<AnnualLeaveRequest> getLeaveRequests(
-            @RequestParam(required = false) String username,
-            @RequestParam(required = false) String Username) {
-        Employee employee = resolveEmployee(normaliseUsername(username, Username), "username");
-        String employeeEmail = employee.getEmail();
-        return leaveRequestRepository.findByEmployeeEmailOrderByCreationTimeDesc(employeeEmail);
+    public List<AnnualLeaveRequest> getLeaveRequests(@RequestParam String username){
+        return leaveRequestRepository.findByEmployeeEmail(username);
     }
 
     @GetMapping("/annualLeave/manager")
     public List<AnnualLeaveRequest> getManagerLeaveRequests(@RequestParam String managerEmail) {
-        Employee manager = resolveEmployee(managerEmail, "managerEmail");
-        return leaveRequestRepository.findByManagerEmailOrderByCreationTimeDesc(manager.getEmail());
+        return leaveRequestRepository.findByManagerEmail(managerEmail);
     }
 
-    @PostMapping({"/createAnnualLeave", "/annualLeave", "/annualLeave/create"})
-    public ResponseEntity<AnnualLeaveRequest> createAnnualLeaveRequest(@RequestBody LeaveRequestRequest request) {
+    @PostMapping("/createAnnualLeave")
+    public void createAnnualLeaveRequest(@RequestBody LeaveRequestRequest request) {
         if (request.getUsername() == null || request.getUsername().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username is required.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
         }
-
-        Employee employee = resolveEmployee(request.getUsername(), "username");
-        LocalDate startDate = toLocalDate(request.getStartOfLeave());
-        LocalDate endDate = toLocalDate(request.getEndOfLeave());
 
         if (request.getEndOfLeave() < request.getStartOfLeave()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "endOfLeave cannot be before startOfLeave.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Leave end date cannot be before start date");
         }
 
-        if (startDate.isBefore(LocalDate.now()) || endDate.isBefore(LocalDate.now())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Leave dates cannot be in the past.");
+        Employee employee = employeeRepository.findByEmail(request.getUsername());
+        if (employee == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
         }
 
-        if (countBusinessDays(startDate, endDate) <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selected dates must include at least one working day.");
+        int requestedDays = calculateRequestedDays(request.getStartOfLeave(), request.getEndOfLeave());
+        if (requestedDays > employee.getAnnualLeaveBalance()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested leave exceeds annual leave balance");
         }
-
-        if (employee.getManagerEmail() == null || employee.getManagerEmail().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee does not have an assigned manager.");
-        }
-
-        String managerEmail = employee.getManagerEmail().trim();
 
         AnnualLeaveRequest annualLeaveRequest = new AnnualLeaveRequest();
+        annualLeaveRequest.setCreationTime(request.getCreationTime());
         annualLeaveRequest.setStartOfLeave(request.getStartOfLeave());
         annualLeaveRequest.setEndOfLeave(request.getEndOfLeave());
         annualLeaveRequest.setReason(request.getReason());
-        annualLeaveRequest.setEmployeeEmail(employee.getEmail());
+        annualLeaveRequest.setEmployeeEmail(request.getUsername());
         annualLeaveRequest.updateStatus(STATUS.OPEN);
-        annualLeaveRequest.setManagerEmail(managerEmail);
-        annualLeaveRequest.setAssignedManager(managerEmail);
+        annualLeaveRequest.setManagerEmail(employee.getManagerEmail());
 
-        AnnualLeaveRequest saved = leaveRequestRepository.save(annualLeaveRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        leaveRequestRepository.save(annualLeaveRequest);
     }
 
-    @PutMapping("/annualLeave/{requestId}/approve")
-    public AnnualLeaveRequest approveLeaveRequest(
-            @PathVariable Long requestId,
-            @RequestParam String managerEmail) {
-        return updateDecision(requestId, managerEmail, STATUS.ACCEPTED);
+    @PostMapping("/resolveAnnualLeaveRequest")
+    public void resolveAnnualLeaveRequest(@RequestBody java.util.Map<String, Object> request) {
+        Object idValue = request.get("id");
+        if (idValue == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Leave request id is required");
+        }
+
+        Long leaveRequestId = Long.valueOf(String.valueOf(idValue));
+
+        AnnualLeaveRequest leaveRequest = leaveRequestRepository.findById(leaveRequestId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Leave request not found"));
+
+        String rejectionReason = request.get("reason") == null ? "" : String.valueOf(request.get("reason")).trim();
+
+        if (!rejectionReason.isEmpty()) {
+            leaveRequest.updateStatus(STATUS.REJECTED);
+            leaveRequest.setRejectionReason(rejectionReason);
+            leaveRequestRepository.save(leaveRequest);
+            return;
+        }
+
+        Employee employee = employeeRepository.findByEmail(leaveRequest.getemployeeEmail());
+        if (employee == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found for leave request");
+        }
+
+        int requestedDays = calculateRequestedDays(leaveRequest.getStartOfLeave(), leaveRequest.getEndOfLeave());
+        if (requestedDays > employee.getAnnualLeaveBalance()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee has insufficient leave balance");
+        }
+
+        employee.setAnnualLeaveBalance(employee.getAnnualLeaveBalance() - requestedDays);
+        employeeRepository.save(employee);
+
+        leaveRequest.updateStatus(STATUS.ACCEPTED);
+        leaveRequestRepository.save(leaveRequest);
     }
 
-    @PutMapping("/annualLeave/{requestId}/reject")
-    public AnnualLeaveRequest rejectLeaveRequest(
-            @PathVariable Long requestId,
-            @RequestParam String managerEmail) {
-        return updateDecision(requestId, managerEmail, STATUS.REJECTED);
+    @DeleteMapping("/annualLeave/{id}")
+    public void cancelLeaveRequest(@PathVariable Long id, @RequestParam String username) {
+        AnnualLeaveRequest leaveRequest = leaveRequestRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Leave request not found"));
+
+        if (!leaveRequest.getemployeeEmail().equalsIgnoreCase(username)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only cancel your own leave requests");
+        }
+
+        if (leaveRequest.getStatus() != STATUS.OPEN) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only pending leave requests can be cancelled");
+        }
+
+        leaveRequestRepository.delete(leaveRequest);
     }
 
-    @DeleteMapping("/annualLeave/{requestId}")
-    public ResponseEntity<Void> cancelLeaveRequest(
-            @PathVariable Long requestId,
-            @RequestParam String username) {
-        Employee requester = resolveEmployee(username, "username");
-
-        AnnualLeaveRequest request = leaveRequestRepository.findById(requestId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Leave request not found."));
-
-        if (!request.getemployeeEmail().equalsIgnoreCase(requester.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only cancel your own leave request.");
-        }
-
-        if (request.getStatus() != STATUS.OPEN) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only pending leave requests can be cancelled.");
-        }
-
-        leaveRequestRepository.delete(request);
-        return ResponseEntity.noContent().build();
-    }
-
-    private AnnualLeaveRequest updateDecision(Long requestId, String managerEmail, STATUS decision) {
-        Employee manager = resolveEmployee(managerEmail, "managerEmail");
-
-        Optional<AnnualLeaveRequest> maybeRequest = leaveRequestRepository.findById(requestId);
-        if (maybeRequest.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Leave request not found.");
-        }
-
-        AnnualLeaveRequest request = maybeRequest.get();
-        if (!request.getAssignedManager().equalsIgnoreCase(manager.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only review requests assigned to you.");
-        }
-
-        if (request.getStatus() != STATUS.OPEN) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This leave request has already been reviewed.");
-        }
-
-        if (decision == STATUS.ACCEPTED) {
-            int businessDays = countBusinessDays(toLocalDate(request.getStartOfLeave()), toLocalDate(request.getEndOfLeave()));
-            Employee employee = resolveEmployee(request.getemployeeEmail(), "employeeEmail");
-            employee.setAnnualLeaveBalance(employee.getAnnualLeaveBalance() - businessDays);
-            employeeRepository.save(employee);
-        }
-
-        request.updateStatus(decision);
-        return leaveRequestRepository.save(request);
-    }
-
-    private LocalDate toLocalDate(long millis) {
-        return Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate();
-    }
-
-    private int countBusinessDays(LocalDate startDate, LocalDate endDate) {
-        int total = 0;
+    private int calculateRequestedDays(long startMillis, long endMillis) {
+        LocalDate startDate = Instant.ofEpochMilli(startMillis).atZone(ZoneOffset.UTC).toLocalDate();
+        LocalDate endDate = Instant.ofEpochMilli(endMillis).atZone(ZoneOffset.UTC).toLocalDate();
+        int count = 0;
         LocalDate current = startDate;
-
         while (!current.isAfter(endDate)) {
-            switch (current.getDayOfWeek()) {
-                case SATURDAY:
-                case SUNDAY:
-                    break;
-                default:
-                    total++;
-                    break;
+            DayOfWeek dow = current.getDayOfWeek();
+            if (dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY) {
+                count++;
             }
             current = current.plusDays(1);
         }
-
-        return total;
-    }
-
-    private String normaliseUsername(String username, String legacyUsername) {
-        String resolved = username;
-        if (resolved == null || resolved.isBlank()) {
-            resolved = legacyUsername;
-        }
-        if (resolved == null || resolved.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username is required.");
-        }
-        return resolved.trim();
-    }
-
-    private Employee resolveEmployee(String identifier, String fieldName) {
-        if (identifier == null || identifier.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, fieldName + " is required.");
-        }
-
-        String normalized = identifier.trim();
-        Employee employee = employeeRepository.findByEmail(normalized);
-        if (employee == null) {
-            employee = employeeRepository.findByUsername(normalized);
-        }
-        if (employee == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found.");
-        }
-        return employee;
+        return Math.max(1, count);
     }
 }

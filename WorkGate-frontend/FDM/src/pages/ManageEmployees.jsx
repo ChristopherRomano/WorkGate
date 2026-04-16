@@ -305,12 +305,8 @@ export default function ManageEmployees() {
 
       {/* Hub buttons */}
       <div className={styles.hubRow}>
-        <button className={`btn btn-primary ${styles.hubBtn}`} onClick={() => {}}>
-          👥 Employees
-        </button>
-        <button className={`btn btn-ghost ${styles.hubBtn}`} onClick={() => navigate('/app/admin/client-codes')}>
-          🏢 Client Codes
-        </button>
+        <button className={`btn btn-primary ${styles.hubBtn}`}>👥 Employees</button>
+        <button className={`btn btn-ghost ${styles.hubBtn}`} onClick={() => navigate('/app/admin/client-codes')}>🏢 Client Codes</button>
       </div>
 
       {actionError && (
@@ -319,7 +315,7 @@ export default function ManageEmployees() {
         </div>
       )}
 
-      {/* Controls */}
+      {/* Controls — desktop only */}
       <div className={`${styles.controlsBar} ${styles.desktopOnly}`}>
         <div className={styles.tabsRow}>
           {TABS.map(({ key, label }) => (
@@ -356,11 +352,9 @@ export default function ManageEmployees() {
         </div>
       )}
 
-      {/* Mobile-only: name list */}
+      {/* Mobile name list */}
       <div className={styles.mobileList}>
-        {filtered.length === 0 && (
-          <div className={styles.mobileEmpty}>No employees found.</div>
-        )}
+        {filtered.length === 0 && <div className={styles.mobileEmpty}>No employees found.</div>}
         {filtered.map(p => (
           <button key={p.id} className={`${styles.mobileCard} ${!p.active ? styles.mobileCardInactive : ''}`} onClick={() => setViewTarget(p)}>
             <div className={styles.mobileCardAvatar}>{p.initials}</div>
@@ -372,7 +366,7 @@ export default function ManageEmployees() {
         ))}
       </div>
 
-      {/* Table */}
+      {/* Table — desktop only */}
       <div className={`card ${styles.desktopOnly}`}>
         <div className="card-header">
           <span className="card-title">Employee Accounts</span>

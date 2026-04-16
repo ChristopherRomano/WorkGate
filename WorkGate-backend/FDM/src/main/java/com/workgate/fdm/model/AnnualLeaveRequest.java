@@ -1,37 +1,30 @@
 package com.workgate.fdm.model;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("ANNUAL_LEAVE_REQUEST")
+@DiscriminatorValue("ANNUAL_LEAVE")
 public class AnnualLeaveRequest extends ManagerRequest {
 
 	private long startOfLeave;
 	private long endOfLeave;
 	private String reason;
-	private String username;
+	private String rejectionReason;
 	private long creationTime;
 	private String assignedManager;
-	private CURRENCY currency;
-	private int amount;
 
 	public AnnualLeaveRequest(String username, long startOfleave, long creationTime, long endOfLeave, String assignedManger, String reason) {
 		super(username, creationTime, assignedManger);
 		this.startOfLeave = startOfleave;
 		this.endOfLeave = endOfLeave;
 		this.reason = reason;
-		this.username = username;
 		this.creationTime = creationTime;
 		this.assignedManager = assignedManger;
 	}
 
 	public AnnualLeaveRequest(){
 		
-	}
-
-	public String getusername() {
-		return this.username;
 	}
 
 	public long getStartOfLeave() {
@@ -66,8 +59,12 @@ public class AnnualLeaveRequest extends ManagerRequest {
 		this.reason = reason;
 	}
 
-	public void setAssignedManager(String assignedManager) {
-		this.assignedManager = assignedManager;
+	public String getRejectionReason() {
+		return this.rejectionReason;
+	}
+
+	public void setRejectionReason(String rejectionReason) {
+		this.rejectionReason = rejectionReason;
 	}
 
 }

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { createItTicket, fetchItTickets } from '../api/api';
+import { fetchMyItTickets, createItTicket } from '../api/api';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './IT.module.css';
@@ -12,9 +12,12 @@ const ALLOWED_SCREENSHOT_EXTENSIONS = ['png', 'jpg', 'jpeg'];
 const isAllowedScreenshot = (file) => {
   if (!file) return false;
   if (ALLOWED_SCREENSHOT_TYPES.includes(file.type)) return true;
-  const extension = file.name.split('.').pop()?.toLowerCase();
-  return !!extension && ALLOWED_SCREENSHOT_EXTENSIONS.includes(extension);
+  const ext = file.name.split('.').pop()?.toLowerCase();
+  return !!ext && ALLOWED_SCREENSHOT_EXTENSIONS.includes(ext);
 };
+
+const STATUS_BADGE = { OPEN: 'open', IN_PROGRESS: 'pending', RESOLVED: 'approved' };
+const STATUS_LABEL = { OPEN: 'OPEN', IN_PROGRESS: 'IN PROGRESS', RESOLVED: 'RESOLVED' };
 
 const KB = [
   {
@@ -44,49 +47,68 @@ const KB = [
   },
 ];
 
-const STATUS_BADGE = { OPEN: 'open', IN_PROGRESS: 'pending', RESOLVED: 'approved' };
-const STATUS_LABEL = { OPEN: 'OPEN', IN_PROGRESS: 'IN PROGRESS', RESOLVED: 'RESOLVED' };
-
 export default function IT() {
   const { currentUser } = useAuth();
-  const [tickets, setTickets]     = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [submitError, setSubmitError] = useState('');
-  const [submitting, setSubmitting]   = useState(false);
-  const [faqItem, setFaqItem]     = useState(null);
-  const [search, setSearch]       = useState('');
-  const [form, setForm]           = useState({ title: '', category: 'Software', priority: 'Medium', desc: '' });
-  const [screenshotFile, setScreenshotFile] = useState(null);
+  const [tickets, setTickets]           = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [loadError, setLoadError]       = useState('');
+  const [showModal, setShowModal]       = useState(false);
+  const [detailTicket, setDetailTicket] = useState(null);
+  const [submitting, setSubmitting]     = useState(false);
+  const [submitError, setSubmitError]   = useState('');
+  const [formErrors, setFormErrors]     = useState({});
+  const [faqItem, setFaqItem]           = useState(null);
+  const [search, setSearch]             = useState('');
+  const [form, setForm]                 = useState({ title: '', category: 'Software', priority: 'Medium', desc: '' });
+  const [screenshotFile, setScreenshotFile]   = useState(null);
   const [screenshotError, setScreenshotError] = useState('');
 
-  const username = currentUser?.username ?? currentUser?.email ?? '';
+  const username = currentUser?.email ?? currentUser?.username ?? '';
 
-  useEffect(() => {
-    fetchItTickets()
-      .then(all => setTickets(all.filter(t => t.username === username)))
-      .finally(() => setLoading(false));
+  const loadTickets = useCallback(async () => {
+    if (!username) { setLoading(false); return; }
+    setLoading(true);
+    setLoadError('');
+    try {
+      const data = await fetchMyItTickets(username);
+      setTickets(Array.isArray(data) ? [...data].sort((a, b) => b.id - a.id) : []);
+    } catch {
+      setLoadError('Unable to load your tickets right now.');
+      setTickets([]);
+    } finally {
+      setLoading(false);
+    }
   }, [username]);
 
+  useEffect(() => { loadTickets(); }, [loadTickets]);
+
+  const openModal = () => { setShowModal(true); setFormErrors({}); setSubmitError(''); };
+  const closeModal = () => { setShowModal(false); setFormErrors({}); setSubmitError(''); };
+
+  const validate = () => {
+    const errors = {};
+    if (!form.title.trim()) errors.title = 'Title is required.';
+    else if (form.title.trim().length < 5) errors.title = 'Title must be at least 5 characters.';
+    if (!form.desc.trim()) errors.desc = 'Description is required.';
+    else if (form.desc.trim().length < 10) errors.desc = 'Please provide more detail (at least 10 characters).';
+    return errors;
+  };
 
   const submit = async () => {
-    if (!form.title.trim()) return;
+    if (submitting) return;
+    const errors = validate();
+    if (Object.keys(errors).length) { setFormErrors(errors); return; }
+    setFormErrors({});
     setSubmitError('');
     setSubmitting(true);
     try {
-      const created = await createItTicket({
-        username,
-        title:       form.title.trim(),
-        description: form.desc.trim(),
-        category:    form.category,
-      });
-      setTickets(prev => [created, ...prev]);
-      setShowModal(false);
+      await createItTicket({ username, title: form.title.trim(), description: form.desc.trim(), category: form.category });
+      closeModal();
       setForm({ title: '', category: 'Software', priority: 'Medium', desc: '' });
       setScreenshotFile(null);
-      setScreenshotError('');
+      await loadTickets();
     } catch (e) {
-      setSubmitError(e.message);
+      setSubmitError(e.message || 'Unable to submit ticket. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -94,24 +116,9 @@ export default function IT() {
 
   const onScreenshotChange = (event) => {
     const file = event.target.files?.[0];
-    if (!file) {
-      setScreenshotFile(null);
-      setScreenshotError('');
-      return;
-    }
-
-    if (!isAllowedScreenshot(file)) {
-      setScreenshotFile(null);
-      setScreenshotError('Invalid screenshot type. Allowed: PNG, JPG, JPEG.');
-      return;
-    }
-
-    if (file.size > MAX_SCREENSHOT_SIZE) {
-      setScreenshotFile(null);
-      setScreenshotError('Screenshot is too large. Maximum size is 5MB.');
-      return;
-    }
-
+    if (!file) { setScreenshotFile(null); setScreenshotError(''); return; }
+    if (!isAllowedScreenshot(file)) { setScreenshotFile(null); setScreenshotError('Invalid type. Allowed: PNG, JPG, JPEG.'); return; }
+    if (file.size > MAX_SCREENSHOT_SIZE) { setScreenshotFile(null); setScreenshotError('Screenshot too large. Max 5MB.'); return; }
     setScreenshotFile(file);
     setScreenshotError('');
   };
@@ -124,21 +131,28 @@ export default function IT() {
       <div className="card" style={{ marginBottom: 18 }}>
         <div className="card-header">
           <span className="card-title">My Tickets</span>
-          <button className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}>+ Raise Ticket</button>
+          <button className="btn btn-primary btn-sm" onClick={openModal}>+ Raise Ticket</button>
         </div>
+        {loadError && (
+          <div style={{ color: 'var(--danger)', padding: '0 20px 16px', fontSize: 13 }}>{loadError}</div>
+        )}
         <div style={{ padding: '10px 20px' }}>
-          {loading && <div style={{ padding: '16px 0', color: 'var(--text-muted)', fontSize: 13 }}>Loading tickets…</div>}
-          {!loading && tickets.length === 0 && (
-            <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--text-dim)', fontSize: 13 }}>No tickets raised yet.</div>
+          {loading && (
+            <div style={{ padding: '16px 0', color: 'var(--text-muted)', fontSize: 13 }}>Loading tickets…</div>
+          )}
+          {!loading && tickets.length === 0 && !loadError && (
+            <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--text-dim)', fontSize: 13 }}>
+              No tickets raised yet.
+            </div>
           )}
           {tickets.map(t => (
-            <div key={t.id} className={styles.ticketCard}>
+            <div key={t.id} className={styles.ticketCard} onClick={() => setDetailTicket(t)}>
               <div className={styles.ticketId}>#{t.id}</div>
               <div style={{ flex: 1 }}>
                 <div className={styles.ticketTitle}>{t.title}</div>
                 <div className={styles.ticketDesc}>{t.description}</div>
                 <div className={styles.ticketFooter}>
-                  <span>{t.category} · {t.claimedByEmail ? `Claimed by ${t.claimedByEmail}` : 'Awaiting claim'}</span>
+                  <span>{t.category} · {t.claimedByEmail ? `Assigned to ${t.claimedByEmail}` : 'Awaiting assignment'}</span>
                   <span className={`badge badge-${STATUS_BADGE[t.status] ?? 'open'}`}>
                     {STATUS_LABEL[t.status] ?? t.status}
                   </span>
@@ -173,6 +187,43 @@ export default function IT() {
         </div>
       </div>
 
+      {/* Ticket Detail Modal */}
+      <Modal isOpen={!!detailTicket} onClose={() => setDetailTicket(null)} title={detailTicket ? `Ticket #${detailTicket.id}` : ''}>
+        {detailTicket && (
+          <div className="form-grid">
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <span className={`badge badge-${STATUS_BADGE[detailTicket.status] ?? 'open'}`}>
+                {STATUS_LABEL[detailTicket.status] ?? detailTicket.status}
+              </span>
+              <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>{detailTicket.category}</span>
+              {detailTicket.claimedByEmail && (
+                <span style={{ fontSize: 11, color: 'var(--text-dim)', fontFamily: 'var(--mono)' }}>
+                  · Assigned to {detailTicket.claimedByEmail}
+                </span>
+              )}
+            </div>
+            <div className="form-group">
+              <label>Title</label>
+              <div className={styles.detailText}>{detailTicket.title}</div>
+            </div>
+            <div className="form-group">
+              <label>Description</label>
+              <div className={styles.detailText}>{detailTicket.description}</div>
+            </div>
+            {detailTicket.resolutionMessage && (
+              <div className="form-group">
+                <label>IT Response</label>
+                <div className={styles.resolution}>{detailTicket.resolutionMessage}</div>
+              </div>
+            )}
+            <div className="modal-actions">
+              <button className="btn btn-ghost" onClick={() => setDetailTicket(null)}>Close</button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* FAQ Modal */}
       <Modal isOpen={!!faqItem} onClose={() => setFaqItem(null)} title={faqItem?.q ?? ''}>
         <div style={{ padding: '4px 0 8px' }}>
           <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
@@ -186,11 +237,18 @@ export default function IT() {
         </div>
       </Modal>
 
-      <Modal isOpen={showModal} onClose={() => { setShowModal(false); setSubmitError(''); }} title="Raise IT Ticket">
+      {/* Raise Ticket Modal */}
+      <Modal isOpen={showModal} onClose={closeModal} title="Raise IT Ticket">
         <div className="form-grid">
           <div className="form-group">
             <label>Title</label>
-            <input className="field" placeholder="Brief description of the issue" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+            <input
+              className="field"
+              placeholder="Brief description of the issue"
+              value={form.title}
+              onChange={e => { setForm(f => ({ ...f, title: e.target.value })); if (formErrors.title) setFormErrors(fe => ({ ...fe, title: '' })); }}
+            />
+            {formErrors.title && <div className={styles.fieldError}>{formErrors.title}</div>}
           </div>
           <div className="form-grid form-grid-2">
             <div className="form-group">
@@ -208,7 +266,14 @@ export default function IT() {
           </div>
           <div className="form-group">
             <label>Description</label>
-            <textarea className="field" style={{ minHeight: 100 }} placeholder="Describe the issue in detail..." value={form.desc} onChange={e => setForm(f => ({ ...f, desc: e.target.value }))} />
+            <textarea
+              className="field"
+              style={{ minHeight: 100 }}
+              placeholder="Describe the issue in detail..."
+              value={form.desc}
+              onChange={e => { setForm(f => ({ ...f, desc: e.target.value })); if (formErrors.desc) setFormErrors(fe => ({ ...fe, desc: '' })); }}
+            />
+            {formErrors.desc && <div className={styles.fieldError}>{formErrors.desc}</div>}
           </div>
           <div className="form-group">
             <label>Screenshot (optional)</label>
@@ -217,22 +282,10 @@ export default function IT() {
                 <div className="upload-zone-icon">🖼</div>
                 <div className="upload-zone-label">Attach screenshot</div>
                 <div className="upload-zone-sub">PNG, JPG, JPEG — max 5MB</div>
-                <input
-                  id="it-screenshot"
-                  type="file"
-                  accept=".png,.jpg,.jpeg,image/png,image/jpeg"
-                  onChange={onScreenshotChange}
-                  style={{ display: 'none' }}
-                />
+                <input id="it-screenshot" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" onChange={onScreenshotChange} style={{ display: 'none' }} />
               </label>
-              {screenshotFile && (
-                <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text)' }}>
-                  Selected: <strong>{screenshotFile.name}</strong>
-                </div>
-              )}
-              {screenshotError && (
-                <div style={{ marginTop: 8, fontSize: 12, color: 'var(--danger)' }}>{screenshotError}</div>
-              )}
+              {screenshotFile && <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text)' }}>Selected: <strong>{screenshotFile.name}</strong></div>}
+              {screenshotError && <div style={{ marginTop: 8, fontSize: 12, color: 'var(--danger)' }}>{screenshotError}</div>}
             </div>
           </div>
           {submitError && (
@@ -241,10 +294,10 @@ export default function IT() {
             </div>
           )}
           <div className="modal-actions">
-            <button className="btn btn-primary" onClick={submit} disabled={!form.title.trim() || submitting}>
+            <button className="btn btn-primary" onClick={submit} disabled={submitting}>
               {submitting ? 'Submitting…' : 'Submit Ticket'}
             </button>
-            <button className="btn btn-ghost" onClick={() => { setShowModal(false); setSubmitError(''); }}>Cancel</button>
+            <button className="btn btn-ghost" onClick={closeModal}>Cancel</button>
           </div>
         </div>
       </Modal>

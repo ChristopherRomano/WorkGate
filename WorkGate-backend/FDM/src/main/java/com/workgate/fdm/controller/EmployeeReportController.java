@@ -23,12 +23,15 @@ public class EmployeeReportController{
     @GetMapping("/employeeReports")
     public List<EmployeeReport> getEmployeeReports(@RequestParam String username) {
         return employeeReportRepository.findByEmployeeEmail(username);
+    }
 
+    @GetMapping("/employeeReports/all")
+    public List<EmployeeReport> getAllEmployeeReports() {
+        return employeeReportRepository.findAll();
     }
 
     @PostMapping("/createEmployeeReport")
-    public void createEmployeeReport(@RequestBody EmployeeReportRequest info){
-
+    public void createEmployeeReport(@RequestBody EmployeeReportRequest info) {
         EmployeeReport employeeReport = new EmployeeReport();
         employeeReport.setContent(info.getContent());
         employeeReport.setAnonymous(info.getIsAnonymous());
@@ -37,24 +40,23 @@ public class EmployeeReportController{
         employeeReportRepository.save(employeeReport);
     }
 
-    @RequestMapping("/claimEmployeeReport")
+    @PostMapping("/claimEmployeeReport")
     public void claimEmployeeReport(@RequestBody ClaimRequest request) {
         EmployeeReport report = employeeReportRepository.findById(request.getId())
             .orElseThrow(() -> new RuntimeException("Report not found"));
-        report.setEmployeeEmail(request.getEmail());
-
+        report.setClaimedByEmail(request.getEmail());
         report.updateStatus(STATUS.IN_PROGRESS);
-
         employeeReportRepository.save(report);
     }
 
-    @RequestMapping("/resolveEmployeeReport")
-    public void resolveEmployeeReport(@RequestBody Long id) {
+    @PostMapping("/resolveEmployeeReport")
+    public void resolveEmployeeReport(@RequestBody java.util.Map<String, Object> body) {
+        Long id = Long.valueOf(String.valueOf(body.get("id")));
         EmployeeReport report = employeeReportRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Report not found"));
-
+        String resolution = body.get("resolution") != null ? String.valueOf(body.get("resolution")).trim() : "";
+        report.setResolution(resolution);
         report.updateStatus(STATUS.RESOLVED);
-
         employeeReportRepository.save(report);
     }
 

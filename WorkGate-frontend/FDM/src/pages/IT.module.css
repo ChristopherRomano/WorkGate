@@ -32,3 +32,32 @@
   color: var(--text-dim);
   font-family: var(--mono);
 }
+
+.detailText {
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.resolution {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--lime);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.fieldError {
+  font-size: 11px;
+  color: var(--danger);
+  margin-top: 4px;
+}

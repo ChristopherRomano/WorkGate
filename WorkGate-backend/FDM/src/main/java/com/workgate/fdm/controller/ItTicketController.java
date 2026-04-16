@@ -21,9 +21,15 @@ public class ItTicketController {
     ItTicketRequestRepository itTicketRepository;
 
     // GET ALL TICKETS
-    @RequestMapping("/itTickets")
+    @GetMapping("/itTickets")
     public List<ItTicket> getTickets() {
         return itTicketRepository.findAll();
+    }
+
+    // GET TICKETS FOR A SPECIFIC EMPLOYEE
+    @GetMapping("/itTickets/employee")
+    public List<ItTicket> getEmployeeTickets(@RequestParam String username) {
+        return itTicketRepository.findByEmployeeEmail(username);
     }
 
     // CLAIM TICKET
@@ -40,14 +46,21 @@ public class ItTicketController {
         itTicketRepository.save(ticket);
     }
 
-    // RESOLVE TICKET
-    @RequestMapping("/resolveItTicket")
-    public void resolveTicket(@RequestParam long id) {
+    // RESOLVE TICKET WITH RESPONSE MESSAGE
+    @PostMapping("/resolveItTicket")
+    public void resolveTicket(@RequestBody java.util.Map<String, Object> body) {
+        Object idValue = body.get("id");
+        if (idValue == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id is required");
+        }
 
+        Long id = Long.valueOf(String.valueOf(idValue));
         ItTicket ticket = itTicketRepository.findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "Ticket not found"));
 
+        String message = body.get("message") != null ? String.valueOf(body.get("message")).trim() : "";
+        ticket.setResolutionMessage(message);
         ticket.updateStatus(STATUS.RESOLVED);
 
         itTicketRepository.save(ticket);

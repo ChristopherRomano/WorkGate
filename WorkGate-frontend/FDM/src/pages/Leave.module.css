@@ -73,3 +73,27 @@
 }
 
 .dateHintVal { color: var(--lime); }
+
+.noteMetaRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.noteDays {
+  font-family: var(--mono);
+  color: var(--lime);
+}
+
+.noteBody {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}

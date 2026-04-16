@@ -123,9 +123,6 @@ export default function Tasks() {
             <button key={t} className={`btn ${filter === t ? 'btn-primary' : 'btn-ghost'} btn-sm`} onClick={() => setFilter(t)}>{t}</button>
           ))}
         </div>
-        {isManager && (
-          <button className="btn btn-primary btn-sm" onClick={() => setAdding(true)}>+ Add Task</button>
-        )}
       </div>
 
       {Object.entries(grouped).map(([type, group]) => (

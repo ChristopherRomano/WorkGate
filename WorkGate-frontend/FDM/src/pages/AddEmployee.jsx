@@ -171,7 +171,7 @@ export default function AddEmployee() {
   };
 
   const copyCredentials = (employee) => {
-    const text = `Email: ${employee.email}\nPassword: ${employee.tempPassword}`;
+    const text = `Username: ${employee.username}\nPassword: ${employee.tempPassword}`;
     navigator.clipboard.writeText(text).then(() => {
       setCopied(employee.id);
       setTimeout(() => setCopied(null), 2000);
@@ -182,17 +182,13 @@ export default function AddEmployee() {
     <div className="animate-fade">
       {/* Hub buttons */}
       <div className={styles.hubRow}>
-        <button className={`btn btn-primary ${styles.hubBtn}`}>
-          ➕ Add Employee
-        </button>
-        <button className={`btn btn-ghost ${styles.hubBtn}`} onClick={() => navigate('/app/admin/client-codes')}>
-          🏢 Client Code
-        </button>
+        <button className={`btn btn-primary ${styles.hubBtn}`}>➕ Add Employee</button>
+        <button className={`btn btn-ghost ${styles.hubBtn}`} onClick={() => navigate('/app/admin/client-codes')}>🏢 Client Codes</button>
       </div>
 
       <div className={styles.layout}>
         <div className="card">
-          <div className="card-header"><span className="card-title">Add Employee</span></div>
+          <div className="card-header"><span className="card-title">New Employee Account</span></div>
           <div className={styles.formBody}>
             <div className={styles.twoCol}>
               <div className="form-group">

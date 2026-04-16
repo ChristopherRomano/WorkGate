@@ -1,13 +1,30 @@
-import { useState } from 'react';
-import { expenses as initial } from '../data/mockData';
+import { useEffect, useState } from 'react';
+import { createExpenseRequest, fetchExpenseRequests } from '../api/api';
 import Modal from '../components/Modal';
 import '../styles/components.css';
 import styles from './Expenses.module.css';
+import { useAuth } from '../context/AuthContext';
 
-const ICONS = { Train: '🚂', Hotel: '🏨', Lunch: '🍽', Taxi: '🚕', Flight: '✈️', Other: '📎' };
+const ICONS = {
+  Train: '\u{1F687}',
+  Hotel: '\u{1F3E8}',
+  Lunch: '\u{1F37D}',
+  Taxi: '\u{1F695}',
+  Flight: '\u2708\uFE0F',
+  Other: '\u{1F4CE}',
+};
+
 const MAX_RECEIPT_SIZE = 10 * 1024 * 1024;
 const ALLOWED_RECEIPT_TYPES = ['application/pdf', 'image/png', 'image/jpeg'];
 const ALLOWED_RECEIPT_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg'];
+const CURRENCY_SYMBOLS = { GBP: '\u00A3', USD: '$', EUR: '\u20AC' };
+const CURRENCY_LABELS = { GBP: 'GBP (\u00A3)', USD: 'USD ($)', EUR: 'EUR (\u20AC)' };
+const DEFAULT_PROJECT = 'CLIENT-003';
+const DATE_FORMATTER = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
 
 const isAllowedReceipt = (file) => {
   if (!file) return false;
@@ -16,62 +33,156 @@ const isAllowedReceipt = (file) => {
   return !!extension && ALLOWED_RECEIPT_EXTENSIONS.includes(extension);
 };
 
-const getIcon = (desc) => {
-  const key = Object.keys(ICONS).find(k => desc.toLowerCase().includes(k.toLowerCase()));
-  return ICONS[key] || '📎';
+const buildInitialForm = (projectCode = DEFAULT_PROJECT) => ({
+  description: '',
+  amount: '',
+  currency: 'GBP',
+  date: '',
+  project: projectCode || DEFAULT_PROJECT,
+});
+
+const getIcon = (description) => {
+  const normalizedDescription = String(description ?? '');
+  const key = Object.keys(ICONS).find((label) => normalizedDescription.toLowerCase().includes(label.toLowerCase()));
+  return ICONS[key] || ICONS.Other;
 };
 
+const mapExpenseStatus = (status) => {
+  switch (String(status ?? '').toUpperCase()) {
+    case 'ACCEPTED':
+    case 'RESOLVED':
+      return 'approved';
+    case 'REJECTED':
+      return 'rejected';
+    case 'OPEN':
+    case 'IN_PROGRESS':
+    default:
+      return 'pending';
+  }
+};
+
+const formatDisplayDate = (timestamp) => {
+  const numericTimestamp = Number(timestamp);
+  if (!Number.isFinite(numericTimestamp)) {
+    return '\u2014';
+  }
+
+  const parsed = new Date(numericTimestamp);
+  if (Number.isNaN(parsed.getTime())) {
+    return '\u2014';
+  }
+
+  return DATE_FORMATTER.format(parsed);
+};
+
+const formatAmount = (value, currency = 'GBP') => {
+  const numericValue = Number(value) || 0;
+  const symbol = CURRENCY_SYMBOLS[currency] ?? `${currency} `;
+  return `${symbol}${numericValue.toFixed(2)}`;
+};
+
+const formatPendingTotal = (expenses) => {
+  const totalsByCurrency = expenses.reduce((totals, expense) => {
+    const currency = expense.currency || 'GBP';
+    totals[currency] = (totals[currency] ?? 0) + expense.amountValue;
+    return totals;
+  }, {});
+
+  const orderedCurrencies = Object.keys(totalsByCurrency).sort((left, right) => {
+    const currencyOrder = ['GBP', 'USD', 'EUR'];
+    const leftIndex = currencyOrder.indexOf(left);
+    const rightIndex = currencyOrder.indexOf(right);
+    const normalizedLeftIndex = leftIndex === -1 ? currencyOrder.length : leftIndex;
+    const normalizedRightIndex = rightIndex === -1 ? currencyOrder.length : rightIndex;
+    return normalizedLeftIndex - normalizedRightIndex || left.localeCompare(right);
+  });
+
+  if (!orderedCurrencies.length) {
+    return formatAmount(0, 'GBP');
+  }
+
+  return orderedCurrencies
+    .map((currency) => formatAmount(totalsByCurrency[currency], currency))
+    .join(' / ');
+};
+
+const mapExpenseRequest = (expenseRequest, fallbackProject) => {
+  const amountValue = Number(expenseRequest?.amount) || 0;
+  const currency = expenseRequest?.currency ?? 'GBP';
+  const createdAt = Number(expenseRequest?.creationTime) || 0;
+
+  return {
+    id: expenseRequest?.id ?? `expense-${createdAt || Date.now()}`,
+    description: expenseRequest?.reason ?? 'Expense',
+    date: formatDisplayDate(createdAt),
+    project: expenseRequest?.project ?? fallbackProject ?? '\u2014',
+    amount: formatAmount(amountValue, currency),
+    amountValue,
+    currency,
+    status: mapExpenseStatus(expenseRequest?.status),
+    createdAt,
+  };
+};
 
 export default function Expenses() {
-  const [items, setItems] = useState(initial);
+  const { currentUser } = useAuth();
+  const userEmail = currentUser?.email ?? currentUser?.username ?? '';
+  const projectCode = currentUser?.clientCode || DEFAULT_PROJECT;
+  const projectOptions = [...new Set([projectCode, DEFAULT_PROJECT, 'CLIENT-001', 'INTERNAL'].filter(Boolean))];
+
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ description: '', amount: '', currency: 'GBP (£)', date: '', project: 'CLIENT-003' });
+  const [form, setForm] = useState(() => buildInitialForm(projectCode));
   const [receiptFile, setReceiptFile] = useState(null);
   const [receiptError, setReceiptError] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const createRequest = async (amount,currency,date,description,evidence) => {
-    let passedCurrency = "";
-    switch (currency){
-      
-      case "GBP (£)":
-        passedCurrency = "GBP"
-        break;
-      case "EUR (€)":
-        passedCurrency = "EUR"
-        break;
-      case "USD ($)":
-        passedCurrency = "USD"
-        break;
-
+  const loadExpenses = async () => {
+    if (!userEmail) {
+      setItems([]);
+      setLoadError('');
+      return;
     }
 
-    const request = {
-      username: "john",
-      creationTime: (new Date()).getTime(),
-      reason: description,
-      amount : parseFloat(amount),
-      purchaseDate : (new Date(date)).getTime(),
-      currency: passedCurrency,
-      evidence: "image",
-    };
+    setLoading(true);
+    setLoadError('');
+
     try {
-      const response = await fetch("http://localhost:8080/api/createExpense", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(request)
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create ticket");
-      }
-    } 
-    catch (error) {
+      const expenseRequests = await fetchExpenseRequests(userEmail);
+      const formattedExpenses = Array.isArray(expenseRequests)
+        ? expenseRequests
+            .map((expenseRequest) => mapExpenseRequest(expenseRequest, projectCode))
+            .sort((left, right) => right.createdAt - left.createdAt)
+        : [];
+
+      setItems(formattedExpenses);
+    } catch (error) {
       console.error(error);
+      setItems([]);
+      setLoadError('Unable to load your expense claims right now.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const submit = () => {
+  useEffect(() => {
+    loadExpenses();
+  }, [userEmail, projectCode]);
+
+  useEffect(() => {
+    setForm((currentForm) => {
+      if (currentForm.project && currentForm.project !== DEFAULT_PROJECT) {
+        return currentForm;
+      }
+
+      return { ...currentForm, project: projectCode };
+    });
+  }, [projectCode]);
+
+  const submit = async () => {
     if (!form.description || !form.amount || !receiptFile) {
       if (!receiptFile) {
         setReceiptError('Please attach a receipt file.');
@@ -79,20 +190,43 @@ export default function Expenses() {
       return;
     }
 
-    const sym = form.currency.match(/[£$€]/)?.[0] || '£';
-    setItems(prev => [
-      { id: `ex${Date.now()}`, description: form.description, date: form.date || 'Today', project: form.project, amount: `${sym}${parseFloat(form.amount).toFixed(2)}`, status: 'pending' },
-      ...prev,
-    ]);
-    setShowModal(false);
-    createRequest(form.amount,form.currency,form.date || new Date().getTime(),form.description,);
-    setForm({ description: '', amount: '', currency: 'GBP (£)', date: '', project: 'CLIENT-003' });
-    setReceiptFile(null);
-    setReceiptError('');
+    if (!userEmail) {
+      setSubmitError('You must be signed in to submit an expense claim.');
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError('');
+
+    const purchaseDate = form.date ? new Date(`${form.date}T00:00:00`).getTime() : Date.now();
+
+    try {
+      await createExpenseRequest({
+        username: userEmail,
+        amount: parseFloat(form.amount),
+        purchaseDate,
+        currency: form.currency,
+        reason: form.description,
+        evidence: receiptFile.name,
+      });
+
+      setShowModal(false);
+      setForm(buildInitialForm(projectCode));
+      setReceiptFile(null);
+      setReceiptError('');
+
+      await loadExpenses();
+    } catch (error) {
+      console.error(error);
+      setSubmitError('Unable to submit your expense claim right now.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const onReceiptChange = (event) => {
     const file = event.target.files?.[0];
+
     if (!file) {
       setReceiptFile(null);
       setReceiptError('');
@@ -115,17 +249,16 @@ export default function Expenses() {
     setReceiptError('');
   };
 
-  const pending = items.filter(e => e.status === 'pending');
-  const pendingTotal = pending.reduce((sum, e) => sum + parseFloat(e.amount.replace(/[^0-9.]/g, '')), 0);
+  const pending = items.filter((expense) => expense.status === 'pending');
+  const pendingTotal = formatPendingTotal(pending);
 
-  // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="animate-fade">
       <div className={styles.statsGrid}>
         {[
-          { icon: '⏳', val: pending.length, label: 'Pending claims' },
-          { icon: '💰', val: `£${pendingTotal.toFixed(2)}`, label: 'Pending total', highlight: true },
-          { icon: '✅', val: items.filter(e => e.status === 'approved').length, label: 'Paid claims' },
+          { icon: '\u23F3', val: pending.length, label: 'Pending claims' },
+          { icon: '\u{1F4B0}', val: pendingTotal, label: 'Pending total', highlight: true },
+          { icon: '\u2705', val: items.filter((expense) => expense.status === 'approved').length, label: 'Paid claims' },
         ].map(({ icon, val, label, highlight }) => (
           <div key={label} className={`${styles.statCard} ${highlight ? styles.highlight : ''}`}>
             <div className={styles.statIcon}>{icon}</div>
@@ -138,73 +271,152 @@ export default function Expenses() {
       <div className="card">
         <div className="card-header">
           <span className="card-title">All Claims</span>
-          <button className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}>+ New Claim</button>
+          <button className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}>
+            + New Claim
+          </button>
         </div>
+
+        {loadError && (
+          <div style={{ color: 'var(--danger)', padding: '0 16px 16px' }}>
+            {loadError}
+          </div>
+        )}
+
         <div className="table-wrap">
           <table>
             <thead>
-              <tr><th></th><th>Description</th><th>Date</th><th>Project</th><th>Amount</th><th>Status</th><th>Action</th></tr>
+              <tr>
+                <th></th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Project</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
             </thead>
             <tbody>
-              {items.map(e => (
-                <tr key={e.id}>
-                  <td className={styles.iconCell}>{getIcon(e.description)}</td>
-                  <td><strong>{e.description}</strong></td>
-                  <td>{e.date}</td>
-                  <td className={styles.projectCell}>{e.project}</td>
-                  <td><strong className={styles.amountCell}>{e.amount}</strong></td>
-                  <td><span className={`badge badge-${e.status}`}>{e.status.toUpperCase()}</span></td>
-                  <td>
-                    {e.status === 'pending'
-                      ? <button className="btn btn-danger" onClick={() => setItems(prev => prev.filter(i => i.id !== e.id))}>Cancel</button>
-                      : <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>—</span>
-                    }
+              {!loading && items.length === 0 && (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '24px 16px' }}>
+                    No claims found.
                   </td>
                 </tr>
-              ))}
+              )}
+
+              {loading && (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '24px 16px' }}>
+                    Loading claims...
+                  </td>
+                </tr>
+              )}
+
+              {!loading &&
+                items.map((expense) => (
+                  <tr key={expense.id}>
+                    <td className={styles.iconCell}>{getIcon(expense.description)}</td>
+                    <td>
+                      <strong>{expense.description}</strong>
+                    </td>
+                    <td>{expense.date}</td>
+                    <td className={styles.projectCell}>{expense.project}</td>
+                    <td>
+                      <strong className={styles.amountCell}>{expense.amount}</strong>
+                    </td>
+                    <td>
+                      <span className={`badge badge-${expense.status}`}>{expense.status.toUpperCase()}</span>
+                    </td>
+                    <td>
+                      {expense.status === 'pending' ? (
+                        <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>Awaiting review</span>
+                      ) : (
+                        <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>{'\u2014'}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* New Claim Modal */}
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="New Expense Claim">
         <div className="form-grid">
           <div className="form-group">
             <label>Description</label>
-            <input className="field" placeholder="e.g. Train – London to Manchester" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+            <input
+              className="field"
+              placeholder="e.g. Train - London to Manchester"
+              value={form.description}
+              onChange={(event) => setForm((currentForm) => ({ ...currentForm, description: event.target.value }))}
+            />
           </div>
+
           <div className="form-grid form-grid-2">
             <div className="form-group">
               <label>Amount</label>
-              <input className="field" type="number" placeholder="0.00" step="0.01" min="0.01" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+              <input
+                className="field"
+                type="number"
+                placeholder="0.00"
+                step="0.01"
+                min="0.01"
+                value={form.amount}
+                onChange={(event) => setForm((currentForm) => ({ ...currentForm, amount: event.target.value }))}
+              />
             </div>
+
             <div className="form-group">
               <label>Currency</label>
-              <select className="field" value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
-                <option>GBP (£)</option><option>USD ($)</option><option>EUR (€)</option>
+              <select
+                className="field"
+                value={form.currency}
+                onChange={(event) => setForm((currentForm) => ({ ...currentForm, currency: event.target.value }))}
+              >
+                {Object.entries(CURRENCY_LABELS).map(([currencyCode, label]) => (
+                  <option key={currencyCode} value={currencyCode}>
+                    {label}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
+
           <div className="form-grid form-grid-2">
             <div className="form-group">
               <label>Date</label>
-              <input className="field" type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
+              <input
+                className="field"
+                type="date"
+                value={form.date}
+                onChange={(event) => setForm((currentForm) => ({ ...currentForm, date: event.target.value }))}
+              />
             </div>
+
             <div className="form-group">
               <label>Project Code</label>
-              <select className="field" value={form.project} onChange={e => setForm(f => ({ ...f, project: e.target.value }))}>
-                <option>CLIENT-003</option><option>CLIENT-001</option><option>INTERNAL</option>
+              <select
+                className="field"
+                value={form.project}
+                onChange={(event) => setForm((currentForm) => ({ ...currentForm, project: event.target.value }))}
+              >
+                {projectOptions.map((project) => (
+                  <option key={project} value={project}>
+                    {project}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
+
           <div className="form-group">
             <label>Receipt</label>
             <div className="upload-zone">
               <label htmlFor="expense-receipt" style={{ display: 'block', cursor: 'pointer' }}>
-                <div className="upload-zone-icon">📎</div>
+                <div className="upload-zone-icon">{'\u{1F4CE}'}</div>
                 <div className="upload-zone-label">Click to upload receipt</div>
-                <div className="upload-zone-sub">PDF, PNG, JPG, JPEG — max 10MB</div>
+                <div className="upload-zone-sub">PDF, PNG, JPG, JPEG - max 10MB</div>
                 <input
                   id="expense-receipt"
                   type="file"
@@ -213,22 +425,32 @@ export default function Expenses() {
                   style={{ display: 'none' }}
                 />
               </label>
+
               {receiptFile && (
                 <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text)' }}>
                   Selected: <strong>{receiptFile.name}</strong>
                 </div>
               )}
+
               {receiptError && (
                 <div style={{ marginTop: 8, fontSize: 12, color: 'var(--danger)' }}>{receiptError}</div>
               )}
             </div>
           </div>
+
+          {submitError && (
+            <div style={{ color: 'var(--danger)', fontSize: 12 }}>
+              {submitError}
+            </div>
+          )}
+
           <div className="modal-actions">
-            <button className="btn btn-primary" onClick={submit}>Submit Claim</button>
+            <button className="btn btn-primary" onClick={submit} disabled={submitting}>
+              {submitting ? 'Submitting...' : 'Submit Claim'}
+            </button>
           </div>
         </div>
       </Modal>
-
     </div>
   );
 }
