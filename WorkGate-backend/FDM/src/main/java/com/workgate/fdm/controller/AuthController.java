@@ -20,25 +20,20 @@ public class AuthController {
     @PostMapping("/login")
     public LoginResponse loginAuthenication(@RequestBody LoginRequest request) {
 
-        LoginResponse response = new LoginResponse();
-        response.setUsername(request.getUsername());
-        response.setTag(TAG.IT);
-        return response;
+        try {
+            Employee e = employeeRepository.findByEmail(request.getUsername());
 
-        // try {
-        //     Employee e = employeeRepository.findByEmail(request.getUsername());
+            if (e != null && e.checkPassword(request.getPassword())) {
+                LoginResponse response = new LoginResponse();
+                response.setUsername(request.getUsername());
+                response.setTag(e.getTag());
+                return response;
+            }
 
-        //     if (e != null && e.checkPassword(request.getPassword())) {
-        //         LoginResponse response = new LoginResponse();
-        //         response.setUsername(request.getUsername());
-        //         response.setTag(e.getTag());
-        //         return response;
-        //     }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
-        // } catch (Exception ex) {
-        //     ex.printStackTrace();
-        // }
-
-        // throw new RuntimeException("Invalid credentials");
+        throw new RuntimeException("Invalid credentials");
     }
 }
