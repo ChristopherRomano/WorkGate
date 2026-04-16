@@ -91,10 +91,10 @@ export function deleteTask(taskId, employeeEmail) {
 
 // ── Admin ─────────────────────────────────────────────────────────────────────
 
-export function createEmployee({ email, username, name, initials, role, tag, managerEmail, password }) {
+export function createEmployee({ email, username, name, initials, role, tag, managerEmail, password, clientCode }) {
   return request('/employees/createEmployee', {
     method: 'POST',
-    body: JSON.stringify({ email, username, name, initials, role, tag, managerEmail, password }),
+    body: JSON.stringify({ email, username, name, initials, role, tag, managerEmail, password, clientCode }),
   });
 }
 

@@ -171,7 +171,7 @@ export default function AddEmployee() {
   };
 
   const copyCredentials = (employee) => {
-    const text = `Username: ${employee.username}\nPassword: ${employee.tempPassword}`;
+    const text = `Email: ${employee.email}\nPassword: ${employee.tempPassword}`;
     navigator.clipboard.writeText(text).then(() => {
       setCopied(employee.id);
       setTimeout(() => setCopied(null), 2000);
