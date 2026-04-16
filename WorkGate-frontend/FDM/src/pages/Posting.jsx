@@ -1,138 +1,124 @@
 import { useState } from 'react';
-import styles from './Posting.module.css';
+import { createPost } from '../api/api';
+import { useAuth } from '../context/AuthContext';
+import '../styles/components.css';
+
+const EMPTY = {
+  title: '',
+  content: '',
+  pinned: false,
+  visibility: 'GLOBAL',
+};
 
 export default function Posting() {
-    const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        pinned: false,
-        visibility: 'Global',
-        timePosted: new Date().toISOString(),
-    });
+  const { currentUser } = useAuth();
+  const [form, setForm] = useState(EMPTY);
+  const [submitting, setSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [error, setError] = useState('');
 
-    const [successMessage, setSuccessMessage] = useState(false);
+  const field = (key) => ({
+    value: form[key],
+    onChange: (e) => setForm((prev) => ({ ...prev, [key]: e.target.value })),
+  });
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value,
-        }));
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.title.trim() || !form.content.trim()) {
+      setError('Title and content are required.');
+      return;
+    }
 
-    const createRequest = async (visibility,content,pinned,title,timePosted) => {
-        const request = {
-            author: "john",
-            timePosted:  (new Date()).getTime(),
-            visibility : visibility.toUpperCase(),
-            pinned: pinned,
-            content : content,
-            title: title,
-        };
-        console.log(request)
-        try {
-            const response = await fetch("http://localhost:8080/api/createPost", {
-                method: "POST",
-                headers: {
-                "Content-Type": "application/json"
-                },
-                body: JSON.stringify(request)
-            });
-            if (!response.ok) {
-                throw new Error("Failed to create ticket");
-            }
-            } 
-        catch (error) {
-            console.error(error);
-        }
-    };
+    setSubmitting(true);
+    setError('');
+    setSuccessMessage('');
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Form submitted:', formData);
-        createRequest(formData.visibility,formData.description,formData.pinned,formData.title);
-        // Show success message
-        setSuccessMessage(true);
-        // Reset form
-        setFormData({
-            title: '',
-            description: '',
-            pinned: false,
-            visibility: 'Global',
-            timePosted: new Date().toISOString(),
-        });
-        // Hide message after 3 seconds
-        setTimeout(() => setSuccessMessage(false), 3000);
-    };
+    try {
+      await createPost({
+        title: form.title.trim(),
+        content: form.content.trim(),
+        pinned: form.pinned,
+        visibility: form.visibility,
+        authorUsername: currentUser?.name ?? currentUser?.email ?? 'Unknown',
+      });
+      setSuccessMessage('Post published successfully.');
+      setForm(EMPTY);
+    } catch (err) {
+      setError(err.message || 'Could not publish the post.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-    return (
-        <div className={styles.postingFormContainer}>
-            <h2>Create New Post</h2>
-            {/* Only show this div if success message is true */}
-            {successMessage && (
-                <div className={styles.successMessage}>
-                    Successfully posted
-                </div>
-            )}
-            <form onSubmit={handleSubmit}>
-                <div className={styles.formGroup}>
-                    <label htmlFor="title">Title *</label>
-                    <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                <div className={styles.formGroup}>
-                    <label htmlFor="description">Description *</label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        rows="5"
-                        required
-                    />
-                </div>
-
-                <div className={styles.formGroup}>
-                    <label htmlFor="visibility">Visibility *</label>
-                    <select
-                        id="visibility"
-                        name="visibility"
-                        value={formData.visibility}
-                        onChange={handleChange}
-                        required
-                    >
-                        <option value="Global">Global</option>
-                        <option value="Regional">Regional</option>
-                        <option value="Social">Social</option>
-                    </select>
-                </div>
-
-                <div className={styles.formGroup}>
-                    <label>
-                        <input
-                            type="checkbox"
-                            name="pinned"
-                            checked={formData.pinned}
-                            onChange={handleChange}
-                        />
-                        Pin this post
-                    </label>
-                </div>
-
-                <div className={styles.formGroup}>
-                    <label>Time Posted</label>
-                    <p className={styles.timePosted}>{new Date(formData.timePosted).toLocaleString()}</p>
-                </div>
-
-                <button type="submit">Submit Post</button>
-            </form>
+  return (
+    <div className="animate-fade">
+      <div className="card" style={{ maxWidth: 680 }}>
+        <div className="card-header">
+          <span className="card-title">New Post</span>
         </div>
-    );
+        <div className="card-body">
+          <form onSubmit={handleSubmit}>
+            <div className="form-grid">
+
+              <div className="form-group">
+                <label>Title</label>
+                <input className="field" placeholder="Post title…" {...field('title')} />
+              </div>
+
+              <div className="form-group">
+                <label>Content</label>
+                <textarea
+                  className="field"
+                  placeholder="Write your announcement or update…"
+                  rows={6}
+                  value={form.content}
+                  onChange={(e) => setForm((prev) => ({ ...prev, content: e.target.value }))}
+                  style={{ resize: 'vertical' }}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Visibility</label>
+                <select className="field" value={form.visibility} onChange={(e) => setForm((prev) => ({ ...prev, visibility: e.target.value }))}>
+                  <option value="GLOBAL">Global — visible to everyone</option>
+                  <option value="REGIONAL">Regional</option>
+                  <option value="SOCIAL">Social</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={form.pinned}
+                    onChange={(e) => setForm((prev) => ({ ...prev, pinned: e.target.checked }))}
+                  />
+                  Pin this post to the top of the news feed
+                </label>
+              </div>
+
+              {successMessage && (
+                <div style={{ fontSize: 13, color: 'var(--text)', background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.28)', borderRadius: 8, padding: '10px 14px' }}>
+                  {successMessage}
+                </div>
+              )}
+
+              {error && (
+                <div style={{ fontSize: 13, color: 'var(--danger)', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: '10px 14px' }}>
+                  {error}
+                </div>
+              )}
+
+              <div className="modal-actions">
+                <button className="btn btn-primary" type="submit" disabled={submitting}>
+                  {submitting ? 'Publishing…' : 'Publish Post'}
+                </button>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 }

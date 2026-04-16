@@ -41,6 +41,7 @@ export const ROLE_PERMISSIONS = {
   hr: [
     ...EMPLOYEE_BASE,
     'hr-management',
+    'posting',
   ],
   ittech: [
     ...EMPLOYEE_BASE,
@@ -52,8 +53,6 @@ export const ROLE_PERMISSIONS = {
     'manage-employees',
     'add-employee',
     'client-codes',
-    'profile',
-    'settings',
   ],
 };
 
