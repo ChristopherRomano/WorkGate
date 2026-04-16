@@ -1,0 +1,188 @@
+/* ── Header ── */
+.profileHeader {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.profileHeader::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--lime), #a8d900);
+}
+
+.bigAvatar {
+  width: 72px; height: 72px;
+  background: var(--lime);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--black);
+  flex-shrink: 0;
+}
+
+.profileMeta  { flex: 1; min-width: 0; }
+.profileName  { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--text); }
+.profileRole  { color: var(--text-dim); font-size: 13px; margin-top: 5px; }
+.profileTags  { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+.profileActions { display: flex; gap: 10px; align-items: flex-start; flex-shrink: 0; }
+
+/* ── Body layout ── */
+
+/* Two-column: consultant view (personal details narrow, skills wide) */
+.twoCol {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 16px;
+}
+
+/* Single-column: non-consultant, cards span full width */
+.fullWidth {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Details table ── */
+.detailLabel {
+  color: var(--text-dim);
+  font-size: 10px;
+  font-family: var(--mono);
+  letter-spacing: 0.5px;
+  width: 130px;
+  padding-left: 20px;
+  white-space: nowrap;
+}
+.detailValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  padding-right: 20px;
+}
+
+/* ── Skills ── */
+.skillsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.skillTag {
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 12px;
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  word-break: break-word;
+}
+.skillTag button {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color var(--transition);
+}
+.skillTag button:hover { color: var(--red); }
+
+/* ── Mobile: preferences + sign-out ── */
+.mobileSignOut {
+  display: none;
+}
+
+.prefCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.prefTitle {
+  font-size: 9px;
+  font-family: var(--mono);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+.prefRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.prefLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+.themeButtons { display: flex; gap: 6px; }
+.themeBtn {
+  padding: 6px 14px;
+  font-size: 11px;
+  font-family: var(--mono);
+  font-weight: 700;
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 0.3px;
+}
+.themeBtn:hover { background: var(--surface-3); color: var(--text); }
+.themeBtnActive { background: var(--green); color: var(--black); border-color: var(--green); }
+
+/* ── Tablet ── */
+@media (max-width: 900px) {
+  .twoCol { grid-template-columns: 1fr; }
+  .skillsGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .mobileSignOut {
+    display: block;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 640px) {
+  .profileHeader {
+    padding: 16px;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .bigAvatar { width: 54px; height: 54px; font-size: 18px; }
+  .profileName { font-size: 17px; }
+  .profileRole { font-size: 12px; }
+  .profileActions { width: 100%; }
+  .profileActions .btn { flex: 1; justify-content: center; }
+
+  .detailLabel { width: 110px; padding-left: 14px; }
+  .detailValue { padding-right: 14px; }
+
+  .skillsGrid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+}

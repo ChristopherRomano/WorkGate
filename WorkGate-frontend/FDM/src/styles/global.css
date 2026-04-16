@@ -1,0 +1,168 @@
+:root {
+  /* Brand greens */
+  --green: #00a651;
+  --green-dark: #007a3d;
+  --green-bright: #00cc63;
+  --green-muted: rgba(0, 166, 81, 0.1);
+  --green-glow: rgba(0, 166, 81, 0.18);
+
+  /* Lime accent — used on numbers, active states, highlights */
+  --lime: #c5ff00;
+  --lime-dim: rgba(197, 255, 0, 0.12);
+  --lime-glow: rgba(197, 255, 0, 0.22);
+  --lime-border: rgba(197, 255, 0, 0.28);
+
+  /* Backgrounds — dark grey, not near-black */
+  --black: #1c1c1c;
+  --black-2: #222222;
+  --black-3: #282828;
+  --surface: #2e2e2e;
+  --surface-2: #333333;
+  --surface-3: #3a3a3a;
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-bright: rgba(197, 255, 0, 0.35);
+
+  /* Text */
+  --text: #f0f0f0;
+  --text-muted: #a0a0a0;
+  --text-dim: #666666;
+
+  /* Status colours */
+  --red: #ff4545;
+  --amber: #ffaa00;
+  --blue: #44aaff;
+
+  /* Role-specific accent colors — dark mode */
+  --role-manager-blue: #44aaff;
+  --role-manager-blue-dim: rgba(68, 170, 255, 0.12);
+  --role-manager-blue-glow: rgba(68, 170, 255, 0.22);
+  --role-manager-blue-border: rgba(68, 170, 255, 0.35);
+
+  --role-admin-red: #ff6b6b;
+  --role-admin-red-dim: rgba(255, 107, 107, 0.12);
+  --role-admin-red-glow: rgba(255, 107, 107, 0.22);
+  --role-admin-red-border: rgba(255, 107, 107, 0.35);
+
+  --role-hr-yellow: #ffd93d;
+  --role-hr-yellow-dim: rgba(255, 217, 61, 0.12);
+  --role-hr-yellow-glow: rgba(255, 217, 61, 0.22);
+  --role-hr-yellow-border: rgba(255, 217, 61, 0.35);
+
+  --role-ittech-purple: #da70d6;
+  --role-ittech-purple-dim: rgba(218, 112, 214, 0.12);
+  --role-ittech-purple-glow: rgba(218, 112, 214, 0.22);
+  --role-ittech-purple-border: rgba(218, 112, 214, 0.35);
+
+  /* Typography */
+  --mono: 'Space Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+
+  /* Geometry */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 5px;
+  --sidebar-width: 240px;
+  --topbar-height: 68px;
+  --transition: 0.15s ease;
+}
+
+/* ── Light theme ─────────────────────────────────────── */
+[data-theme="light"] {
+  --lime: #6fa000;
+  --lime-dim: rgba(100, 150, 0, 0.1);
+  --lime-glow: rgba(100, 150, 0, 0.16);
+  --lime-border: rgba(100, 150, 0, 0.3);
+  --border-bright: rgba(100, 150, 0, 0.35);
+
+  --black: #efefef;
+  --black-2: #e4e4e4;
+  --black-3: #dadada;
+  --surface: #e9e9e9;
+  --surface-2: #dedede;
+  --surface-3: #d2d2d2;
+
+  --border: rgba(0, 0, 0, 0.1);
+
+  --text: #1a1a1a;
+  --text-muted: #555555;
+  --text-dim: #888888;
+
+  /* Role-specific accent colors — light mode */
+  --role-manager-blue: #0066cc;
+  --role-manager-blue-dim: rgba(0, 102, 204, 0.1);
+  --role-manager-blue-glow: rgba(0, 102, 204, 0.16);
+  --role-manager-blue-border: rgba(0, 102, 204, 0.3);
+
+  --role-admin-red: #cc0000;
+  --role-admin-red-dim: rgba(204, 0, 0, 0.1);
+  --role-admin-red-glow: rgba(204, 0, 0, 0.16);
+  --role-admin-red-border: rgba(204, 0, 0, 0.3);
+
+  --role-hr-yellow: #cc9900;
+  --role-hr-yellow-dim: rgba(204, 153, 0, 0.1);
+  --role-hr-yellow-glow: rgba(204, 153, 0, 0.16);
+  --role-hr-yellow-border: rgba(204, 153, 0, 0.3);
+
+  --role-ittech-purple: #9933cc;
+  --role-ittech-purple-dim: rgba(153, 51, 204, 0.1);
+  --role-ittech-purple-glow: rgba(153, 51, 204, 0.16);
+  --role-ittech-purple-border: rgba(153, 51, 204, 0.3);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  min-height: 100vh;
+}
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--sans);
+  border: none;
+  outline: none;
+}
+
+input, select, textarea {
+  font-family: var(--sans);
+  font-size: 13px;
+  outline: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--black-2); }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--lime); }
+
+/* Utility animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-fade { animation: fadeIn 0.22s ease both; }
